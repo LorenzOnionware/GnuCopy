@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="Project1"
+        xmlns:project1="clr-namespace:Project1"
+        x:DataType="project1:MainWindow"
+        xmlns:sys = "clr-namespace:Microsoft;assembly=System"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Project1.MainWindow"
+        Title="Project1" MinHeight="720" MinWidth="900" MaxWidth="900"  MaxHeight="720" Background="DarkGray" Foreground="White">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="450"></ColumnDefinition>
+            <ColumnDefinition Width="450"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="300"></RowDefinition>
+            <RowDefinition Height="120"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.Styles>
+            <Style Selector="ListBox.listbox1style:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="BorderThickness" Value="2,5"></Setter>
+                <Setter Property="BorderBrush" Value="#004f91"/>
+            </Style>
+            <Style Selector="ListBox.listbox1style:focus /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="BorderThickness" Value="2,5"></Setter>
+                <Setter Property="BorderBrush" Value="#004f91"></Setter>
+            </Style>
+        </Grid.Styles>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Margin="8,8" Grid.Row="0" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Watermark="Copy from?" Height="18" Foreground="Black" Name="Copyfrom" Width="670"></TextBox>
+                    <Button Click="CopyDialogClicked" Content="^" FontSize="15" Margin="2,9"></Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Watermark="Copy to?" Height="20" Foreground="Black" Name="Copyto" Margin="1,10" Width="670"></TextBox>
+                    <Button Click="PasteDialogClicked" Content="^" FontSize="15" Margin="2,9"></Button>
+                </StackPanel>
+
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Grid.Column="1">
+            <StackPanel Orientation="Horizontal">
+                <ListBox VerticalAlignment="Top" SelectionChanged="ListBox1_OnSelectionChanged" Name="ListBox1" Classes="listbox1style"
+                         Background="Gray" Foreground="Black" Width="300" Height="300" SelectionMode="Multiple">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="DarkGray" CornerRadius="4" Padding="4">
+                                <TextBlock Foreground="Black" Text="{Binding}"></TextBlock>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Orientation="Vertical">
+                    <Button Name="AddPreset" VerticalAlignment="Top" Margin="6,0" Content="+" FontSize="20"></Button>
+                    <Button Name="RemovePreset" VerticalAlignment="Top" Margin="6,5" Content="-" FontSize="26"></Button>
+                </StackPanel>
+            </StackPanel>
+            <TextBlock Foreground="Red" Margin="110,10 " FontSize="20" FontWeight="Bold" Name="noitemselected" Text="Please select a Preset!" IsVisible="False"></TextBlock>
+        </StackPanel>
+         <StackPanel Grid.Row="0" Orientation="Horizontal" Grid.Column="0">
+             <Button Click="Copy_OnClick" Content="Copy" Height="35" Width="55"></Button>
+         </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <TextBlock Foreground="Black" FontSize="20" Name="JsonIndex"></TextBlock>
+        </StackPanel>
+    </Grid>
+
+</Window>
