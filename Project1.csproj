@@ -31,6 +31,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Presets\lel.json" />
-    <Content Include="Presets\lel.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Search.cs">
+      <DependentUpon>MainWindow.axaml</DependentUpon>
+    </Compile>
+    <Compile Remove="Foldercounting.cs" />
   </ItemGroup>
 </Project>
