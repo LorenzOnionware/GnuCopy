@@ -61,13 +61,15 @@ public class Folders
                         }
                     }
                 }
-                string movepath = new string (datapath +@"\" + (value2.Reverse()));
+                string movepath = new string (ct + @"\" + new string(value2.Reverse().ToArray()));
                 Directory.CreateDirectory(movepath);
                 await CopyFile(movepath, currentfiles, a1);
-            }else if (foldercount < foldercountofct)
+            }
+            else if (foldercount < foldercountofct)
             {
                 
-            }else if (foldercount == foldercountofct)
+            }
+            else if (foldercount == foldercountofct)
             {
 
             }
