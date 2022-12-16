@@ -1,7 +1,7 @@
 # GnuCopy
 We (Onionware) don't collect any personal data about our users. Only anonymous usage data such as usage times or error reports are sent to us over the Microsoft Store.
 
-Some features of OnionMedia use third party libraries which may collect data: By using OnionMedia, you thus also agree to these Third-Party-Libraries' privacy policies.
+Some features of GnuCopy use third party libraries which may collect data: By using GnuCopy, you thus also agree to these Third-Party-Libraries' privacy policies.
 
 ## Third-Party-Libraries:
 - Newtonsoft(https://www.newtonsoft.com/json)
