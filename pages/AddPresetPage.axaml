@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Project1.pages.AddPreset"
+        Title="AddPreset" Height="400" Width="600" CanResize="False">
+        
+        <Grid>
+                <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Vertical">
+                        <TextBox Text="{Binding Textboxtext,Mode=TwoWay}" Watermark="add dataformats" x:Name="DataFormatsad" Margin="2,5"></TextBox>
+                        <Label Content="Please write like this: .Rtf,.txt,.pdf,folder1,folder2"></Label>
+                        <TextBox Name="NameOfPreset" Text="{Binding Textbox2text,Mode=TwoWay}"></TextBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Grid.Row="1">
+                        <StackPanel Orientation="Horizontal">
+                                <Button Name="ApplyButton" Content="Apply" Click="ApplyButton_OnClick"/>
+                                <Button Name="CancelButton" Content="Cancel" Click="CancelButton_OnClick"></Button>
+                        </StackPanel>
+                </StackPanel>
+        </Grid>
+</Window>

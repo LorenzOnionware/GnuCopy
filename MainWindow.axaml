@@ -60,8 +60,13 @@
                 </ListBox>
                 
                 <StackPanel Orientation="Vertical">
-                    <Button Name="AddPreset" VerticalAlignment="Top" Margin="6,0" Content="+" FontSize="20"></Button>
-                    <Button Name="RemovePreset" VerticalAlignment="Top" Margin="6,5" Content="-" FontSize="26"></Button>
+                    <Button Name="AddPreset" Click="AddPreset_OnClick" VerticalAlignment="Top" Margin="6,0" Content="+" FontSize="20"></Button>
+                    <Button Name="RemovePreset" Click="RemovePreset_OnClick" VerticalAlignment="Top" Margin="6,5" Content="-" FontSize="26"></Button>
+                    <Button Name="aktualisieren" Click="Aktualisieren_OnClick">
+                        <Panel>
+                            <Image Source="{Binding loadimagepath,Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="20" Height="30"></Image>
+                        </Panel>
+                        </Button>
                 </StackPanel>
             </StackPanel>
             <ProgressBar Name="ProgressBar1" Maximum="{Binding Progressmax}" Value="{Binding Progressvalue}" Margin="0,8" Width="30"></ProgressBar>

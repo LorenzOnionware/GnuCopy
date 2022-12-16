@@ -1,16 +1,22 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MessageBox.Avalonia.DTO;
+using MessageBox.Avalonia.Enums;
 using Newtonsoft.Json;
+using Project1.pages;
 using Project1.Viewmodels;
 using static Project1.FirstFolderFiles;
 using static Project1.Files;
+
 
 namespace Project1
 {
@@ -19,6 +25,9 @@ namespace Project1
         public List<string> valuea = new();
         public List<string> ignore = new();
         public ObservableCollection<string> folderitems = new ObservableCollection<string>();
+        public bool selectionchange = false;
+        private bool _eventHandlerBlocked = false;
+        private int _blockDuration = 2000;
 
         public MainWindow()
         {
@@ -31,8 +40,9 @@ namespace Project1
         #region JsonRead
 
 
-        private void AddItemsToList()
+        private async Task  AddItemsToList()
         {
+            string[] listboxitems = ListBox1.Items.OfType<string>().ToArray();
             System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(System.Reflection.Assembly.GetEntryAssembly().Location+ @"\..\Presets");
             var fs = Items.GetFiles();
             for (var index = 0; index < fs.Length; index++)
@@ -44,8 +54,9 @@ namespace Project1
                 }
             }
 
-            Debug.WriteLine(folderitems.Count);
-            ListBox1.Items = folderitems;
+            ListBox1.Items = folderitems.Distinct();
+            ListBox1.SelectedIndex = 0;
+
         }
 
         #endregion
@@ -87,7 +98,7 @@ namespace Project1
                 MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(Copyfrom.Text, "*", SearchOption.AllDirectories).Count()-1;
                 noitemselected.IsVisible = false;
                 string itemst = item.ToString();
-                var value3 = IndexObject(System.Reflection.Assembly.GetEntryAssembly().Location + @"\..\Presets\" + itemst);
+                var value3 = IndexObject(System.Reflection.Assembly.GetEntryAssembly()?.Location + @"\..\Presets\" + itemst);
                 foreach (var value4 in value3)
                 {
                     if (value4.Contains("."))
@@ -115,8 +126,12 @@ namespace Project1
         }
         private void ListBox1_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
+            if (_eventHandlerBlocked)
+            {
+                return;
+            }
             string value2 = "";
-            var item =ListBox1.SelectedItem;
+            var item = ListBox1.SelectedItem;
             string itemst = item.ToString();
             var value = IndexObject(System.Reflection.Assembly.GetEntryAssembly().Location + @"\..\Presets\" + itemst);
             foreach (string i in value)
@@ -126,8 +141,32 @@ namespace Project1
             JsonIndex.Text = value2;
         }
         #endregion
+        
+        #region Presets
+
+        
+        private void AddPreset_OnClick(object? sender, RoutedEventArgs e)
+        {
+            if (MainViewmodel.openwindow == false)
+            {
+                var window = new Project1.pages.AddPreset();
+                window.Show();
+                MainViewmodel.openwindow = true;
+            }
+        }
+        private void RemovePreset_OnClick(object? sender, RoutedEventArgs e)
+        {
+          // File.Delete(ListBox1.SelectedIndex.ToString());
+        }
+        #endregion
 
 
-
+        private void Aktualisieren_OnClick(object? sender, RoutedEventArgs e)
+        {
+            _eventHandlerBlocked = true;
+            Task.Delay(_blockDuration).ContinueWith(t => _eventHandlerBlocked = false);
+            AddItemsToList();
+        }
     }
+    
 }

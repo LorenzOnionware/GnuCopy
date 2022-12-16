@@ -10,46 +10,28 @@ public class CreateDirectories
 {
     public static async Task DirectoriesCreate(string pathfrom, string pathto,List<string> ignore)
     {
+        bool ignorebool = false;
         if (ignore == null)
         {
             await FolderCreate(pathto, pathfrom);
         }
         else
         {
-            bool mybool = false;
-            bool mybool2 = false;
-            string string1 = "";
-            foreach (var a in pathfrom.Reverse())
-            {
-                if (a.ToString() == @"\")
-                {
-                    if (mybool != true)
-                    {
-                        string1 += a;
-                        mybool = true;
-                    }
-                }
-                else
-                {
-                    if (mybool != true)
-                    {
-                        string1 += a;
-                    }
-                }
-            }
-            string foldername = new string(string1.Reverse().ToArray());
+            bool ignore1 = false;
             foreach (var a in ignore)
             {
-                if (@"\"+a == foldername)
+                if (ignorebool = pathfrom.TrimEnd('\\').EndsWith(a) == true)
                 {
-                    mybool2 = true;
+                    ignore1 = true;
                 }
             }
-            if (mybool2 == false)
+            if (ignore1 == false)
             {
                 await FolderCreate(pathto, pathfrom);
             }
         }
+
+        
     }
 
     private static async Task FolderCreate(string pathto,string pathfrom)

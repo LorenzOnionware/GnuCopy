@@ -5,7 +5,6 @@ using static Project1.MainWindow;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Project1.Search;
 using static Project1.CopyFiles;
 namespace Project1;
 
