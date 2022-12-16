@@ -28,6 +28,7 @@ namespace Project1
         public bool selectionchange = false;
         private bool _eventHandlerBlocked = false;
         private int _blockDuration = 2000;
+        private string PresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
 
         public MainWindow()
         {
@@ -35,15 +36,43 @@ namespace Project1
             InitializeComponent();
             AddItemsToList();
             ListBox1.SelectedIndex = 0;
+            string Appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string[] directories = Directory.GetDirectories(Appdata);
+            if (directories.Any(x => x.Contains(PresetPath))){}
+            else
+            {
+                Directory.CreateDirectory(PresetPath);
+                FirstStart();
+            }
+            
         }
 
         #region JsonRead
 
 
-        private async Task  AddItemsToList()
+        private async Task FirstStart()
+        {
+            string path = PresetPath + @"\" + "Preset1" + ".json";
+            using (StreamWriter file = File.CreateText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                string json = @"["" .exe"", "" .dll"", "" .msixbundle"", "" .msixupload"", "" .pfx"", "" .winmd""]";;
+                await file.WriteAsync(json);
+            }
+
+            path = PresetPath + @"\" + "Preset2" + ".json";
+            using (StreamWriter file = File.CreateText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                string json = @"["".xaml"","".csproj"",""images"",""obj"",""bin"","".mp3"","".mp4"","".png"","".txt"","".xml"","".jpg"",""test1"",""new1""]";;
+                await file.WriteAsync(json);
+            }
+        }
+        
+        private async Task AddItemsToList()
         {
             string[] listboxitems = ListBox1.Items.OfType<string>().ToArray();
-            System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(System.Reflection.Assembly.GetEntryAssembly().Location+ @"\..\Presets");
+            System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
             var fs = Items.GetFiles();
             for (var index = 0; index < fs.Length; index++)
             {
@@ -98,7 +127,7 @@ namespace Project1
                 MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(Copyfrom.Text, "*", SearchOption.AllDirectories).Count()-1;
                 noitemselected.IsVisible = false;
                 string itemst = item.ToString();
-                var value3 = IndexObject(System.Reflection.Assembly.GetEntryAssembly()?.Location + @"\..\Presets\" + itemst);
+                var value3 = IndexObject(PresetPath + itemst);
                 foreach (var value4 in value3)
                 {
                     if (value4.Contains("."))
@@ -133,7 +162,7 @@ namespace Project1
             string value2 = "";
             var item = ListBox1.SelectedItem;
             string itemst = item.ToString();
-            var value = IndexObject(System.Reflection.Assembly.GetEntryAssembly().Location + @"\..\Presets\" + itemst);
+            var value = IndexObject(PresetPath + @"\" + itemst);
             foreach (string i in value)
             {
                 value2 += i+"\n";
@@ -156,7 +185,21 @@ namespace Project1
         }
         private void RemovePreset_OnClick(object? sender, RoutedEventArgs e)
         {
-          // File.Delete(ListBox1.SelectedIndex.ToString());
+            if (MainViewmodel.openwindow1 == false)
+            {
+                MainViewmodel.SelectedListItem = ListBox1.SelectedItem.ToString();
+                if (ListBox1.SelectedIndex < 1)
+                {
+                    ListBox1.SelectedIndex++;
+                }
+                else
+                {
+                    ListBox1.SelectedIndex--;
+                }
+                var window = new Project1.Delete();
+                window.Show();
+                MainViewmodel.openwindow1 = true;
+            }
         }
         #endregion
 

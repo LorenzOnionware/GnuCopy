@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,6 +39,7 @@ public partial class AddPreset : Window
     private async  void ApplyButton_OnClick(object? sender, RoutedEventArgs e)
     {
         await Dataformats(MainViewmodel.Default.Textboxtext);
+        MainViewmodel.openwindow = false;
         this.Close();
     }
 
@@ -66,7 +68,7 @@ public partial class AddPreset : Window
             }
             b++;
         }
-        string path = @System.Reflection.Assembly.GetEntryAssembly().Location + @"\..\Presets\" + MainViewmodel.Default.Textbox2text + ".json";
+        string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy"+ @"\" +  MainViewmodel.Default.Textbox2text + ".json";
         using (StreamWriter file = File.CreateText(path))
         {
             JsonSerializer serializer = new JsonSerializer();
