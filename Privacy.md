@@ -1,3 +1,17 @@
 # GnuCopy
-Application to copy directors without specific files types
-GnuCopy does not collect any user data. OnionWare is not liable for any damaged or lost files. GnuCopy is licensed under the GNU GPL3
+We (Onionware) don't collect any personal data about our users. Only anonymous usage data such as usage times or error reports are sent to us over the Microsoft Store.
+
+Some features of GnuCopy use third party libraries which may collect data: By using GnuCopy, you thus also agree to these Third-Party-Libraries' privacy policies.
+
+## Third-Party-Libraries:
+- Newtonsoft(https://www.newtonsoft.com/json)
+- Avalonia(https://www.avaloniaui.net/)
+- MessageBox.Avalonia(https://github.com/AvaloniaCommunity/MessageBox.Avalonia)
+
+## This App can access following data:
+
+    Filesystem (for saving and loading files)
+    
+## Changes to our Privacy Statement
+
+We may change our Privacy Statement from time to time.
