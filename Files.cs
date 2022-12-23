@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Project1.Viewmodels;
 using static Project1.CreateDirectories;
@@ -29,7 +30,7 @@ public class Files : ObservableObject
             await DirectoriesCreate(value,ct, ignore);
         }
         int i = 0;
-        await FirstFolder(cf, ct, a1);
+        await FirstFolder(cf, ct, a1,ignore);
         int count = folders1.ToArray().Length -1;
         while(count >= i)
         {
@@ -78,25 +79,7 @@ public class Files : ObservableObject
                             }
                         }
                     }
-
-                    try
-                    {
-                        File.Copy(file, datapath2 + new string(value2.Reverse().ToArray()), overwrite: true);
-                    }
-                    catch(System.IO.IOException ex)
-                    {
-                        var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                            new MessageBoxStandardParams
-                            {
-                                ButtonDefinitions = (ButtonEnum)messageboxbuttons.ok,
-                                ContentTitle = "Error",
-                                ContentHeader = "Something went wrong by copying files",
-                                ContentMessage = ex.ToString() + "Contact: contact.onionware@gmail.com ",
-                                Icon = Icon.Error,
-                                Style = Style.UbuntuLinux
-                            });
-                        messageBoxStandardWindow.Show();
-                    }
+                    File.Copy(file, datapath2 + new string(value2.Reverse().ToArray()), overwrite: true);
                 }
             }
             MainViewmodel.Default.Progressvalue++;

@@ -20,7 +20,7 @@ public class CreateDirectories
             bool ignore1 = false;
             foreach (var a in ignore)
             {
-                if (ignorebool = pathfrom.TrimEnd('\\').EndsWith(a) == true)
+                if (pathfrom.TrimEnd('\\').EndsWith(a))
                 {
                     ignore1 = true;
                 }

@@ -7,7 +7,7 @@ namespace Project1;
 
 public class FirstFolderFiles
 {
-    public static async Task FirstFolder(string cf, string ct, List<string> a1)
+    public static async Task FirstFolder(string cf, string ct, List<string> a1, List<string> ignorefolders)
     {
 
         foreach (var abc in cf.Reverse())

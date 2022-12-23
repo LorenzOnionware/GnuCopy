@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="80" CanResize="False" Height="100" Width="205"
+        x:Class="Project1.Delete"
+        Title="Delete" Background="Gray" Foreground="Black">
+    <StackPanel Orientation="Vertical">
+        <TextBlock Margin="5,5" TextWrapping="Wrap" Text="Would you really delete it?" Foreground="Black" FontSize="14" FontWeight="Bold"></TextBlock>
+        <StackPanel Orientation="Horizontal">
+        <Button Margin="5,5" Name="DeleteButton" Content="Delete" Click="DeleteButton_OnClick"></Button>
+        <Button Name="Cancel" Margin="5,5" Content="Cancel" Click="Cancel_OnClick"></Button>
+            
+        </StackPanel>
+    </StackPanel>
+</Window>

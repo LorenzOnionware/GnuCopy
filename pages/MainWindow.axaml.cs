@@ -3,12 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Diagnostics;
 using System.IO;
+using Avalonia.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Threading;
+using DynamicData;
 using MessageBox.Avalonia.DTO;
 using MessageBox.Avalonia.Enums;
 using Newtonsoft.Json;
@@ -26,8 +29,9 @@ namespace Project1
         public List<string> ignore = new();
         public bool selectionchange = false;
         private bool _eventHandlerBlocked = false;
-        private int _blockDuration = 2000;
-        private string PresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
+        private int _blockDuration = 500;
+        private string PresetPath = MainViewmodel.PPresetPath;
+        private bool _blockMethod = false;
 
         public MainWindow()
         {
@@ -37,13 +41,13 @@ namespace Project1
             ListBox1.SelectedIndex = 0;
             string Appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string[] directories = Directory.GetDirectories(Appdata);
-            if (directories.Any(x => x.Contains(PresetPath))){}
+            if (directories.Any(x => x.Contains(PresetPath))) { }
             else
             {
                 Directory.CreateDirectory(PresetPath);
                 FirstStart();
             }
-            
+
         }
 
         #region JsonRead
@@ -51,54 +55,23 @@ namespace Project1
 
         private async Task FirstStart()
         {
-            string path = PresetPath + @"\" + "Preset1" + ".json";
-            using (StreamWriter file = File.CreateText(path))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                string json = @"["" .exe"", "" .dll"", "" .msixbundle"", "" .msixupload"", "" .pfx"", "" .winmd""]";;
-                await file.WriteAsync(json);
-            }
+            string[] preset1Extensions = new string[] { ".exe", ".dll", ".msixbundle", ".msixupload", ".pfx", ".winmd" };
+            string[] preset2Extensions = new string[] { ".mp3", ".mp4", ".png", ".txt", ".docx", ".jpg", ".png" };
 
-            path = PresetPath + @"\" + "Preset2" + ".json";
+            await WritePresetToFile("Preset1", preset1Extensions);
+            await WritePresetToFile("Preset2", preset2Extensions);
+        }
+
+        private async Task WritePresetToFile(string presetName, string[] extensions)
+        {
+            string path = PresetPath + @"\" + presetName + ".json";
             using (StreamWriter file = File.CreateText(path))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                string json = @"["".xaml"","".csproj"",""images"",""obj"",""bin"","".mp3"","".mp4"","".png"","".txt"","".xml"","".jpg"",""test1"",""new1""]";;
+                string json = JsonConvert.SerializeObject(extensions);
                 await file.WriteAsync(json);
             }
         }
-
-        public async Task AddItemsToList(bool a)
-            {
-                if (a == true)
-                {
-                    for (int value = 0; value <= MainViewmodel.Default.Folderitems.Count; value++)
-                    {
-                        if (MainViewmodel.Default.Folderitems[value] == MainViewmodel.SelectedListItem)
-                        {
-                            MainViewmodel.Default.Folderitems.RemoveAt(value);
-                        }
-                    }
-                }
-
-                var folderitems = new HashSet<string>();
-                System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
-                var fs = Items.GetFiles();
-                for (var index = 0; index < fs.Length; index++)
-                {
-                    FileInfo f = fs[index];
-                    if (f.Name.Contains(".json") || f.Name.Contains(".Json"))
-                    {
-                        folderitems.Add(f.Name.ToString());
-                    }
-                }
-
-                Debug.WriteLine(folderitems.Count());
-                MainViewmodel.Default.Folderitems.Clear();
-                foreach (var item in folderitems)
-                    MainViewmodel.Default.Folderitems.Add(item);
-                ListBox1.SelectedIndex = 0;
-            }
 
         #endregion
 
@@ -135,11 +108,11 @@ namespace Project1
             }
             else
             {
-                
-                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(Copyfrom.Text, "*", SearchOption.AllDirectories).Count()-1;
+
+                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(Copyfrom.Text, "*", SearchOption.AllDirectories).Count() - 1;
                 noitemselected.IsVisible = false;
                 string itemst = item.ToString();
-                var value3 = IndexObject(PresetPath + itemst);
+                var value3 = IndexObject(PresetPath+ @"\" + itemst);
                 foreach (var value4 in value3)
                 {
                     if (value4.Contains("."))
@@ -148,7 +121,7 @@ namespace Project1
                     }
                     else
                     {
-                         ignore.Add(value4);
+                        ignore.Add(value4);
                     }
                 }
                 string a = Copyfrom.Text;
@@ -165,27 +138,70 @@ namespace Project1
                 }
             }
         }
+
+        #endregion
+
+        #region Presets
+
+
+
+        public async Task AddItemsToList(bool a)
+        {
+            if (a == true)
+            {
+                for (int value = 0; value <= MainViewmodel.Default.Folderitems.Count; value++)
+                {
+                    if (MainViewmodel.Default.Folderitems[value] == MainViewmodel.SelectedListItem)
+                    {
+                        MainViewmodel.Default.Folderitems.RemoveAt(value);
+                    }
+                }
+            }
+
+            var folderitems = new HashSet<string>();
+            System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
+            var fs = Items.GetFiles();
+            for (var index = 0; index < fs.Length; index++)
+            {
+                FileInfo f = fs[index];
+                if (f.Name.Contains(".json") || f.Name.Contains(".Json"))
+                {
+                    folderitems.Add(f.Name.ToString());
+                }
+            }
+
+            Debug.WriteLine(folderitems.Count());
+            MainViewmodel.Default.Folderitems.Clear();
+            foreach (var item in folderitems)
+                MainViewmodel.Default.Folderitems.Add(item);
+            ListBox1.SelectedIndex = 0;
+        }
+
         private void ListBox1_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (_eventHandlerBlocked)
             {
                 return;
             }
+
             string value2 = "";
             var item = ListBox1.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+
             string itemst = item.ToString();
             var value = IndexObject(PresetPath + @"\" + itemst);
+            _blockMethod = true;
+            Task.Delay(_blockDuration).ContinueWith(t => _blockMethod = false);
+            MainViewmodel.Default.jsonindex.Clear();
             foreach (string i in value)
             {
-                value2 += i+"\n";
+                MainViewmodel.Default.jsonindex.Add(i);
             }
-            JsonIndex.Text = value2;
         }
-        #endregion
-        
-        #region Presets
 
-        
         private void AddPreset_OnClick(object? sender, RoutedEventArgs e)
         {
             if (MainViewmodel.openwindow == false)
@@ -195,7 +211,8 @@ namespace Project1
                 MainViewmodel.openwindow = true;
             }
         }
-        private void RemovePreset_OnClick(object? sender, RoutedEventArgs e)
+
+        private async void RemovePreset_OnClick(object? sender, RoutedEventArgs e)
         {
             if (MainViewmodel.openwindow1 == false)
             {
@@ -208,10 +225,27 @@ namespace Project1
                 {
                     ListBox1.SelectedIndex--;
                 }
+
                 var window = new Project1.Delete();
                 window.Show();
                 MainViewmodel.openwindow1 = true;
             }
+        }
+        public static void DeleteSucces()
+        {
+
+            MainWindow window1 = new MainWindow();
+            window1._eventHandlerBlocked = true;
+            Task.Delay(500).ContinueWith(t => window1._eventHandlerBlocked = false);
+            window1.AddItemsToList(true);
+        }
+
+        public static void AddSuccess()
+        {
+            MainWindow window1 = new MainWindow();
+            window1._eventHandlerBlocked = true;
+            Task.Delay(500).ContinueWith(t => window1._eventHandlerBlocked = false);
+            window1.AddItemsToList(false);
         }
         #endregion
 
@@ -223,5 +257,4 @@ namespace Project1
             AddItemsToList(false);
         }
     }
-    
 }
