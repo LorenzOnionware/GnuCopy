@@ -47,6 +47,10 @@
       <DependentUpon>MainWindow.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="createPresets\AddPresetPage.axaml.cs">
+      <DependentUpon>AddPresetPage.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Remove="Presets\Preset1.json" />

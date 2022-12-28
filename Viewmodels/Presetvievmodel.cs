@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Project1.Viewmodels;
@@ -14,9 +16,13 @@ public partial class Presetvievmodel
     [ObservableProperty]
     private string textboxtext;
 
-    public string dataformatstext { get; set;}
-    public string folderstext { get; set;}
+    [ObservableProperty] public string dataformatstext;
+
+    [ObservableProperty] public string folderstext;
 
     [ObservableProperty] 
     private string textbox2text;
+
+    [ObservableProperty] private int folderitemlistindex = -1;
+    [ObservableProperty] private int dataformatlistIndex = -1;
 }

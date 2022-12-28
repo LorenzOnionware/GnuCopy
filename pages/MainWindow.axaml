@@ -36,12 +36,12 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Margin="8,8" Grid.Row="0" Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Watermark="Copy from?" Height="18" Foreground="Black" Name="Copyfrom" Width="670"></TextBox>
-                    <Button Click="CopyDialogClicked" Content="^" FontSize="15" Margin="2,9"></Button>
+                    <TextBox Watermark="Copy from?" Background="Gray" Height="18" Foreground="White" Name="Copyfrom" Width="671"></TextBox>
+                    <Button Click="CopyDialogClicked" Background="Gray" Content="^" FontSize="15" Margin="2,9"></Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Watermark="Copy to?" Height="20" Foreground="Black" Name="Copyto" Margin="1,10" Width="670"></TextBox>
-                    <Button Click="PasteDialogClicked" Content="^" FontSize="15" Margin="2,9"></Button>
+                    <TextBox Watermark="Copy to?" Height="20" Foreground="White" Name="Copyto" Background="Gray" Margin="1,10" Width="670"></TextBox>
+                    <Button Click="PasteDialogClicked" Background="Gray" Content="^" FontSize="15" Margin="2,9"></Button>
                 </StackPanel>
 
             </StackPanel>
@@ -60,15 +60,15 @@
                 </ListBox>
                 
                 <StackPanel Orientation="Vertical">
-                    <Button Name="AddPreset" Click="AddPreset_OnClick" VerticalAlignment="Top" Margin="6,0" Content="+" FontSize="20"></Button>
-                    <Button Name="RemovePreset" Click="RemovePreset_OnClick" VerticalAlignment="Top" Margin="6,5" Content="-" FontSize="26"></Button>
+                    <Button Name="AddPreset" Background="Gray" Click="AddPreset_OnClick" VerticalAlignment="Top" Margin="6,0" Content="+" FontSize="20"></Button>
+                    <Button Name="RemovePreset" Background="Gray" Click="RemovePreset_OnClick" VerticalAlignment="Top" Margin="6,5" Content="-" FontSize="26"></Button>
                 </StackPanel>
             </StackPanel>
-            <ProgressBar Name="ProgressBar1" Maximum="{Binding Progressmax}" Value="{Binding Progressvalue}" Margin="0,8" Width="30"></ProgressBar>
             <TextBlock Foreground="Red" Margin="110,10 " FontSize="20" FontWeight="Bold" Name="noitemselected" Text="Please select a Preset!" IsVisible="False"></TextBlock>
         </StackPanel>
+        <ProgressBar Grid.Column="1" Grid.Row="2" Name="ProgressBar1" Maximum="{Binding Progressmax}" Value="{Binding Progressvalue}" Margin="0,8" Width="30"></ProgressBar>
          <StackPanel Grid.Row="0" Orientation="Horizontal" Grid.Column="0">
-             <Button Click="Copy_OnClick" Content="Copy" Height="35" Width="55"></Button>
+             <Button Background="Gray" Click="Copy_OnClick" Margin="6" Content="Copy" Height="35" Width="55"></Button>
          </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0">
             <ScrollViewer>

@@ -36,9 +36,7 @@ namespace Project1
         public MainWindow()
         {
             DataContext = MainViewmodel.Default;
-            InitializeComponent();
-            AddItemsToList(false);
-            ListBox1.SelectedIndex = 0;
+            InitializeComponent();    
             string Appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string[] directories = Directory.GetDirectories(Appdata);
             if (directories.Any(x => x.Contains(PresetPath))) { }
@@ -47,6 +45,8 @@ namespace Project1
                 Directory.CreateDirectory(PresetPath);
                 FirstStart();
             }
+            AddItemsToList(false);
+            ListBox1.SelectedIndex = 0;
 
         }
 
@@ -100,6 +100,7 @@ namespace Project1
 
         private async void Copy_OnClick(object? sender, RoutedEventArgs e)
         {
+            if(string.IsNullOrEmpty(Copyfrom.Text)|| string.IsNullOrEmpty(Copyto.Text))return;
             var item = ListBox1.SelectedItem;
             if (item == null)
             {
