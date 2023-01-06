@@ -36,11 +36,11 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <StackPanel Margin="8,8" Grid.Row="0" Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Watermark="Copy from?" Background="Gray" Height="18" Foreground="White" Name="Copyfrom" Width="671"></TextBox>
+                    <TextBox Watermark="Copy from?" Text="{Binding Copyfromtext}" Background="Gray" Height="18" Foreground="White" Name="Copyfrom" Width="671"></TextBox>
                     <Button Click="CopyDialogClicked" Background="Gray" Content="^" FontSize="15" Margin="2,9"></Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Watermark="Copy to?" Height="20" Foreground="White" Name="Copyto" Background="Gray" Margin="1,10" Width="670"></TextBox>
+                    <TextBox Watermark="Copy to?" Text="{Binding Copytotext}" Height="20" Foreground="White" Name="Copyto" Background="Gray" Margin="1,10" Width="670"></TextBox>
                     <Button Click="PasteDialogClicked" Background="Gray" Content="^" FontSize="15" Margin="2,9"></Button>
                 </StackPanel>
 

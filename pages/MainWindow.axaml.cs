@@ -8,8 +8,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Threading;
 using DynamicData;
 using MessageBox.Avalonia.DTO;
@@ -77,14 +79,26 @@ namespace Project1
 
         #region TextBoxBackend
 
-        private void CopyDialogClicked(object sender, RoutedEventArgs e)
+
+        
+        private async void CopyDialogClicked(object sender, RoutedEventArgs e)
         {
+            var dialog = new OpenFolderDialog();
+            var result = await dialog.ShowAsync(this);
+            if (result != null)
+            {
+                MainViewmodel.Default.Copyfromtext = result;
+            }
+
         }
-
-
-        private void PasteDialogClicked(object sender, RoutedEventArgs e)
+        private async void PasteDialogClicked(object sender, RoutedEventArgs e)
         {
-
+            var dialog = new OpenFolderDialog();
+            var result = await dialog.ShowAsync(this);
+            if (result != null)
+            {
+                MainViewmodel.Default.Copytotext = result;
+            }
         }
 
         #endregion
@@ -116,13 +130,14 @@ namespace Project1
                 var value3 = IndexObject(PresetPath+ @"\" + itemst);
                 foreach (var value4 in value3)
                 {
-                    if (value4.Contains("."))
+                    if (value4.Contains(@"#") != true)
                     {
                         valuea.Add(value4);
                     }
                     else
                     {
-                        ignore.Add(value4);
+                        string value5 = Regex.Replace(value4, @"#", "");
+                        ignore.Add(value5);
                     }
                 }
                 string a = Copyfrom.Text;
@@ -249,13 +264,5 @@ namespace Project1
             window1.AddItemsToList(false);
         }
         #endregion
-
-
-        private void Aktualisieren_OnClick(object? sender, RoutedEventArgs e)
-        {
-            _eventHandlerBlocked = true;
-            Task.Delay(_blockDuration).ContinueWith(t => _eventHandlerBlocked = false);
-            AddItemsToList(false);
-        }
     }
 }

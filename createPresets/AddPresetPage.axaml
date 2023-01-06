@@ -4,8 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Project1.pages.AddPreset"
+        xmlns:viewmodels="using:Project1.Viewmodels"
         x:DataType="viewmodels:Presetvievmodel"
-        xmlns:viewmodels="clr-namespace:Project1.Viewmodels"
         Title="AddPreset" Height="400" Width="600" CanResize="False"
         x:CompileBindings="True">
 

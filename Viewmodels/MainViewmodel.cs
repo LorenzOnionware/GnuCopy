@@ -20,6 +20,8 @@ public partial class MainViewmodel
     
     public static bool openwindow = false;
     public static bool openwindow1 = false;
+    [ObservableProperty] private string copytotext;
+    [ObservableProperty] private string copyfromtext;
 
 
     public static string SelectedListItem; 

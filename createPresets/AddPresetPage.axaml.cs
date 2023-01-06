@@ -77,7 +77,7 @@ public partial class AddPreset : Window
 
         foreach (var value in folderlist1)
         {
-            list1.Add(value);
+            list1.Add(@"#" + value);
         }
         string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy"+ @"\" +  Presetvievmodel.Default.Textbox2text + ".json";
         using (StreamWriter file = File.CreateText(path))
