@@ -59,16 +59,17 @@
     <None Remove="icons\aktualisieren.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icons\aktualisieren.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Avalonia.Controls">
       <HintPath>bin\Release\net7.0\Avalonia.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Avalonia.Themes.Fluent">
       <HintPath>..\..\Users\loren\.nuget\packages\avalonia\0.10.14\lib\netcoreapp2.0\Avalonia.Themes.Fluent.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="icons\settings.png" />
+    <Content Include="Assets\settings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -26,6 +27,7 @@ public partial class Delete : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+        this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
     }
 
     private void DeleteButton_OnClick(object? sender, RoutedEventArgs e)
@@ -41,5 +43,11 @@ public partial class Delete : Window
     {
         MainViewmodel.openwindow1 = false;
         this.Close();
+    }
+
+    private void TopLevel_OnClosed(object? sender, EventArgs e)
+    {
+        MainViewmodel.openwindow1 = false;
+        
     }
 }

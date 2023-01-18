@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 
@@ -26,10 +28,7 @@ public partial class MainViewmodel
 
     public static string SelectedListItem; 
     public static string PPresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
-    
-    public string loadimagepath => (System.Reflection.Assembly.GetEntryAssembly().Location + @"icons\aktualisieren.png");
-
     public static bool deleted = false;
-    
+    public string Settingicopath => @"..\Assets\settings.ico";
     public ObservableCollection<string> jsonindex { get; set; } = new();
 }

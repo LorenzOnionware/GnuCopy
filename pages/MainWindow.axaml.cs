@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Avalonia;
 using Avalonia.Threading;
 using DynamicData;
 using MessageBox.Avalonia.DTO;
@@ -38,9 +38,11 @@ namespace Project1
         public MainWindow()
         {
             DataContext = MainViewmodel.Default;
-            InitializeComponent();    
+            InitializeComponent();
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             string Appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string[] directories = Directory.GetDirectories(Appdata);
+           
             if (directories.Any(x => x.Contains(PresetPath))) { }
             else
             {
@@ -48,7 +50,7 @@ namespace Project1
                 FirstStart();
             }
             AddItemsToList(false);
-            ListBox1.SelectedIndex = 0;
+            PresetList.SelectedIndex = 0;
 
         }
 
@@ -81,7 +83,7 @@ namespace Project1
 
 
         
-        private async void CopyDialogClicked(object sender, RoutedEventArgs e)
+        private async void CopyDialog(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFolderDialog();
             var result = await dialog.ShowAsync(this);
@@ -91,7 +93,7 @@ namespace Project1
             }
 
         }
-        private async void PasteDialogClicked(object sender, RoutedEventArgs e)
+        private async void PasteDialog(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFolderDialog();
             var result = await dialog.ShowAsync(this);
@@ -114,47 +116,33 @@ namespace Project1
 
         private async void Copy_OnClick(object? sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrEmpty(Copyfrom.Text)|| string.IsNullOrEmpty(Copyto.Text))return;
-            var item = ListBox1.SelectedItem;
-            if (item == null)
+            if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
+            var item = PresetList.SelectedItem;
+            MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
+            string itemst = item.ToString();
+            var value3 = IndexObject(PresetPath + @"\" + itemst);
+            foreach (var value4 in value3)
             {
-                noitemselected.Text = "Please select a Preset!";
-                noitemselected.IsVisible = true;
-            }
-            else
-            {
-
-                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(Copyfrom.Text, "*", SearchOption.AllDirectories).Count() - 1;
-                noitemselected.IsVisible = false;
-                string itemst = item.ToString();
-                var value3 = IndexObject(PresetPath+ @"\" + itemst);
-                foreach (var value4 in value3)
+                if (value4.Contains(@"#") != true)
                 {
-                    if (value4.Contains(@"#") != true)
-                    {
-                        valuea.Add(value4);
-                    }
-                    else
-                    {
-                        string value5 = Regex.Replace(value4, @"#", "");
-                        ignore.Add(value5);
-                    }
-                }
-                string a = Copyfrom.Text;
-                string b = Copyto.Text;
-                var c = ListBox1.SelectedItem;
-                if (a != "" || b != "" || a != null || b != null)
-                {
-                    await Task.Run(() => CopyFolder(a, b, valuea, ignore));
+                    valuea.Add(value4);
                 }
                 else
                 {
-                    noitemselected.Text = "Path ist empty or doesn't exist";
-                    noitemselected.IsVisible = true;
+                    ignore.Add(Regex.Replace(value4, @"#", ""));
                 }
             }
-        }
 
+            string a = MainViewmodel.Default.Copyfromtext;
+            string b = MainViewmodel.Default.Copytotext;
+            var c = PresetList.SelectedItem;
+            if (String.IsNullOrEmpty(a) || String.IsNullOrEmpty(b))
+            {
+                return;
+            }
+
+            await Task.Run(() => CopyFolder(a, b, valuea, ignore));
+        }
         #endregion
 
         #region Presets
@@ -185,15 +173,13 @@ namespace Project1
                     folderitems.Add(f.Name.ToString());
                 }
             }
-
-            Debug.WriteLine(folderitems.Count());
             MainViewmodel.Default.Folderitems.Clear();
             foreach (var item in folderitems)
                 MainViewmodel.Default.Folderitems.Add(item);
-            ListBox1.SelectedIndex = 0;
+            PresetList.SelectedIndex = 0;
         }
 
-        private void ListBox1_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void PresetList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (_eventHandlerBlocked)
             {
@@ -201,7 +187,7 @@ namespace Project1
             }
 
             string value2 = "";
-            var item = ListBox1.SelectedItem;
+            var item = PresetList.SelectedItem;
             if (item == null)
             {
                 return;
@@ -232,14 +218,14 @@ namespace Project1
         {
             if (MainViewmodel.openwindow1 == false)
             {
-                MainViewmodel.SelectedListItem = ListBox1.SelectedItem.ToString();
-                if (ListBox1.SelectedIndex < 1)
+                MainViewmodel.SelectedListItem = PresetList.SelectedItem.ToString();
+                if (PresetList.SelectedIndex < 1)
                 {
-                    ListBox1.SelectedIndex++;
+                    PresetList.SelectedIndex++;
                 }
                 else
                 {
-                    ListBox1.SelectedIndex--;
+                    PresetList.SelectedIndex--;
                 }
 
                 var window = new Project1.Delete();
@@ -264,5 +250,16 @@ namespace Project1
             window1.AddItemsToList(false);
         }
         #endregion
+
+        private void SelectingItemsControl_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            jsonindexviev.SelectedIndex = -1;
+        }
+
+        private void Settingb_OnClick(object? sender, RoutedEventArgs e)
+        {
+            var window = new Project1.pages.SettingWindow();
+            window.Show();
+        }
     }
 }

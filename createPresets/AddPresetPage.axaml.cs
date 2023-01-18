@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,7 @@ public partial class AddPreset : Window
     {
         DataContext = Presetvievmodel.Default;
         InitializeComponent();
+        this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -45,7 +47,6 @@ public partial class AddPreset : Window
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
     {
         MainViewmodel.openwindow = false;
-        Presetvievmodel.Default = new();
         this.Close();
     }
 
@@ -77,7 +78,8 @@ public partial class AddPreset : Window
 
         foreach (var value in folderlist1)
         {
-            list1.Add(@"#" + value);
+            string value3 = new string(@"#" + value);
+            list1.Add(value3);
         }
         string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy"+ @"\" +  Presetvievmodel.Default.Textbox2text + ".json";
         using (StreamWriter file = File.CreateText(path))
@@ -124,5 +126,10 @@ public partial class AddPreset : Window
 
         Presetvievmodel.Default.Dataformatstext = "";
         Presetvievmodel.Default.Folderstext = "";
+    }
+
+    private void Window_Closing(object? sender, CancelEventArgs e)
+    { 
+        MainViewmodel.openwindow = false;
     }
 }
