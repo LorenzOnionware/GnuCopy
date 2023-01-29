@@ -123,7 +123,7 @@ namespace Project1
             var value3 = IndexObject(PresetPath + @"\" + itemst);
             foreach (var value4 in value3)
             {
-                if (value4.Contains(@"#") != true)
+                if (value4.Contains('#') != true)
                 {
                     valuea.Add(value4);
                 }

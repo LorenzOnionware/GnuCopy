@@ -29,6 +29,5 @@ public partial class MainViewmodel
     public static string SelectedListItem; 
     public static string PPresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
     public static bool deleted = false;
-    public string Settingicopath => @"..\Assets\settings.ico";
     public ObservableCollection<string> jsonindex { get; set; } = new();
 }

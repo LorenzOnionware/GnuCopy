@@ -10,7 +10,7 @@
         xmlns:viewmodels="clr-namespace:Project1.Viewmodels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Project1.MainWindow"
-        Title="GnuCopy" Width="800" Height="720" CanResize="False" 
+        Title="GnuCopy" Width="800" Height="640" CanResize="False" 
         x:CompileBindings="True">
 
     <Grid>
@@ -22,7 +22,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="300"/>
             <RowDefinition Height="300"></RowDefinition>
-            <RowDefinition Height="120"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Width="650" Grid.ColumnSpan="3" Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
@@ -33,6 +33,17 @@
                 <TextBox Name="Copyto" Width="600" Margin="5,5" Watermark="Copy to" Text="{Binding Copytotext}"></TextBox>
                 <Button Width="40" MaxWidth="40" Margin="5,5" Content="^" FontSize="18" Click="PasteDialog"></Button>
             </StackPanel>
+            <Grid Margin="5,5">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Progress:"></Label>
+                            <ProgressBar Width="580" Margin="5,5"  Maximum="{Binding Progressmax}" Minimum="0" Value="{Binding Progressvalue}"></ProgressBar>
+                        </StackPanel>
+                        <Button Margin="3,5" Content="Copy" Click="Copy_OnClick"></Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal">
             <StackPanel>
@@ -64,17 +75,6 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </ScrollViewer>
-        </Grid>
-        <Grid Grid.Row="2" Grid.Column="2">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <Button Margin="5,5" Content="Copy" Click="Copy_OnClick"></Button>
-                    <StackPanel Orientation="Vertical">
-                        <Label Content="Progress:"></Label>
-                        <ProgressBar Maximum="{Binding Progressmax}" Minimum="0" Value="{Binding Progressvalue}"></ProgressBar>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
         </Grid>
     </Grid>
 </Window>

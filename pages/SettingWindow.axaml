@@ -2,8 +2,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
+        xmlns:viewmodels="clr-namespace:Project1.Viewmodels"
+        x:DataType="viewmodels:SettingsViewmodel"
         x:Class="Project1.pages.SettingWindow"
-        Title="SettingWindow">
-    in Progress! Coming soon.
+        Title="SettingsWindow"
+        Height="400" Width="400" CanResize="False" Closed="TopLevel_OnClosed">
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"></ColumnDefinition>
+                <ColumnDefinition Width="160"></ColumnDefinition>
+                <ColumnDefinition Width="50"></ColumnDefinition>
+                <ColumnDefinition Width="120"></ColumnDefinition>
+               
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"></RowDefinition>
+                <RowDefinition Height="100"></RowDefinition>
+                <RowDefinition Height="100"></RowDefinition>
+                <RowDefinition Height="110"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="9,5" Orientation="Vertical">
+                <CheckBox Name="overritefiles">Overwrite</CheckBox>
+                <CheckBox Name="clearforcopy">Clear for copy</CheckBox>
+                <CheckBox Name="clearaftercopy">Delete after copy</CheckBox>
+            </StackPanel>
+            <StackPanel Background="green" Grid.Column="3" Grid.Row="1"></StackPanel>
+            <StackPanel Grid.Column="3" Grid.Row="3" Height="110">
+                <Label Foreground="#7cc1fb" Content="Contributors" Tapped="Contributors_OnTapped"></Label>
+                <Label Foreground="#7cc1fb" Content="Contact" Tapped="Contact_OnTapped"></Label>
+                <Label Content="Github" Tapped="Github_OnTapped" Foreground="#7cc1fb"></Label>
+                <Label Content="License" Tapped="License_OnTapped" Foreground="#7cc1fb"></Label>
+            </StackPanel>
+            <StackPanel Background="green" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <Image></Image>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>
