@@ -4,6 +4,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,15 +20,28 @@ namespace Project1;
 
 public class Files : ObservableObject
 {
+    //Damn after 5 month Im editing this piece of sh**, and i cant belive that i wrote this sh**!!
+    
     public static List<string> paths = new();
     public static List<string> folders1 = new();
     public static async Task CopyFolder(string cf, string ct, List<string> a1, List<string> ignore)
     {
         var folders = Directory.EnumerateDirectories(cf, "*", SearchOption.AllDirectories);
-
         foreach (string value in folders)
-        { 
-            await DirectoriesCreate(value,ct, ignore);
+        {
+            string pattern = @"^(.*\\)([^\\]*)$";
+
+            Match match = Regex.Match(value, pattern);
+
+            if (match.Success)
+            {
+                string file = match.Groups[2].Value;
+                if (!ignore.Contains(file))
+                {
+                    await DirectoriesCreate(value, ct, ignore);
+                }
+            }
+            
         }
         int i = 0;
         await FirstFolder(cf, ct, a1,ignore);
@@ -42,44 +56,60 @@ public class Files : ObservableObject
             string[] currentfiles = Directory.GetFiles(datapath);
             foreach (var file in currentfiles)
             {   
-                bool ab = false;
-                foreach (var a in a1)
-                {
-                    if (Path.GetExtension(file) == a)
-                    {
-                        ab = true;
-                    }
-                }
-
-                if (ab == true)
-                {
-                    ab = false;
-                }
+                if(itemlistfirstfolder.FirstFolderFileList.Contains(Path.GetFileName(file)))
+                {continue;}
                 else
                 {
-                    string value2 = "";
-                    bool ab2 = false;
-                    foreach (var b in file.Reverse())
-                    {
-                        if (b.ToString() == @"\")
-                        {
-                            if (ab2 == false)
-                            {
-                                value2 += b;
-                                ab2 = true;
 
-                            }
-                            
-                        }
-                        else
+
+                    bool ab = false;
+                    foreach (var a in a1)
+                    {
+                        if (Path.GetExtension(file) == a)
                         {
-                            if (ab2 == false)
-                            {
-                                value2 += b;
-                            }
+                            ab = true;
                         }
                     }
-                    File.Copy(file, datapath2 + new string(value2.Reverse().ToArray()), overwrite: true);
+
+                    if (ab == true)
+                    {
+                        ab = false;
+                    }
+                    else
+                    {
+                        string value2 = "";
+                        bool ab2 = false;
+                        foreach (var b in file.Reverse())
+                        {
+                            if (b.ToString() == @"\")
+                            {
+                                if (ab2 == false)
+                                {
+                                    value2 += b;
+                                    ab2 = true;
+
+                                }
+
+                            }
+                            else
+                            {
+                                if (ab2 == false)
+                                {
+                                    value2 += b;
+                                }
+                            }
+                        }
+
+                        try
+                        {
+                            File.Copy(file, datapath2 + new string(value2.Reverse().ToArray()),
+                                overwrite: Readsettings.Read(0));
+                        }
+                        catch (IOException e)
+                        {
+                            continue;
+                        }
+                    }
                 }
             }
             MainViewmodel.Default.Progressvalue++;

@@ -8,30 +8,9 @@ namespace Project1;
 
 public class CreateDirectories
 {
-    public static async Task DirectoriesCreate(string pathfrom, string pathto,List<string> ignore)
+    public static async Task DirectoriesCreate(string pathfrom, string pathto, List<string> ignore)
     {
-        bool ignorebool = false;
-        if (ignore == null)
-        {
-            await FolderCreate(pathto, pathfrom);
-        }
-        else
-        {
-            bool ignore1 = false;
-            foreach (var a in ignore)
-            {
-                if (pathfrom.TrimEnd('\\').EndsWith(a))
-                {
-                    ignore1 = true;
-                }
-            }
-            if (ignore1 == false)
-            {
-                await FolderCreate(pathto, pathfrom);
-            }
-        }
-
-        
+        await FolderCreate(pathto, pathfrom);
     }
 
     private static async Task FolderCreate(string pathto,string pathfrom)

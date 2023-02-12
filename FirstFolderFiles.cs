@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using static Project1.CreateDirectories;
 namespace Project1;
+using static Readsettings;
 
 public class FirstFolderFiles
 {
@@ -15,34 +16,38 @@ public class FirstFolderFiles
             string[] MyArray = Directory.GetFiles(cf);
             foreach (var a in MyArray)
             {
-
-                bool abcd = false;
-                foreach (var b in a1)
+                if(itemlistfirstfolder.FirstFolderFileList.Contains(Path.GetFileName(a)))
+                {continue;}
+                else
                 {
-                    if (b == Path.GetExtension(a))
+                    bool abcd = false;
+                    foreach (var b in a1)
                     {
-                        abcd = true;
-                    }
-                }
-
-                if (abcd != true)
-                {
-                    string value1234 = "";
-                    bool value123 = false;
-                    foreach (var b in a.Reverse())
-                    {
-                        if (b.ToString() == @"\")
+                        if (b == Path.GetExtension(a))
                         {
-                            value123 = true;
-                        }
-                        else if (value123 != true)
-                        {
-                            value1234 += b;
+                            abcd = true;
                         }
                     }
 
-                    string lel = new string(ct + @"\" + new string(value1234.Reverse().ToArray()));
-                    File.Copy(a, lel,overwrite:true);
+                    if (abcd != true)
+                    {
+                        string value1234 = "";
+                        bool value123 = false;
+                        foreach (var b in a.Reverse())
+                        {
+                            if (b.ToString() == @"\")
+                            {
+                                value123 = true;
+                            }
+                            else if (value123 != true)
+                            {
+                                value1234 += b;
+                            }
+                        }
+
+                        string lel = new string(ct + @"\" + new string(value1234.Reverse().ToArray()));
+                        File.Copy(a, lel, overwrite: Readsettings.Read(0));
+                    }
                 }
             }
         }

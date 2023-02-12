@@ -68,20 +68,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="icons\settings.png" />
-    <Content Include="Assets\Onionware-310x310.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\settings.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <AvaloniaResource Include="Assets\settings.png" />
     <None Remove="Assets\GithubIco.png" />
-    <Content Include="Assets\GithubIco.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <AvaloniaResource Include="Assets\GithubIco.png" />
     <None Remove="Assets\Gpl3Ico.png" />
-    <Content Include="Assets\Gpl3Ico.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <AvaloniaResource Include="Assets\Gpl3Ico.png" />
     <None Remove="Assets\Onionware-310x310.png" />
+    <None Remove="Assets\Onionware.png" />
+    <AvaloniaResource Include="Assets\Onionware.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GnuCopy.ico" />
   </ItemGroup>
 </Project>

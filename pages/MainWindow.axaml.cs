@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,15 +41,9 @@ namespace Project1
             DataContext = MainViewmodel.Default;
             InitializeComponent();
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            string Appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string[] directories = Directory.GetDirectories(Appdata);
-           
-            if (directories.Any(x => x.Contains(PresetPath))) { }
-            else
-            {
-                Directory.CreateDirectory(PresetPath);
-                FirstStart();
-            }
+            Directory.CreateDirectory(PresetPath);
+            Directory.CreateDirectory(Path.Combine(PresetPath,"Settings") );
+            FirstStart();
             AddItemsToList(false);
             PresetList.SelectedIndex = 0;
 
@@ -59,13 +54,23 @@ namespace Project1
 
         private async Task FirstStart()
         {
+            var files1 = Directory.GetFiles(PresetPath);
+            if (files1.Length != 0)
+                return;
+            
             string[] preset1Extensions = new string[] { ".exe", ".dll", ".msixbundle", ".msixupload", ".pfx", ".winmd" };
             string[] preset2Extensions = new string[] { ".mp3", ".mp4", ".png", ".txt", ".docx", ".jpg", ".png" };
-
+            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false" };
+            string path = Path.Combine(PresetPath,"Settings","Settings.json") ;
+            using (StreamWriter file = File.CreateText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                string json = JsonConvert.SerializeObject(settings);
+                await file.WriteAsync(json);
+            }
             await WritePresetToFile("Preset1", preset1Extensions);
             await WritePresetToFile("Preset2", preset2Extensions);
         }
-
         private async Task WritePresetToFile(string presetName, string[] extensions)
         {
             string path = PresetPath + @"\" + presetName + ".json";
@@ -123,13 +128,13 @@ namespace Project1
             var value3 = IndexObject(PresetPath + @"\" + itemst);
             foreach (var value4 in value3)
             {
-                if (value4.Contains('#') != true)
+                if (value4.Contains('#'))
                 {
-                    valuea.Add(value4);
+                    ignore.Add(Regex.Replace(value4, @"#", ""));
                 }
                 else
                 {
-                    ignore.Add(Regex.Replace(value4, @"#", ""));
+                    valuea.Add(value4);
                 }
             }
 
@@ -140,7 +145,7 @@ namespace Project1
             {
                 return;
             }
-
+            
             await Task.Run(() => CopyFolder(a, b, valuea, ignore));
         }
         #endregion
