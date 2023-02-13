@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -79,20 +80,29 @@ public partial class SettingWindow : Window
     #region  Labels
     private void Contributors_OnTapped(object? sender, TappedEventArgs e)
     {
-        
-    }
-
-    private void Contact_OnTapped(object? sender, TappedEventArgs e)
-    {
-        
+        var window = new Project1.pages.Contributors();
+        window.Show();
     }
     private void Github_OnTapped(object? sender, TappedEventArgs e)
     {
-        
+        OpenLink("https://github.com/neutralezwiebel/");
+    }
+    
+    private void OpenLink(string url)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
     }
     private void License_OnTapped(object? sender, TappedEventArgs e)
     {
-        
+        OpenLink(Environment.CurrentDirectory + @"\pages\License.html");
+    }
+    private void Contact_OnTapped(object? sender, TappedEventArgs e)
+    {
+        OpenLink("mailto:contact.onionware@gmail.com");
     }
     #endregion
 #region checkboxen

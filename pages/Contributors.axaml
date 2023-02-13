@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
+        x:Class="Project1.pages.Contributors"
+        Height="200" Width="290" CanResize="False"
+        Title="Contributors">
+        <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical">
+                        <Label Content="OnionWare:" FontWeight="Bold" Foreground="Purple"></Label>
+                        <Label Content="Lorenz Otto" FontStyle="Italic"></Label>
+                        <Label Content="Jaden Nebel" FontStyle="Italic"></Label>
+                        <Label Content="Helpers:" FontWeight="Bold" Foreground="Green"></Label>
+                        <Label Content="Marvin Miltkau" FontStyle="Italic"></Label>
+                </StackPanel>
+                <Image Source="../Assets/Onionware.png" Stretch="Fill"></Image>
+        </StackPanel>
+</Window>

@@ -6,7 +6,7 @@
         x:Class="Project1.pages.SettingWindow"
         xmlns:viewmodels="using:Project1.Viewmodels"
         x:DataType="viewmodels:SettingsViewmodel"
-        Title="SettingsWindow" Height="400" Width="400" CanResize="False" x:CompileBindings="True" 
+        Title="SettingsWindow" Height="420" Width="470" CanResize="False" x:CompileBindings="True" 
         Closed="TopLevel_OnClosed">
     <Grid>
         <Grid>
@@ -14,6 +14,7 @@
                 <ColumnDefinition Width="50"></ColumnDefinition>
                 <ColumnDefinition Width="160"></ColumnDefinition>
                 <ColumnDefinition Width="50"></ColumnDefinition>
+                <ColumnDefinition Width="70"></ColumnDefinition>
                 <ColumnDefinition Width="120"></ColumnDefinition>
                
             </Grid.ColumnDefinitions>
@@ -21,7 +22,7 @@
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="100"></RowDefinition>
                 <RowDefinition Height="100"></RowDefinition>
-                <RowDefinition Height="110"></RowDefinition>
+                <RowDefinition Height="130"></RowDefinition>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="9,5" Orientation="Vertical">
@@ -29,15 +30,15 @@
                 <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
                 <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
             </StackPanel>
-            <StackPanel Grid.Column="3" Grid.Row="1">
+            <StackPanel Grid.Column="4" Grid.Row="1">
                 <Image Source="../Assets/Gpl3Ico.png"></Image>
                 <Image Source="../Assets/GithubIco.png"></Image>
             </StackPanel>
-            <StackPanel Grid.Column="3" Grid.Row="3" Height="110">
+            <StackPanel Grid.Column="4" Grid.Row="3" Height="110">
                 <Label Foreground="#7cc1fb" Content="Contributors" Tapped="Contributors_OnTapped"></Label>
-                <Label Foreground="#7cc1fb" Content="Contact" Tapped="Contact_OnTapped"></Label>
                 <Label Content="Github" Tapped="Github_OnTapped" Foreground="#7cc1fb"></Label>
                 <Label Content="License" Tapped="License_OnTapped" Foreground="#7cc1fb"></Label>
+                <Label Content="Contact" Tapped="Contact_OnTapped" Foreground="#7cc1fb"></Label>
             </StackPanel>
             <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                 <Image Source="../Assets/Onionware.png"></Image>
