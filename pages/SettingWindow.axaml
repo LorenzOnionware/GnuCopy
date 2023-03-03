@@ -6,7 +6,7 @@
         x:Class="Project1.pages.SettingWindow"
         xmlns:viewmodels="using:Project1.Viewmodels"
         x:DataType="viewmodels:SettingsViewmodel"
-        Title="SettingsWindow" Height="420" Width="470" CanResize="False" x:CompileBindings="True" 
+        Title="SettingsWindow" Height="420" Width="470" Icon="../Assets/settings.png" CanResize="False" x:CompileBindings="True" 
         Closed="TopLevel_OnClosed">
     <Grid>
         <Grid>
@@ -24,9 +24,19 @@
                 <RowDefinition Height="100"></RowDefinition>
                 <RowDefinition Height="130"></RowDefinition>
             </Grid.RowDefinitions>
-
+            <FlyoutPresenter Grid.Column="1" Height="15" IsVisible="{Binding #Overritefiles.IsPointerOver}">
+                <TextBlock TextWrapping="Wrap" FontSize="11" Text="Overrite existing files"></TextBlock>
+            </FlyoutPresenter>
+            <FlyoutPresenter Grid.Column="1"  Height="15" IsVisible="{Binding #Clearforcopy.IsPointerOver}">
+                <TextBlock TextWrapping="Wrap" FontSize="11" Text="Clear target folder"></TextBlock>
+            </FlyoutPresenter>
+            <FlyoutPresenter Grid.Column="1" Height="15" Width="200" IsVisible="{Binding #Clearaftercopy.IsPointerOver}">
+                <TextBlock TextWrapping="Wrap" FontSize="11" Text="Clear source folder after copy"></TextBlock>
+            </FlyoutPresenter>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="9,5" Orientation="Vertical">
-                <CheckBox IsChecked="{Binding Overritechecked}" Name="Overritefiles" Unchecked="Overritefiles_OnUnchecked" Checked="Overritefiles_OnChecked">Overwrite</CheckBox>
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding Overritechecked}" Name="Overritefiles" Unchecked="Overritefiles_OnUnchecked" Checked="Overritefiles_OnChecked">Overwrite</CheckBox>
+                </StackPanel>
                 <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
                 <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
             </StackPanel>

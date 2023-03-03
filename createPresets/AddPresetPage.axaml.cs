@@ -14,10 +14,11 @@ using Avalonia.Markup.Xaml;
 using DynamicData;
 using Project1.Viewmodels;
 using Newtonsoft.Json;
+using static Project1.MainWindow;
 
 namespace Project1.pages;
 
-public partial class AddPreset : Window
+public partial class AddPreset : MainWindow
 {
     public AddPreset()
     {
@@ -28,12 +29,19 @@ public partial class AddPreset : Window
             this.AttachDevTools();
 #endif
     }
+    
 
     
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+        if (isediting)
+        {
+            
+        }
     }
+
+    
 
     private void FolderlistOnSelectionChange(object sender, SelectionChangedEventArgs e)
     {

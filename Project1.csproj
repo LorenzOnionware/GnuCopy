@@ -9,6 +9,12 @@
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>GnuCopy.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="Presets\jadensoreset.json" />
@@ -67,6 +73,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Include="GnuCopy.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+    <EmbeddedResource Include="pages\Gpl3Ico.png">
+      <DependentUpon>License.html</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Remove="icons\settings.png" />
     <AvaloniaResource Include="Assets\settings.png" />
     <None Remove="Assets\GithubIco.png" />
@@ -76,8 +89,17 @@
     <None Remove="Assets\Onionware-310x310.png" />
     <None Remove="Assets\Onionware.png" />
     <AvaloniaResource Include="Assets\Onionware.png" />
+    <None Remove="License.txt" />
+    <None Remove="Assets\GnuCopy.ico" />
+    <AvaloniaResource Include="Assets\GnuCopy.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GnuCopy.ico" />
+    <None Remove="pages\License.html" />
+    <EmbeddedResource Include="pages\License.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="pages\l.bat" />
   </ItemGroup>
 </Project>

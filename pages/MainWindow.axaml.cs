@@ -1,33 +1,22 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System.Diagnostics;
 using System.IO;
-using Avalonia.Dialogs;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Threading;
-using DynamicData;
-using MessageBox.Avalonia.DTO;
-using MessageBox.Avalonia.Enums;
 using Newtonsoft.Json;
-using Project1.pages;
 using Project1.Viewmodels;
-using static Project1.FirstFolderFiles;
 using static Project1.Files;
+using static Project1.DeleteDirectories;
 
 
 namespace Project1
 {
     public partial class MainWindow : Window
     {
+        public static bool isediting = false;
         public List<string> valuea = new();
         public List<string> ignore = new();
         public bool selectionchange = false;
@@ -121,6 +110,12 @@ namespace Project1
 
         private async void Copy_OnClick(object? sender, RoutedEventArgs e)
         {
+            if (Readsettings.Read(1))
+            {
+                await DeleteDirectory(MainViewmodel.Default.Copytotext);
+            }
+            MainViewmodel.Default.Isvisable = true;
+            MainViewmodel.Default.Opaciprogress = 1;
             if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
             var item = PresetList.SelectedItem;
             MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
@@ -145,15 +140,17 @@ namespace Project1
             {
                 return;
             }
-            
             await Task.Run(() => CopyFolder(a, b, valuea, ignore));
+            if (Readsettings.Read(2) == true)
+            {
+               await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
+            }
+            MainViewmodel.Default.Isenable = false;
+            MainViewmodel.Default.Opaciprogress = 0;
         }
         #endregion
 
         #region Presets
-
-
-
         public async Task AddItemsToList(bool a)
         {
             if (a == true)
@@ -170,7 +167,7 @@ namespace Project1
             var folderitems = new HashSet<string>();
             System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
             var fs = Items.GetFiles();
-            for (var index = 0; index < fs.Length; index++)
+            for(var index = 0; index < fs.Length; index++)
             {
                 FileInfo f = fs[index];
                 if (f.Name.Contains(".json") || f.Name.Contains(".Json"))
@@ -264,6 +261,30 @@ namespace Project1
         private void Settingb_OnClick(object? sender, RoutedEventArgs e)
         {
             var window = new Project1.pages.SettingWindow();
+            window.Show();
+        }
+
+        private void Copyfrom_OnTextChanged(object? sender, TextChangingEventArgs textChangingEventArgs)
+        {
+            if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
+            {
+                MainViewmodel.Default.Isenable = true; 
+            }
+        }
+
+        private void Copyto_OnTextChanged(object? sender, TextChangingEventArgs textChangingEventArgs)
+        {
+            if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
+            {
+                MainViewmodel.Default.Isenable = true;
+            }
+        }
+
+       //Edit presets button
+        private void Button_OnClick(object? sender, RoutedEventArgs e)
+        {
+            isediting = true;
+            var window = new Project1.pages.AddPreset();
             window.Show();
         }
     }

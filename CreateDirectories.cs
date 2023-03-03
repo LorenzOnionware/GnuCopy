@@ -12,7 +12,6 @@ public class CreateDirectories
     {
         await FolderCreate(pathto, pathfrom);
     }
-
     private static async Task FolderCreate(string pathto,string pathfrom)
     {
         string movepath;

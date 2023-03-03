@@ -11,6 +11,7 @@ public partial class Contributors : Window
         InitializeComponent();
 #if DEBUG
         this.AttachDevTools();
+        this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
 #endif
     }
 

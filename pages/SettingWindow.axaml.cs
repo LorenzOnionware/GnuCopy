@@ -6,11 +6,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Remote.Protocol.Input;
 using DynamicData;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
@@ -139,7 +141,6 @@ public partial class SettingWindow : Window
         }
         File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
     }
-
     private void Clearforcopy_OnChecked(object? sender, RoutedEventArgs e)
     {
         if (cancel == true)
@@ -206,4 +207,5 @@ public partial class SettingWindow : Window
         File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
     }
     #endregion
+    
 }

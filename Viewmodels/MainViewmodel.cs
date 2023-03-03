@@ -24,7 +24,9 @@ public partial class MainViewmodel
     public static bool openwindow1 = false;
     [ObservableProperty] private string copytotext;
     [ObservableProperty] private string copyfromtext;
-
+    [ObservableProperty] private bool isvisable;
+    [ObservableProperty] private bool isenable;
+    [ObservableProperty] private double opaciprogress = 0.0;
 
     public static string SelectedListItem; 
     public static string PPresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";

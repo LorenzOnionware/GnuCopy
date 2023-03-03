@@ -46,7 +46,7 @@ public class FirstFolderFiles
                         }
 
                         string lel = new string(ct + @"\" + new string(value1234.Reverse().ToArray()));
-                        File.Copy(a, lel, overwrite: Readsettings.Read(0));
+                        File.Copy(a, lel, overwrite: Read(0));
                     }
                 }
             }
