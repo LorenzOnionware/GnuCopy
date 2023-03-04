@@ -28,7 +28,7 @@ public partial class MainViewmodel
     [ObservableProperty] private bool isenable;
     [ObservableProperty] private double opaciprogress = 0.0;
 
-    public static string SelectedListItem; 
+    [ObservableProperty]private string selectedlistitem; 
     public static string PPresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
     public static bool deleted = false;
     public ObservableCollection<string> jsonindex { get; set; } = new();

@@ -32,7 +32,7 @@ public partial class Delete : Window
 
     private void DeleteButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        File.Delete( MainViewmodel.PPresetPath + @"\" + MainViewmodel.SelectedListItem);
+        File.Delete( MainViewmodel.PPresetPath + @"\" + MainViewmodel.Default.Selectedlistitem);
         MainViewmodel.deleted = true;
         Project1.MainWindow.DeleteSucces();
         MainViewmodel.openwindow1 = false;

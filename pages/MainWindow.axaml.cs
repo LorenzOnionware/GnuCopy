@@ -4,8 +4,10 @@ using Avalonia.Interactivity;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
 using static Project1.Files;
@@ -22,7 +24,7 @@ namespace Project1
         public bool selectionchange = false;
         private bool _eventHandlerBlocked = false;
         private int _blockDuration = 500;
-        private string PresetPath = MainViewmodel.PPresetPath;
+        public static string PresetPath = MainViewmodel.PPresetPath;
         private bool _blockMethod = false;
 
         public MainWindow()
@@ -33,8 +35,8 @@ namespace Project1
             Directory.CreateDirectory(PresetPath);
             Directory.CreateDirectory(Path.Combine(PresetPath,"Settings") );
             FirstStart();
-            AddItemsToList(false);
-            PresetList.SelectedIndex = 0;
+            AddItemsToList();
+            //PresetList.SelectedIndex = 0;
 
         }
 
@@ -117,7 +119,7 @@ namespace Project1
             MainViewmodel.Default.Isvisable = true;
             MainViewmodel.Default.Opaciprogress = 1;
             if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
-            var item = PresetList.SelectedItem;
+            var item = MainViewmodel.Default.Selectedlistitem;
             MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
             string itemst = item.ToString();
             var value3 = IndexObject(PresetPath + @"\" + itemst);
@@ -135,7 +137,6 @@ namespace Project1
 
             string a = MainViewmodel.Default.Copyfromtext;
             string b = MainViewmodel.Default.Copytotext;
-            var c = PresetList.SelectedItem;
             if (String.IsNullOrEmpty(a) || String.IsNullOrEmpty(b))
             {
                 return;
@@ -151,19 +152,8 @@ namespace Project1
         #endregion
 
         #region Presets
-        public async Task AddItemsToList(bool a)
+        public async Task AddItemsToList()
         {
-            if (a == true)
-            {
-                for (int value = 0; value <= MainViewmodel.Default.Folderitems.Count; value++)
-                {
-                    if (MainViewmodel.Default.Folderitems[value] == MainViewmodel.SelectedListItem)
-                    {
-                        MainViewmodel.Default.Folderitems.RemoveAt(value);
-                    }
-                }
-            }
-
             var folderitems = new HashSet<string>();
             System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
             var fs = Items.GetFiles();
@@ -172,13 +162,13 @@ namespace Project1
                 FileInfo f = fs[index];
                 if (f.Name.Contains(".json") || f.Name.Contains(".Json"))
                 {
-                    folderitems.Add(f.Name.ToString());
+                    if(File.Exists(fs[index].ToString())) 
+                        folderitems.Add(f.Name.ToString());
                 }
             }
             MainViewmodel.Default.Folderitems.Clear();
             foreach (var item in folderitems)
                 MainViewmodel.Default.Folderitems.Add(item);
-            PresetList.SelectedIndex = 0;
         }
 
         private void PresetList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -188,28 +178,31 @@ namespace Project1
                 return;
             }
 
-            string value2 = "";
-            var item = PresetList.SelectedItem;
-            if (item == null)
+            Dispatcher.UIThread.Post(() =>
             {
-                return;
-            }
+                string item = MainViewmodel.Default.Selectedlistitem;
+                if (item == null)
+                {
+                    return;
+                }
 
-            string itemst = item.ToString();
-            var value = IndexObject(PresetPath + @"\" + itemst);
-            _blockMethod = true;
-            Task.Delay(_blockDuration).ContinueWith(t => _blockMethod = false);
-            MainViewmodel.Default.jsonindex.Clear();
-            foreach (string i in value)
-            {
-                MainViewmodel.Default.jsonindex.Add(i);
-            }
+                string itemst = item.ToString();
+                var value = IndexObject(PresetPath + @"\" + itemst);
+                _blockMethod = true;
+                Task.Delay(_blockDuration).ContinueWith(t => _blockMethod = false);
+                MainViewmodel.Default.jsonindex.Clear();
+                foreach (string i in value)
+                {
+                    MainViewmodel.Default.jsonindex.Add(i);
+                }
+            });
         }
 
         private void AddPreset_OnClick(object? sender, RoutedEventArgs e)
         {
             if (MainViewmodel.openwindow == false)
             {
+                _blockMethod = true;
                 var window = new Project1.pages.AddPreset();
                 window.Show();
                 MainViewmodel.openwindow = true;
@@ -220,16 +213,7 @@ namespace Project1
         {
             if (MainViewmodel.openwindow1 == false)
             {
-                MainViewmodel.SelectedListItem = PresetList.SelectedItem.ToString();
-                if (PresetList.SelectedIndex < 1)
-                {
-                    PresetList.SelectedIndex++;
-                }
-                else
-                {
-                    PresetList.SelectedIndex--;
-                }
-
+                MainViewmodel.Default.Selectedlistitem = MainViewmodel.Default.Selectedlistitem;
                 var window = new Project1.Delete();
                 window.Show();
                 MainViewmodel.openwindow1 = true;
@@ -237,11 +221,10 @@ namespace Project1
         }
         public static void DeleteSucces()
         {
-
             MainWindow window1 = new MainWindow();
             window1._eventHandlerBlocked = true;
             Task.Delay(500).ContinueWith(t => window1._eventHandlerBlocked = false);
-            window1.AddItemsToList(true);
+            window1.AddItemsToList();
         }
 
         public static void AddSuccess()
@@ -249,7 +232,7 @@ namespace Project1
             MainWindow window1 = new MainWindow();
             window1._eventHandlerBlocked = true;
             Task.Delay(500).ContinueWith(t => window1._eventHandlerBlocked = false);
-            window1.AddItemsToList(false);
+            window1.AddItemsToList();
         }
         #endregion
 
@@ -279,9 +262,8 @@ namespace Project1
                 MainViewmodel.Default.Isenable = true;
             }
         }
-
-       //Edit presets button
-        private void Button_OnClick(object? sender, RoutedEventArgs e)
+        //Edit presets button
+       private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
             isediting = true;
             var window = new Project1.pages.AddPreset();

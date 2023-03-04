@@ -57,7 +57,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal">
             <StackPanel>
-                <ListBox Width="250" Name="PresetList" Margin="5,5" SelectionChanged="PresetList_OnSelectionChanged" Items="{Binding Folderitems}">
+                <ListBox Width="250" Name="PresetList" SelectedItem="{Binding Selectedlistitem}" Margin="5,5" SelectionChanged="PresetList_OnSelectionChanged" Items="{Binding Folderitems}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Border CornerRadius="4" Padding="4">
