@@ -9,6 +9,7 @@ On our side we don't collect any personal data from our users. These libraries a
 - CommunityToolkit (https://github.com/CommunityToolkit)
 - Avalonia UI
 - Newtonsoft
+- Material.Icons(https://github.com/SKProCH/Material.Icons)
 
 ### This App can access following data:
 * System settings (to get Systemtheme, Accentcolor and other settings)
