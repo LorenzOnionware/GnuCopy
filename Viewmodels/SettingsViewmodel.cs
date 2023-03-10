@@ -17,4 +17,6 @@ public partial class SettingsViewmodel
     [ObservableProperty] private bool overritechecked;
     [ObservableProperty] private bool clearforchecked ;
     [ObservableProperty] private bool clearafterchecked;
+
+    [ObservableProperty] private string listingart;
 }

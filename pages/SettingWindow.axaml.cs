@@ -43,6 +43,7 @@ public partial class SettingWindow : Window
    
     private void TopLevel_OnClosed(object? sender, EventArgs e)
     {
+        MainWindow.AktualisereSetting();
         MainViewmodel.openwindow1 = false;
     }
 
@@ -71,6 +72,9 @@ public partial class SettingWindow : Window
                         break;
                     case "clearaftercopy":
                         if (value == "true"){SettingsViewmodel.Default.Clearafterchecked = true; }else{SettingsViewmodel.Default.Clearafterchecked = false;}
+                        break;
+                    case "listingart" :
+                        if (value == "0"){SettingsViewmodel.Default.Listingart = "Blacklisting"; SettingsViewmodel.Default.Listingarts = false;}else if(value == "1"){SettingsViewmodel.Default.Listingart = "Whitelisting"; SettingsViewmodel.Default.Listingarts = true; }else{SettingsViewmodel.Default.Listingart = "Without preset"; SettingsViewmodel.Default.Listingarts = null;}
                         break;
                 }
             }
@@ -207,5 +211,58 @@ public partial class SettingWindow : Window
         File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
     }
     #endregion
-    
+
+    private void ToggleButton_OnChecked(object? sender, RoutedEventArgs e)
+    {
+        SettingsViewmodel.Default.Listingart = "Whitelist mode";
+        if (cancel==true)
+            return;
+        var list = Jsonfile.ToArray();
+        string input = list[3];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, "=1");
+        list.Replace<string>(list[3], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+
+    private void ToggleButton_OnUnchecked(object? sender, RoutedEventArgs e)
+    {
+        SettingsViewmodel.Default.Listingart = "Blacklist mode";
+        if (cancel==true)
+            return;
+        var list = Jsonfile.ToArray();
+        string input = list[3];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, "=0");
+        list.Replace<string>(list[3], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+
+    private void ToggleButton_OnIndeterminate(object? sender, RoutedEventArgs e)
+    {
+        SettingsViewmodel.Default.Listingart = "without presets";
+        if (cancel==true)
+            return;
+        var list = Jsonfile.ToArray();
+        string input = list[3];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, "=2");
+        list.Replace<string>(list[3], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
 }

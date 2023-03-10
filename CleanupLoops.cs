@@ -29,4 +29,26 @@ public class CleanupLoops
 
         return output.ToArray();
     }
+    public static string[] CLeanWhite(string[] arraytoclean, string[] cleanfromat)
+    { 
+        bool allow = false;
+        List<string> output = new();
+        foreach (var element in arraytoclean)
+        {
+            allow = false;
+            foreach (var value in cleanfromat)
+            {
+                if (element.Contains(value))
+                {
+                    allow = true;
+                }
+            }
+            if (allow)
+            {
+                output.Add(element);
+            }
+        }
+
+        return output.ToArray();
+    }
 }

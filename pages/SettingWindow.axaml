@@ -33,15 +33,21 @@
             <FlyoutPresenter Grid.Column="1" Height="15" Width="200" IsVisible="{Binding #Clearaftercopy.IsPointerOver}">
                 <TextBlock TextWrapping="Wrap" FontSize="11" Text="Clear source folder after copy"></TextBlock>
             </FlyoutPresenter>
+            <FlyoutPresenter Grid.Column="1" Height="15" Width="200" IsVisible="{Binding #listing.IsPointerOver}">
+                <TextBlock TextWrapping="Wrap" FontSize="11" Text="how files/folders are get excluded"></TextBlock>
+            </FlyoutPresenter>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="9,5" Orientation="Vertical">
                 <StackPanel>
                     <CheckBox IsChecked="{Binding Overritechecked}" Name="Overritefiles" Unchecked="Overritefiles_OnUnchecked" Checked="Overritefiles_OnChecked">Overwrite</CheckBox>
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
                 <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
+                <CheckBox Name="listing" IsThreeState="True" Content="{Binding Listingart}" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked" Indeterminate="ToggleButton_OnIndeterminate" IsChecked="{Binding Listingarts}"></CheckBox>
             </StackPanel>
             <StackPanel Grid.Column="4" Grid.Row="1">
-                <Image Source="../Assets/Gpl3Ico.png"></Image>
+                <Viewbox>
+                    <Image Stretch="Uniform" Height="100" Width="180" Source="../Assets/Gpl3Ico.png"></Image>
+                </Viewbox>
                 <Image Source="../Assets/GithubIco.png"></Image>
             </StackPanel>
             <StackPanel Grid.Column="4" Grid.Row="3" Height="110">

@@ -8,7 +8,7 @@ namespace Project1;
 
 public class CreateDirectories
 {
-    public static async Task DirectoriesCreate(string pathfrom, string pathto, List<string> ignore)
+    public static async Task DirectoriesCreate(string pathfrom, string pathto)
     {
         await FolderCreate(pathto, pathfrom);
     }

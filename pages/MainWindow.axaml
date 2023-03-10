@@ -30,12 +30,12 @@
                 <TextBox Name="Copyfrom" TextChanging="Copyfrom_OnTextChanged" Margin="5,20" Width="600" Text="{Binding Copyfromtext}" Watermark="Copy from"></TextBox>
                 <Button Width="40" MaxWidth="40" Content="..." Margin="5,5" FontSize="18" Click="CopyDialog"></Button>
                 <Button Click="Settingb_OnClick" Height="37" Width="40" Margin="2,2">
-                    <controls:SymbolIcon FontSize="20" Symbol="Setting">
-                        <controls:SymbolIcon.RenderTransform>
-                            <ScaleTransform ScaleX="1.5" ScaleY="1.5"></ScaleTransform>
-                        </controls:SymbolIcon.RenderTransform>
-                    </controls:SymbolIcon>
-                </Button>
+                        <controls:SymbolIcon FontSize="20" Symbol="Setting">
+                            <controls:SymbolIcon.RenderTransform>
+                                <ScaleTransform ScaleX="1.5" ScaleY="1.5"></ScaleTransform>
+                            </controls:SymbolIcon.RenderTransform>
+                        </controls:SymbolIcon>
+                    </Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBox Name="Copyto" TextChanging="Copyto_OnTextChanged" Width="600" Margin="5,5" Watermark="Copy to" Text="{Binding Copytotext}"></TextBox>
@@ -57,7 +57,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal">
             <StackPanel>
-                <ListBox Width="250" Name="PresetList" SelectedItem="{Binding Selectedlistitem}" Margin="5,5" SelectionChanged="PresetList_OnSelectionChanged" Items="{Binding Folderitems}">
+                <ListBox Width="250" Name="PresetList" IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5" SelectionChanged="PresetList_OnSelectionChanged" Items="{Binding Folderitems}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Border CornerRadius="4" Padding="4">

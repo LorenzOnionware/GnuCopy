@@ -86,7 +86,9 @@
     <None Remove="Assets\GithubIco.png" />
     <AvaloniaResource Include="Assets\GithubIco.png" />
     <None Remove="Assets\Gpl3Ico.png" />
-    <AvaloniaResource Include="Assets\Gpl3Ico.png" />
+    <AvaloniaResource Include="Assets\Gpl3Ico.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
     <None Remove="Assets\Onionware-310x310.png" />
     <None Remove="Assets\Onionware.png" />
     <AvaloniaResource Include="Assets\Onionware.png" />

@@ -32,4 +32,32 @@ public class Readsettings
         }
         return index;
     }
+    
+    public static byte Read1(byte index)
+    {
+        byte index2 = 0;
+
+        string[] Jsonfile2 = (JsonConvert.DeserializeObject<string[]>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy\Settings\Settings.json")));
+        string pattern2 = "=(.*)$";
+        Match match2 = Regex.Match(Jsonfile2[index], pattern2);
+        if (match2.Success)
+        {
+            string value = match2.Groups[1].Value;
+            Console.WriteLine(value);
+            switch (value)
+            {
+                case "0":
+                    index2 = 0;
+                    break;
+                case "1":
+                    index2 = 1;
+                    break;
+                case "2":
+                    index2 = 2;
+                    break;
+            }
+        }
+
+        return index2;
+    }
 }

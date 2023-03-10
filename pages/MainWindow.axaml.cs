@@ -18,6 +18,7 @@ namespace Project1
 {
     public partial class MainWindow : Window
     {
+        public static bool? Listing = false;
         public static bool isediting = false;
         public List<string> valuea = new();
         public List<string> ignore = new();
@@ -33,32 +34,48 @@ namespace Project1
             InitializeComponent();
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Directory.CreateDirectory(PresetPath);
-            Directory.CreateDirectory(Path.Combine(PresetPath,"Settings") );
-            FirstStart();
-            AddItemsToList();
-            //PresetList.SelectedIndex = 0;
+            Directory.CreateDirectory(Path.Combine(PresetPath,"Settings"));
+            if (File.Exists(Path.Combine(PresetPath, "Settings", "Settings.json")))
+            {
+                List<string> lel = IndexObject(Path.Combine(PresetPath, "Settings", "Settings.json"));
+                if (lel.Count < 4)
+                {
+                    File.Delete(Path.Combine(PresetPath, "Settings", "Settings.json"));
+                    FirstStart(true);
 
+                }
+            }
+            else
+            {
+                FirstStart(true);
+            }
+            FirstStart(false);
+            AddItemsToList();
+            AktualisereSetting();
         }
 
         #region JsonRead
 
-
-        private async Task FirstStart()
+        private async Task FirstStart(bool a)
         {
+            if (a == true)
+            {
+                string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0" };
+                string path = Path.Combine(PresetPath, "Settings", "Settings.json");
+                using (StreamWriter file = File.CreateText(path))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    string json = JsonConvert.SerializeObject(settings);
+                    await file.WriteAsync(json);
+                }
+            }
             var files1 = Directory.GetFiles(PresetPath);
             if (files1.Length != 0)
                 return;
             
             string[] preset1Extensions = new string[] { ".exe", ".dll", ".msixbundle", ".msixupload", ".pfx", ".winmd" };
             string[] preset2Extensions = new string[] { ".mp3", ".mp4", ".png", ".txt", ".docx", ".jpg", ".png" };
-            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false" };
-            string path = Path.Combine(PresetPath,"Settings","Settings.json") ;
-            using (StreamWriter file = File.CreateText(path))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                string json = JsonConvert.SerializeObject(settings);
-                await file.WriteAsync(json);
-            }
+
             await WritePresetToFile("Preset1", preset1Extensions);
             await WritePresetToFile("Preset2", preset2Extensions);
         }
@@ -116,38 +133,58 @@ namespace Project1
             {
                 await DeleteDirectory(MainViewmodel.Default.Copytotext);
             }
-            MainViewmodel.Default.Isvisable = true;
-            MainViewmodel.Default.Opaciprogress = 1;
-            if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
-            var item = MainViewmodel.Default.Selectedlistitem;
-            MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
-            string itemst = item.ToString();
-            var value3 = IndexObject(PresetPath + @"\" + itemst);
-            foreach (var value4 in value3)
-            {
-                if (value4.Contains('#'))
-                {
-                    ignore.Add(Regex.Replace(value4, @"#", ""));
-                }
-                else
-                {
-                    valuea.Add(value4);
-                }
-            }
 
-            string a = MainViewmodel.Default.Copyfromtext;
-            string b = MainViewmodel.Default.Copytotext;
-            if (String.IsNullOrEmpty(a) || String.IsNullOrEmpty(b))
+            if (Readsettings.Read1(3) < 2)
             {
-                return;
+                MainViewmodel.Default.Isvisable = true;
+                MainViewmodel.Default.Opaciprogress = 1;
+                if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
+                var item = MainViewmodel.Default.Selectedlistitem;
+                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
+                string itemst = item.ToString();
+                var value3 = IndexObject(PresetPath + @"\" + itemst);
+                foreach (var value4 in value3)
+                {
+                    if (value4.Contains('#'))
+                    {
+                        ignore.Add(Regex.Replace(value4, @"#", ""));
+                    }
+                    else
+                    {
+                        valuea.Add(value4);
+                    }
+                }
+
+                string a = MainViewmodel.Default.Copyfromtext;
+                string b = MainViewmodel.Default.Copytotext;
+                if (String.IsNullOrEmpty(a) || String.IsNullOrEmpty(b))
+                {
+                    return;
+                }
+                await Task.Run(() => CopyFolder(a, b, valuea, ignore));
+                if (Readsettings.Read(2) == true)
+                {
+                    await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
+                }
+                MainViewmodel.Default.Isenable = false;
+                MainViewmodel.Default.Opaciprogress = 0;
             }
-            await Task.Run(() => CopyFolder(a, b, valuea, ignore));
-            if (Readsettings.Read(2) == true)
+            else
             {
-               await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
+                MainViewmodel.Default.Isvisable = true;
+                MainViewmodel.Default.Opaciprogress = 1;
+                if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
+                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
+                string a = MainViewmodel.Default.Copyfromtext;
+                string b = MainViewmodel.Default.Copytotext;
+                await Task.Run(() => CopyFolder(a, b, valuea, ignore));
+                if (Readsettings.Read(2) == true)
+                {
+                    await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
+                }
+                MainViewmodel.Default.Isenable = false;
+                MainViewmodel.Default.Opaciprogress = 0;
             }
-            MainViewmodel.Default.Isenable = false;
-            MainViewmodel.Default.Opaciprogress = 0;
         }
         #endregion
 
@@ -265,9 +302,34 @@ namespace Project1
         //Edit presets button
        private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
+            if(PresetList.SelectedIndex == -1) 
+                return;
             isediting = true;
             var window = new Project1.pages.AddPreset();
             window.Show();
         }
+
+       public static void AktualisereSetting()
+       {
+           Dispatcher.UIThread.Post(() =>
+           {
+               var setting = Readsettings.Read1(3);
+               switch (setting)
+               {
+                   case 0:
+                       Listing = false;
+                       MainViewmodel.Default.Presetlistenable  = true;
+                       break;
+                   case 1:
+                       Listing = true;
+                       MainViewmodel.Default.Presetlistenable  = true;
+                       break;
+                   case 2:
+                       Listing = null;
+                       MainViewmodel.Default.Presetlistenable = false;
+                       break;
+               }
+           });
+       }
     }
 }

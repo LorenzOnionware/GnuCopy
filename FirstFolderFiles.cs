@@ -8,47 +8,42 @@ using static Readsettings;
 
 public class FirstFolderFiles
 {
-    public static async Task FirstFolder(string cf, string ct, List<string> a1, List<string> ignorefolders)
+    public static async Task FirstFolder(string cf, string ct, List<string> a1, bool? setting)
     {
-
         foreach (var abc in cf.Reverse())
         {
-            string[] MyArray = Directory.GetFiles(cf);
+            string[] MyArray;
+            switch (setting)
+            {
+                case true :
+                    MyArray = CleanupLoops.CLeanWhite(Directory.GetFiles(cf),a1.ToArray());
+                    break;
+                case false:
+                    MyArray = CleanupLoops.CLean(Directory.GetFiles(cf),a1.ToArray());
+                    break;
+                case null:
+                    MyArray = Directory.GetFiles(cf);
+                    break;
+            }
             foreach (var a in MyArray)
             {
-                if(itemlistfirstfolder.FirstFolderFileList.Contains(Path.GetFileName(a)))
-                {continue;}
-                else
+
+                string value1234 = "";
+                bool value123 = false;
+                foreach (var b in a.Reverse())
                 {
-                    bool abcd = false;
-                    foreach (var b in a1)
+                    if (b.ToString() == @"\")
                     {
-                        if (b == Path.GetExtension(a))
-                        {
-                            abcd = true;
-                        }
+                        value123 = true;
                     }
-
-                    if (abcd != true)
+                    else if (value123 != true)
                     {
-                        string value1234 = "";
-                        bool value123 = false;
-                        foreach (var b in a.Reverse())
-                        {
-                            if (b.ToString() == @"\")
-                            {
-                                value123 = true;
-                            }
-                            else if (value123 != true)
-                            {
-                                value1234 += b;
-                            }
-                        }
-
-                        string lel = new string(ct + @"\" + new string(value1234.Reverse().ToArray()));
-                        File.Copy(a, lel, overwrite: Read(0));
+                        value1234 += b;
                     }
                 }
+
+                string lel = new string(ct + @"\" + new string(value1234.Reverse().ToArray()));
+                File.Copy(a, lel, overwrite: Read(0));
             }
         }
     }
