@@ -14,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Remote.Protocol.Input;
 using DynamicData;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
 
@@ -76,6 +77,11 @@ public partial class SettingWindow : Window
                     case "listingart" :
                         if (value == "0"){SettingsViewmodel.Default.Listingart = "Blacklisting"; SettingsViewmodel.Default.Listingarts = false;}else if(value == "1"){SettingsViewmodel.Default.Listingart = "Whitelisting"; SettingsViewmodel.Default.Listingarts = true; }else{SettingsViewmodel.Default.Listingart = "Without preset"; SettingsViewmodel.Default.Listingarts = null;}
                         break;
+                    case "savelastpaths":
+                        if (value == "true"){SettingsViewmodel.Default.Savepaths = true;}else{SettingsViewmodel.Default.Savepaths = false;}
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -104,7 +110,7 @@ public partial class SettingWindow : Window
     }
     private void License_OnTapped(object? sender, TappedEventArgs e)
     {
-        OpenLink(Environment.CurrentDirectory + @"\pages\License.html");
+        OpenLink(Path.Combine(Environment.CurrentDirectory, "pages","License.txt"));
     }
     private void Contact_OnTapped(object? sender, TappedEventArgs e)
     {
@@ -258,6 +264,41 @@ public partial class SettingWindow : Window
         string pattern = "=(.*)$";
         string result = Regex.Replace(input, pattern, "=2");
         list.Replace<string>(list[3], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+
+    private void PathsChecked(object sender, RoutedEventArgs e)
+    {
+        SettingsViewmodel.Default.Savepaths = true;
+        if (cancel==true)
+            return;
+        var list = Jsonfile.ToArray();
+        string input = list[4];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, "=true");
+        list.Replace<string>(list[4], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+    private void PathsUnChecked(object sender, RoutedEventArgs e)
+    {
+        SettingsViewmodel.Default.Listingart = "Whitelist mode";
+        if (cancel==true)
+            return;
+        var list = Jsonfile.ToArray();
+        string input = list[4];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, "=false");
+        list.Replace<string>(list[4], result);
         Jsonfile.Clear();
         for (byte a = 0; a <= 2; a++)
         {

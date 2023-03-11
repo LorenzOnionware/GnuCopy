@@ -2,14 +2,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"  
         x:Class="Project1.pages.SettingWindow"
         xmlns:viewmodels="using:Project1.Viewmodels"
         x:DataType="viewmodels:SettingsViewmodel"
-        Title="SettingsWindow" Height="420" Width="470" Icon="../Assets/settings.png" CanResize="False" x:CompileBindings="True" 
-        Closed="TopLevel_OnClosed">
+        Title="SettingsWindow" Height="420" Width="470" Icon="\..\Assets\Settings.png" CanResize="False"
+        x:CompileBindings="True" Closed="TopLevel_OnClosed">
+    <Window.Styles>
+        <materialIcons:MaterialIconStyles />
+    </Window.Styles>
     <Grid>
         <Grid>
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50"></ColumnDefinition>
                 <ColumnDefinition Width="160"></ColumnDefinition>
@@ -27,6 +32,9 @@
             <FlyoutPresenter Grid.Column="1" Height="15" IsVisible="{Binding #Overritefiles.IsPointerOver}">
                 <TextBlock TextWrapping="Wrap" FontSize="11" Text="Overrite existing files"></TextBlock>
             </FlyoutPresenter>
+            <FlyoutPresenter Grid.Column="1" Height="15" Width="225" IsVisible="{Binding #Save.IsPointerOver}">
+                <TextBlock TextWrapping="Wrap" FontSize="11" Text="Save your last used paths for next time"></TextBlock>
+            </FlyoutPresenter>
             <FlyoutPresenter Grid.Column="1"  Height="15" IsVisible="{Binding #Clearforcopy.IsPointerOver}">
                 <TextBlock TextWrapping="Wrap" FontSize="11" Text="Clear target folder"></TextBlock>
             </FlyoutPresenter>
@@ -42,6 +50,7 @@
                 </StackPanel>
                 <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
                 <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
+                <CheckBox Name="Save" IsThreeState="False" IsChecked="{Binding Savepaths}" Unchecked="PathsUnChecked" Checked="PathsChecked">Save last paths</CheckBox>
                 <CheckBox Name="listing" IsThreeState="True" Content="{Binding Listingart}" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked" Indeterminate="ToggleButton_OnIndeterminate" IsChecked="{Binding Listingarts}"></CheckBox>
             </StackPanel>
             <StackPanel Grid.Column="4" Grid.Row="1">

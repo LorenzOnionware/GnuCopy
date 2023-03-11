@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using DynamicData;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
 using static Project1.Files;
@@ -27,6 +28,8 @@ namespace Project1
         private int _blockDuration = 500;
         public static string PresetPath = MainViewmodel.PPresetPath;
         private bool _blockMethod = false;
+        private static bool  savepath;
+        public List<string> Jsonfile => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(SettingsViewmodel.Default.settingspath));
 
         public MainWindow()
         {
@@ -38,47 +41,49 @@ namespace Project1
             if (File.Exists(Path.Combine(PresetPath, "Settings", "Settings.json")))
             {
                 List<string> lel = IndexObject(Path.Combine(PresetPath, "Settings", "Settings.json"));
-                if (lel.Count < 4)
+                if (lel.Count < 6)
                 {
                     File.Delete(Path.Combine(PresetPath, "Settings", "Settings.json"));
-                    FirstStart(true);
+                    FirstStart();
 
                 }
+                savepath = Readsettings.Read(4);
             }
             else
             {
-                FirstStart(true);
+                FirstStart();
             }
-            FirstStart(false);
             AddItemsToList();
             AktualisereSetting();
+            if (savepath)
+            {
+                MainViewmodel.Default.Copytotext = Readsettings.read2(6);
+                MainViewmodel.Default.Copyfromtext = Readsettings.read2(5);
+            }
         }
 
         #region JsonRead
 
-        private async Task FirstStart(bool a)
+        private async Task FirstStart()
         {
-            if (a == true)
+            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0","pathfrom=","pathto="};
+            string path = Path.Combine(PresetPath, "Settings", "Settings.json");
+            using (StreamWriter file = File.CreateText(path))
             {
-                string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0" };
-                string path = Path.Combine(PresetPath, "Settings", "Settings.json");
-                using (StreamWriter file = File.CreateText(path))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    string json = JsonConvert.SerializeObject(settings);
-                    await file.WriteAsync(json);
-                }
+                JsonSerializer serializer = new JsonSerializer();
+                string json = JsonConvert.SerializeObject(settings);
+                await file.WriteAsync(json);
             }
+
             var files1 = Directory.GetFiles(PresetPath);
-            if (files1.Length != 0)
-                return;
-            
-            string[] preset1Extensions = new string[] { ".exe", ".dll", ".msixbundle", ".msixupload", ".pfx", ".winmd" };
+            string[] preset1Extensions = new string[]
+                { ".exe", ".dll", ".msixbundle", ".msixupload", ".pfx", ".winmd" };
             string[] preset2Extensions = new string[] { ".mp3", ".mp4", ".png", ".txt", ".docx", ".jpg", ".png" };
 
             await WritePresetToFile("Preset1", preset1Extensions);
             await WritePresetToFile("Preset2", preset2Extensions);
         }
+
         private async Task WritePresetToFile(string presetName, string[] extensions)
         {
             string path = PresetPath + @"\" + presetName + ".json";
@@ -103,6 +108,7 @@ namespace Project1
             if (result != null)
             {
                 MainViewmodel.Default.Copyfromtext = result;
+                SettingsChange(5, result);
             }
 
         }
@@ -113,6 +119,7 @@ namespace Project1
             if (result != null)
             {
                 MainViewmodel.Default.Copytotext = result;
+                SettingsChange(6, result);
             }
         }
 
@@ -127,8 +134,25 @@ namespace Project1
             return jsonfile;
         }
 
+        private async Task SettingsChange(byte index,object ab)
+        {
+            var list = Jsonfile.ToArray();
+            string input = list[index];
+            string pattern = "=(.*)$";
+            string result = Regex.Replace(input, pattern, $"={ab}");
+            list.Replace<string>(list[index], result);
+            Jsonfile.Clear();
+            for (byte a = 0; a <= 2; a++)
+            {
+                Jsonfile.Add(list[a]);
+            }
+            File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+        }
         private async void Copy_OnClick(object? sender, RoutedEventArgs e)
         {
+            bool settingswrite = false;
+            byte ab = Readsettings.Read1(3);
+            A:
             if (Readsettings.Read(1))
             {
                 await DeleteDirectory(MainViewmodel.Default.Copytotext);
@@ -141,7 +165,16 @@ namespace Project1
                 if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
                 var item = MainViewmodel.Default.Selectedlistitem;
                 MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
-                string itemst = item.ToString();
+                string itemst = "";
+                if(item != null) 
+                    itemst = item.ToString();
+                else
+                {
+                    SettingsChange(3,2);
+                    settingswrite = true;
+                    goto A;
+                }
+              
                 var value3 = IndexObject(PresetPath + @"\" + itemst);
                 foreach (var value4 in value3)
                 {
@@ -181,6 +214,11 @@ namespace Project1
                 if (Readsettings.Read(2) == true)
                 {
                     await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
+                }
+
+                if (settingswrite)
+                {
+                    SettingsChange(3,ab);
                 }
                 MainViewmodel.Default.Isenable = false;
                 MainViewmodel.Default.Opaciprogress = 0;
@@ -224,7 +262,7 @@ namespace Project1
                 }
 
                 string itemst = item.ToString();
-                var value = IndexObject(PresetPath + @"\" + itemst);
+                var value = IndexObject(Path.Combine(PresetPath,itemst));
                 _blockMethod = true;
                 Task.Delay(_blockDuration).ContinueWith(t => _blockMethod = false);
                 MainViewmodel.Default.jsonindex.Clear();
@@ -288,7 +326,8 @@ namespace Project1
         {
             if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
             {
-                MainViewmodel.Default.Isenable = true; 
+                MainViewmodel.Default.Isenable = true;
+                SettingsChange(5, MainViewmodel.Default.Copyfromtext);
             }
         }
 
@@ -297,12 +336,13 @@ namespace Project1
             if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
             {
                 MainViewmodel.Default.Isenable = true;
+                SettingsChange(6, MainViewmodel.Default.Copytotext);
             }
         }
         //Edit presets button
        private void Button_OnClick(object? sender, RoutedEventArgs e)
         {
-            if(PresetList.SelectedIndex == -1) 
+            if(PresetList.SelectedIndex == -1 || isediting) 
                 return;
             isediting = true;
             var window = new Project1.pages.AddPreset();
@@ -311,6 +351,7 @@ namespace Project1
 
        public static void AktualisereSetting()
        {
+           savepath = Readsettings.Read(4);
            Dispatcher.UIThread.Post(() =>
            {
                var setting = Readsettings.Read1(3);

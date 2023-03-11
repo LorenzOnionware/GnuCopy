@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
         x:Class="Project1.pages.Contributors"
-        Height="200" Width="290" CanResize="False"
+        Height="240" Width="330" CanResize="False"
         Title="Contributors">
         <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Vertical">
@@ -13,6 +13,8 @@
                         <Label Content="Jaden Nebel" FontStyle="Italic"></Label>
                         <Label Content="Helpers:" FontWeight="Bold" Foreground="Green"></Label>
                         <Label Content="Marvin Miltkau" FontStyle="Italic"></Label>
+                        <Label Content="Icons:" FontWeight="Bold" Foreground="Green"></Label>
+                        <Label Content="SKProCH " FontStyle="Italic"></Label>
                 </StackPanel>
                 <Image Source="../Assets/Onionware.png" Stretch="Fill"></Image>
         </StackPanel>

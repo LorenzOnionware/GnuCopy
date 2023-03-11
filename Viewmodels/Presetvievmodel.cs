@@ -12,6 +12,7 @@ public partial class Presetvievmodel
     public static Presetvievmodel Default = new();
     public ObservableCollection<string> Dataformatlist { get; set; } = new();
     public ObservableCollection<string> Folderlist { get; set; } = new();
+    public bool editing = false;
 
     [ObservableProperty]
     private string textboxtext;

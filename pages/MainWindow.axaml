@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:local="Project1"
         xmlns:project1="clr-namespace:Project1"
         x:DataType="viewmodels:MainViewmodel"
@@ -13,6 +14,10 @@
         x:Class="Project1.MainWindow"
         Title="GnuCopy" Width="800" Height="640" CanResize="False" Icon="../Assets/GnuCopy.ico" 
         x:CompileBindings="True">
+
+    <Window.Styles>
+        <materialIcons:MaterialIconStyles />
+    </Window.Styles>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -28,19 +33,13 @@
         <StackPanel Grid.Row="0" Width="650" Grid.ColumnSpan="3" Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
                 <TextBox Name="Copyfrom" TextChanging="Copyfrom_OnTextChanged" Margin="5,20" Width="600" Text="{Binding Copyfromtext}" Watermark="Copy from"></TextBox>
-                <Button Width="40" MaxWidth="40" Content="..." Margin="5,5" FontSize="18" Click="CopyDialog"></Button>
-                <Button Click="Settingb_OnClick" Height="37" Width="40" Margin="2,2">
-                        <controls:SymbolIcon FontSize="20" Symbol="Setting">
-                            <controls:SymbolIcon.RenderTransform>
-                                <ScaleTransform ScaleX="1.5" ScaleY="1.5"></ScaleTransform>
-                            </controls:SymbolIcon.RenderTransform>
-                        </controls:SymbolIcon>
-                    </Button>
+                <Button Width="40" MaxWidth="40" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,5" FontSize="18" Click="CopyDialog"></Button>
+                <Button Click="Settingb_OnClick" Height="37" Width="40" Margin="2,2" Content="{materialIcons:MaterialIconExt Kind=Settings}"></Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBox Name="Copyto" TextChanging="Copyto_OnTextChanged" Width="600" Margin="5,5" Watermark="Copy to" Text="{Binding Copytotext}"></TextBox>
                <StackPanel Orientation="Vertical">
-                       <Button Width="40" MaxWidth="40" Margin="5,5" Content="..." FontSize="18" Click="PasteDialog"></Button>
+                       <Button Width="40" MaxWidth="40" Margin="5,5" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" FontSize="18" Click="PasteDialog"></Button>
                </StackPanel>
             </StackPanel>
             <Grid Margin="5,5">
@@ -68,15 +67,9 @@
                 </ListBox>
             </StackPanel>
             <StackPanel Orientation="Vertical">
-                <Button Margin="2,2" Content="+" Click="AddPreset_OnClick" Height="40" Width="40" FontSize="18"></Button>
-                <Button Content="-" Margin="2,2" Height="40" Width="40" Click="RemovePreset_OnClick" FontSize="18"></Button>
-                <Button Width="40" Height="40" Margin="2,2" Click="Button_OnClick">
-                    <controls:SymbolIcon FontSize="20" Symbol="Edit">
-                        <controls:SymbolIcon.RenderTransform>
-                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform>
-                        </controls:SymbolIcon.RenderTransform>
-                    </controls:SymbolIcon>
-                </Button>
+                <Button Margin="2,2" Content="{materialIcons:MaterialIconExt Kind=Add}" Click="AddPreset_OnClick" Height="40" Width="40" FontSize="18"></Button>
+                <Button Content="{materialIcons:MaterialIconExt Kind=Delete}" Margin="2,2" Height="40" Width="40" Command="{Binding DeleteSelectedPresetCommand}" FontSize="18"></Button>
+                <Button Width="40" Height="40" Margin="2,2" Click="Button_OnClick" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
             </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1" Grid.RowSpan="2" Margin="5,5" Grid.Column="0">

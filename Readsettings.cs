@@ -60,4 +60,24 @@ public class Readsettings
 
         return index2;
     }
+
+    public static string read2(byte index)
+    {
+        string indexe = "";
+        string[] Jsonfile3 = (JsonConvert.DeserializeObject<string[]>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy\Settings\Settings.json")));   
+        string pattern2 = "=(.*)$";
+        Match match2 = Regex.Match(Jsonfile3[index], pattern2);
+        if (match2.Success)
+        {
+            if (index == 4)
+            {
+                indexe = match2.Groups[1].Value;
+            }
+            else
+            {
+                indexe = match2.Groups[1].Value;
+            }
+        }
+        return indexe;
+    }
 }

@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Project1.pages.AddPreset"
         xmlns:viewmodels="using:Project1.Viewmodels"
@@ -9,6 +10,9 @@
         Title="AddPreset" Height="400" Width="600" CanResize="False"
         x:CompileBindings="True" Closing="Window_Closing">
 
+        <Window.Styles>
+                <materialIcons:MaterialIconStyles />
+        </Window.Styles>
         <Grid>
                 <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition>
@@ -84,7 +88,6 @@
                                         </ListBox.ItemTemplate>
                                 </ListBox>
                         </ScrollViewer>
-
                 </Grid>
         </Grid>
 </Window>

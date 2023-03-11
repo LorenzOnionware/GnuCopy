@@ -39,6 +39,7 @@ public partial class AddPreset : Window
         {
             if (MainWindow.isediting)
             {
+                this.Title = "EditPreset";
                 var l = MainWindow.IndexObject((MainWindow.PresetPath + @"\" + MainViewmodel.Default.Selectedlistitem));
                 var ll = l.ToArray();
                 Presetvievmodel.Default.Textbox2text = Regex.Replace(MainViewmodel.Default.Selectedlistitem, @"\..*$", "");
@@ -103,8 +104,11 @@ public partial class AddPreset : Window
         var folderlist1 = Presetvievmodel.Default.Folderlist;
         foreach (var value in Dataformatlist1)
         {
-            string value2 = new string(@"." + value);
-            list1.Add(value2);
+            bool startsWithDot = Regex.IsMatch(value, @"^\.");
+            if(startsWithDot)
+                list1.Add(value);
+            else
+                list1.Add("."+value);
         }
 
         foreach (var value in folderlist1)
@@ -159,17 +163,19 @@ public partial class AddPreset : Window
             Presetvievmodel.Default.Folderlist.Add(folders);
         }
 
-        Presetvievmodel.Default.Dataformatstext = "";
+        Presetvievmodel.Default.Dataformatstext = ".";
         Presetvievmodel.Default.Folderstext = "";
     }
 
-    private void Window_Closing(object? sender, CancelEventArgs e)
+    private void Window_Closing(object? sender, WindowClosingEventArgs e)
     {
         MainWindow.isediting = false;
+        this.Title = "AddPreset";
         if (Presetvievmodel.Default.Textbox2text != null)
             Presetvievmodel.Default.Textbox2text = "";
         Presetvievmodel.Default.Dataformatlist.Clear();
         Presetvievmodel.Default.Folderlist.Clear();
         MainViewmodel.openwindow = false;
+        Presetvievmodel.Default.editing = false;
     }
 }
