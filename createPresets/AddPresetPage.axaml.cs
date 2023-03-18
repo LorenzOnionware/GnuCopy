@@ -35,6 +35,8 @@ public partial class AddPreset : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+        Presetvievmodel.Default.Dataformatlist.Clear();
+        Presetvievmodel.Default.Folderlist.Clear();
         Dispatcher.UIThread.Post((() =>
         {
             if (MainWindow.isediting)
@@ -177,5 +179,7 @@ public partial class AddPreset : Window
         Presetvievmodel.Default.Folderlist.Clear();
         MainViewmodel.openwindow = false;
         Presetvievmodel.Default.editing = false;
+        list1.Clear();
+        Presetvievmodel.Default = new();
     }
 }

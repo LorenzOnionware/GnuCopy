@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using DynamicData;
@@ -29,6 +30,7 @@ namespace Project1
         public static string PresetPath = MainViewmodel.PPresetPath;
         private bool _blockMethod = false;
         private static bool  savepath;
+        public static bool aktualiseallows = true;
         public List<string> Jsonfile => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(SettingsViewmodel.Default.settingspath));
 
         public MainWindow()
@@ -38,10 +40,11 @@ namespace Project1
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Directory.CreateDirectory(PresetPath);
             Directory.CreateDirectory(Path.Combine(PresetPath,"Settings"));
+            Task.Run(() => aktualisecopybt());
             if (File.Exists(Path.Combine(PresetPath, "Settings", "Settings.json")))
             {
                 List<string> lel = IndexObject(Path.Combine(PresetPath, "Settings", "Settings.json"));
-                if (lel.Count < 6)
+                if (lel.Count < 7)
                 {
                     File.Delete(Path.Combine(PresetPath, "Settings", "Settings.json"));
                     FirstStart();
@@ -62,11 +65,27 @@ namespace Project1
             }
         }
 
+        public static async Task aktualisecopybt()
+        {
+            while(aktualiseallows)
+            {
+                if (string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) == false && string.IsNullOrEmpty(MainViewmodel.Default.Copytotext)==false)
+                {
+                    MainViewmodel.Default.Isenable = true;
+                }
+                else
+                {
+                    MainViewmodel.Default.Isenable = false;
+                }
+                Thread.Sleep(500);
+            }
+        }
+
         #region JsonRead
 
         private async Task FirstStart()
         {
-            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0","pathfrom=","pathto="};
+            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0","savelastpaths=false","pathfrom=","pathto="};
             string path = Path.Combine(PresetPath, "Settings", "Settings.json");
             using (StreamWriter file = File.CreateText(path))
             {
@@ -97,7 +116,7 @@ namespace Project1
 
         #endregion
 
-        #region TextBoxBackend
+        #region Dialogs
 
 
         
@@ -125,15 +144,14 @@ namespace Project1
 
         #endregion
 
-
-        #region MoveProcess
-
         public static List<string> IndexObject(string e)
         {
             List<string> jsonfile = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(e));
             return jsonfile;
         }
-
+        
+        #region MoveProcess
+        
         private async Task SettingsChange(byte index,object ab)
         {
             var list = Jsonfile.ToArray();
@@ -199,7 +217,7 @@ namespace Project1
                 {
                     await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
                 }
-                MainViewmodel.Default.Isenable = false;
+                aktualiseallows = false;
                 MainViewmodel.Default.Opaciprogress = 0;
             }
             else
@@ -220,7 +238,8 @@ namespace Project1
                 {
                     SettingsChange(3,ab);
                 }
-                MainViewmodel.Default.Isenable = false;
+
+                aktualiseallows = true;
                 MainViewmodel.Default.Opaciprogress = 0;
             }
         }
@@ -324,20 +343,20 @@ namespace Project1
 
         private void Copyfrom_OnTextChanged(object? sender, TextChangingEventArgs textChangingEventArgs)
         {
-            if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
+            if (string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext))
             {
-                MainViewmodel.Default.Isenable = true;
-                SettingsChange(5, MainViewmodel.Default.Copyfromtext);
-            }
+                return;
+            } 
+            SettingsChange(5, MainViewmodel.Default.Copyfromtext);
         }
 
         private void Copyto_OnTextChanged(object? sender, TextChangingEventArgs textChangingEventArgs)
         {
-            if (!string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) & !string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
+            if (string.IsNullOrEmpty(MainViewmodel.Default.Copytotext))
             {
-                MainViewmodel.Default.Isenable = true;
-                SettingsChange(6, MainViewmodel.Default.Copytotext);
-            }
+               return;
+            } 
+            SettingsChange(6, MainViewmodel.Default.Copytotext);
         }
         //Edit presets button
        private void Button_OnClick(object? sender, RoutedEventArgs e)

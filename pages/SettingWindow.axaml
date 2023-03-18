@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"  
         x:Class="Project1.pages.SettingWindow"
         xmlns:viewmodels="using:Project1.Viewmodels"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         x:DataType="viewmodels:SettingsViewmodel"
         Title="SettingsWindow" Height="420" Width="470" Icon="\..\Assets\Settings.png" CanResize="False"
         x:CompileBindings="True" Closed="TopLevel_OnClosed">
@@ -60,10 +61,10 @@
                 <Image Source="../Assets/GithubIco.png"></Image>
             </StackPanel>
             <StackPanel Grid.Column="4" Grid.Row="3" Height="110">
-                <Label Foreground="#7cc1fb" Content="Contributors" Tapped="Contributors_OnTapped"></Label>
-                <Label Content="Github" Tapped="Github_OnTapped" Foreground="#7cc1fb"></Label>
-                <Label Content="License" Tapped="License_OnTapped" Foreground="#7cc1fb"></Label>
-                <Label Content="Contact" Tapped="Contact_OnTapped" Foreground="#7cc1fb"></Label>
+                <controls:HyperlinkButton Content="Contributors" Tapped="Contributors_OnTapped"></controls:HyperlinkButton>
+                <controls:HyperlinkButton Content="Github" Tapped="Github_OnTapped"></controls:HyperlinkButton>
+                <controls:HyperlinkButton Content="License" Tapped="License_OnTapped"></controls:HyperlinkButton>
+                <controls:HyperlinkButton Content="Contact" Tapped="Contact_OnTapped"></controls:HyperlinkButton>
             </StackPanel>
             <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
                 <Image Source="../Assets/Onionware.png"></Image>
