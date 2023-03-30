@@ -47,6 +47,7 @@ public partial class Delete : Window
 
     private void TopLevel_OnClosed(object? sender, EventArgs e)
     {
+        MainViewmodel.Default.Selectedpreset = 0;
         MainViewmodel.openwindow1 = false;
         
     }

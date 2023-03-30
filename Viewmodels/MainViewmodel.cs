@@ -30,12 +30,13 @@ public partial class MainViewmodel
     public static bool openwindow = false;
     public static bool openwindow1 = false;
     [ObservableProperty]private static bool presetlistenable = false;
-    [ObservableProperty] private string copytotext;
-    [ObservableProperty] private string copyfromtext;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copytotext;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;
-    [ObservableProperty] private bool isenable;
-    [ObservableProperty] private double opaciprogress = 0.0;
+    public bool Isenable => MainViewmodel.Default.Copyfromtext != "" && MainViewmodel.Default.Copytotext != "";
 
+    [ObservableProperty] private double opaciprogress = 0.0;
+    [ObservableProperty] private int selectedpreset;
     [ObservableProperty]private string selectedlistitem; 
     public static string PPresetPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy";
     public static bool deleted = false;

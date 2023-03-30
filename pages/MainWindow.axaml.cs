@@ -12,8 +12,10 @@ using Avalonia.Threading;
 using DynamicData;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
-using static Project1.Files;
-using static Project1.DeleteDirectories;
+using SharpCompress.Archives;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
 
 
 namespace Project1
@@ -22,15 +24,14 @@ namespace Project1
     {
         public static bool? Listing = false;
         public static bool isediting = false;
-        public List<string> valuea = new();
-        public List<string> ignore = new();
+        public List<string> ignorefiles = new();
+        public List<string> ignorefolder = new();
         public bool selectionchange = false;
         private bool _eventHandlerBlocked = false;
         private int _blockDuration = 500;
         public static string PresetPath = MainViewmodel.PPresetPath;
         private bool _blockMethod = false;
         private static bool  savepath;
-        public static bool aktualiseallows = true;
         public List<string> Jsonfile => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(SettingsViewmodel.Default.settingspath));
 
         public MainWindow()
@@ -40,11 +41,10 @@ namespace Project1
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             Directory.CreateDirectory(PresetPath);
             Directory.CreateDirectory(Path.Combine(PresetPath,"Settings"));
-            Task.Run(() => aktualisecopybt());
             if (File.Exists(Path.Combine(PresetPath, "Settings", "Settings.json")))
             {
-                List<string> lel = IndexObject(Path.Combine(PresetPath, "Settings", "Settings.json"));
-                if (lel.Count < 7)
+                List<string>? lel = IndexObject(Path.Combine(PresetPath, "Settings", "Settings.json"));
+                if (lel == null||lel.Count < 8)
                 {
                     File.Delete(Path.Combine(PresetPath, "Settings", "Settings.json"));
                     FirstStart();
@@ -63,29 +63,14 @@ namespace Project1
                 MainViewmodel.Default.Copytotext = Readsettings.read2(6);
                 MainViewmodel.Default.Copyfromtext = Readsettings.read2(5);
             }
-        }
-
-        public static async Task aktualisecopybt()
-        {
-            while(aktualiseallows)
-            {
-                if (string.IsNullOrEmpty(MainViewmodel.Default.Copyfromtext) == false && string.IsNullOrEmpty(MainViewmodel.Default.Copytotext)==false)
-                {
-                    MainViewmodel.Default.Isenable = true;
-                }
-                else
-                {
-                    MainViewmodel.Default.Isenable = false;
-                }
-                Thread.Sleep(500);
-            }
+            
         }
 
         #region JsonRead
 
         private async Task FirstStart()
         {
-            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0","savelastpaths=false","pathfrom=","pathto="};
+            string[] settings = new[] { "Overrite=true", "clearforcopy=false", "clearaftercopy=false", "listingart=0","savelastpaths=false","pathfrom=","pathto=","packageformat=none"};
             string path = Path.Combine(PresetPath, "Settings", "Settings.json");
             using (StreamWriter file = File.CreateText(path))
             {
@@ -168,83 +153,93 @@ namespace Project1
         }
         private async void Copy_OnClick(object? sender, RoutedEventArgs e)
         {
-            bool settingswrite = false;
-            byte ab = Readsettings.Read1(3);
-            A:
-            if (Readsettings.Read(1))
+            if (Readsettings.read3(7) != "none")
             {
-                await DeleteDirectory(MainViewmodel.Default.Copytotext);
-            }
-
-            if (Readsettings.Read1(3) < 2)
-            {
-                MainViewmodel.Default.Isvisable = true;
-                MainViewmodel.Default.Opaciprogress = 1;
-                if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
-                var item = MainViewmodel.Default.Selectedlistitem;
-                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
-                string itemst = "";
-                if(item != null) 
-                    itemst = item.ToString();
-                else
-                {
-                    SettingsChange(3,2);
-                    settingswrite = true;
-                    goto A;
-                }
-              
-                var value3 = IndexObject(PresetPath + @"\" + itemst);
+                var value3 = IndexObject(Path.Combine(PresetPath, MainViewmodel.Default.Selectedlistitem));
                 foreach (var value4 in value3)
                 {
                     if (value4.Contains('#'))
                     {
-                        ignore.Add(Regex.Replace(value4, @"#", ""));
+                        ignorefolder.Add(Regex.Replace(value4, @"#", ""));
                     }
                     else
                     {
-                        valuea.Add(value4);
+                        ignorefiles.Add(value4);
                     }
                 }
-
-                string a = MainViewmodel.Default.Copyfromtext;
-                string b = MainViewmodel.Default.Copytotext;
-                if (String.IsNullOrEmpty(a) || String.IsNullOrEmpty(b))
+                switch (Readsettings.read3(7))
                 {
-                    return;
+                    case "7Zip" :
+                        await copypackaged.Copy(ignorefiles,ignorefolder);
+                        StartPackaging(true);
+                        break;
+                    case "Tar":
+                        await copypackaged.Copy(ignorefiles,ignorefolder);
+                        StartPackaging(false);
+                        break;
                 }
-                await Task.Run(() => CopyFolder(a, b, valuea, ignore));
-                if (Readsettings.Read(2) == true)
-                {
-                    await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
-                }
-                aktualiseallows = false;
-                MainViewmodel.Default.Opaciprogress = 0;
             }
             else
             {
-                MainViewmodel.Default.Isvisable = true;
-                MainViewmodel.Default.Opaciprogress = 1;
-                if (string.IsNullOrEmpty(Copyto.Text) || string.IsNullOrEmpty(Copyfrom.Text)) return;
-                MainViewmodel.Default.Progressmax = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories).Count() - 1;
-                string a = MainViewmodel.Default.Copyfromtext;
-                string b = MainViewmodel.Default.Copytotext;
-                await Task.Run(() => CopyFolder(a, b, valuea, ignore));
-                if (Readsettings.Read(2) == true)
-                {
-                    await DeleteDirectories.DeleteDirectory(MainViewmodel.Default.Copyfromtext);
-                }
+                CopyUnPackaged();
+            }
+        }
 
-                if (settingswrite)
-                {
-                    SettingsChange(3,ab);
-                }
+        private static void StartPackaging(bool verfahren)
+        {
+            switch (verfahren)
+            {
+                case true:
+                    goto B;
+                    break;
+                case false:
+                    goto C;
+                    break;
+            }
+            B:
+            using (var archive = ZipArchive.Create())
+            {
+                archive.AddAllFromDirectory(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"));
+                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,"Compresseddirection.7z"),CompressionType.LZMA);
+            }
+            Directory.Delete(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"),true);
+            C:
+            using (var archive = ZipArchive.Create())
+            {
+                archive.AddAllFromDirectory(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"));
+                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,"Compresseddirection.tar"),CompressionType.None);
+            }
+            Directory.Delete(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"),true);
+            
+        }
 
-                aktualiseallows = true;
-                MainViewmodel.Default.Opaciprogress = 0;
+        private async void CopyUnPackaged()
+        {
+            bool settingschaged = false;
+            if (MainViewmodel.Default.Selectedpreset == -1)
+            {
+                settingschaged = true;
+            }
+            if (Path.Exists(MainViewmodel.Default.Copyfromtext) && Path.Exists(MainViewmodel.Default.Copytotext))
+            {
+                var value3 = IndexObject(Path.Combine(PresetPath, MainViewmodel.Default.Selectedlistitem));
+                foreach (var value4 in value3)
+                {
+                    if (value4.Contains('#'))
+                    {
+                        ignorefolder.Add(Regex.Replace(value4, @"#", ""));
+                    }
+                    else
+                    {
+                        ignorefiles.Add(value4);
+                    }
+                }
+                await Copy.Settings(ignorefolder, ignorefiles);
             }
         }
         #endregion
 
+        
         #region Presets
         public async Task AddItemsToList()
         {
@@ -277,6 +272,7 @@ namespace Project1
                 string item = MainViewmodel.Default.Selectedlistitem;
                 if (item == null)
                 {
+                    MainViewmodel.Default.jsonindex.Clear();
                     return;
                 }
 
@@ -302,17 +298,6 @@ namespace Project1
                 MainViewmodel.openwindow = true;
             }
         }
-
-        private async void RemovePreset_OnClick(object? sender, RoutedEventArgs e)
-        {
-            if (MainViewmodel.openwindow1 == false)
-            {
-                MainViewmodel.Default.Selectedlistitem = MainViewmodel.Default.Selectedlistitem;
-                var window = new Project1.Delete();
-                window.Show();
-                MainViewmodel.openwindow1 = true;
-            }
-        }
         public static void DeleteSucces()
         {
             MainWindow window1 = new MainWindow();
@@ -329,7 +314,8 @@ namespace Project1
             window1.AddItemsToList();
         }
         #endregion
-
+        
+        #region something-other
         private void SelectingItemsControl_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             jsonindexviev.SelectedIndex = -1;
@@ -390,6 +376,9 @@ namespace Project1
                        break;
                }
            });
+             
        }
+       
+       #endregion  
     }
 }

@@ -47,12 +47,24 @@
             </FlyoutPresenter>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="9,5" Orientation="Vertical">
                 <StackPanel>
-                    <CheckBox IsChecked="{Binding Overritechecked}" Name="Overritefiles" Unchecked="Overritefiles_OnUnchecked" Checked="Overritefiles_OnChecked">Overwrite</CheckBox>
+                    <CheckBox IsChecked="{Binding Overritechecked}" Name="Overritefiles" Unchecked="Overritefiles_OnUnchecked" Checked="Overritefiles_OnChecked">Overwrite</CheckBox>       
+                    <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
+                    <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
+                    <CheckBox Name="Save" IsThreeState="False" IsChecked="{Binding Savepaths}" Unchecked="PathsUnChecked" Checked="PathsChecked">Save last paths</CheckBox>
+                    <CheckBox Name="listing" IsThreeState="True" Content="{Binding Listingart}" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked" Indeterminate="ToggleButton_OnIndeterminate" IsChecked="{Binding Listingarts}"></CheckBox>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Package to"/>
+                        <ComboBox Width="80"  DropDownClosed="SelectingItemsControl_OnSelectionChanged" SelectedIndex="{Binding Comboboxselectedindex}">
+                            <ComboBox.Items >
+                                <ComboBoxItem Content="none"></ComboBoxItem>
+                                <ComboBoxItem Content="7Zip"></ComboBoxItem>
+                                <ComboBoxItem Content="Tar"></ComboBoxItem>
+                            </ComboBox.Items>
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
-                <CheckBox IsChecked="{Binding Clearforchecked}" Name="Clearforcopy" Checked="Clearforcopy_OnChecked" Unchecked="Clearforcopy_OnUnchecked">Clear for copy</CheckBox>
-                <CheckBox IsChecked="{Binding Clearafterchecked}" Name="Clearaftercopy" Unchecked="Clearaftercopy_OnUnchecked" Checked="Clearaftercopy_OnChecked">Delete after copy</CheckBox>
-                <CheckBox Name="Save" IsThreeState="False" IsChecked="{Binding Savepaths}" Unchecked="PathsUnChecked" Checked="PathsChecked">Save last paths</CheckBox>
-                <CheckBox Name="listing" IsThreeState="True" Content="{Binding Listingart}" Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnUnchecked" Indeterminate="ToggleButton_OnIndeterminate" IsChecked="{Binding Listingarts}"></CheckBox>
+             
+               
             </StackPanel>
             <StackPanel Grid.Column="4" Grid.Row="1">
                 <Viewbox>

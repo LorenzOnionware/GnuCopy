@@ -80,6 +80,21 @@ public partial class SettingWindow : Window
                     case "savelastpaths":
                         if (value == "true"){SettingsViewmodel.Default.Savepaths = true;}else{SettingsViewmodel.Default.Savepaths = false;}
                         break;
+                    case "packageformat":
+                        if (value == "none")
+                        {
+                            SettingsViewmodel.Default.Comboboxselectedindex = 0;
+                            
+                        }
+                        else if (value == "7Zip")
+                        {
+                            SettingsViewmodel.Default.Comboboxselectedindex = 1;
+                        }
+                        else
+                        {
+                            SettingsViewmodel.Default.Comboboxselectedindex = 2;
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -305,5 +320,39 @@ public partial class SettingWindow : Window
             Jsonfile.Add(list[a]);
         }
         File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+
+    private void SelectingItemsControl_OnSelectionChanged(object? sender, EventArgs e)
+    {
+        var list = Jsonfile.ToArray();
+        string input = list[7];
+        string pattern = "=(.*)$";
+        string result = Regex.Replace(input, pattern, $"={IntToStrg(SettingsViewmodel.Default.Comboboxselectedindex)}");
+        list.Replace<string>(list[7], result);
+        Jsonfile.Clear();
+        for (byte a = 0; a <= 2; a++)
+        {
+            Jsonfile.Add(list[a]);
+        }
+        File.WriteAllText(SettingsViewmodel.Default.settingspath, JsonConvert.SerializeObject(list));
+    }
+
+    public string IntToStrg(int a)
+    {
+        var ab = "";
+        switch (a)
+        {
+          case 0:
+              ab= "none";
+              break;
+          case 1:
+              ab= "7Zip";
+              break;
+          case 2:
+              ab= "Tar";
+              break;
+          
+        }
+        return ab;
     }
 }

@@ -80,4 +80,13 @@ public class Readsettings
         }
         return indexe;
     }
+
+    public static string read3(byte index)
+    {
+        string[] Jsonfile3 = (JsonConvert.DeserializeObject<string[]>(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\GnuCopy\Settings\Settings.json")));   
+        string pattern2 = "=(.*)$";
+        Match match2 = Regex.Match(Jsonfile3[index], pattern2);
+        return match2.Groups[1].Value;
+
+    }
 }

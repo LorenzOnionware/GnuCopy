@@ -90,6 +90,11 @@ public partial class AddPreset : Window
             Presetvievmodel.Default.Textbox2text = "Please write a name for this preset.";
             return;
         }
+
+        if (Presetvievmodel.Default.Textbox2text == "Please write a name for this preset.")
+        {
+            return;
+        }
         
         await Dataformats(Presetvievmodel.Default.Textboxtext);
         MainViewmodel.openwindow = false;
@@ -102,8 +107,10 @@ public partial class AddPreset : Window
     private static List<string>  list1 = new();
     private async Task Dataformats(string a)
     {
-        var Dataformatlist1= Presetvievmodel.Default.Dataformatlist;
-        var folderlist1 = Presetvievmodel.Default.Folderlist;
+        HashSet<string> Dataformatlist1 = new HashSet<string>();
+        HashSet<string> folderlist1 = new HashSet<string>();
+        Dataformatlist1 = Presetvievmodel.Default.Dataformatlist.ToHashSet();
+        folderlist1 = Presetvievmodel.Default.Folderlist.ToHashSet();
         foreach (var value in Dataformatlist1)
         {
             bool startsWithDot = Regex.IsMatch(value, @"^\.");
@@ -157,15 +164,20 @@ public partial class AddPreset : Window
         var folders = Presetvievmodel.Default.folderstext;
         if (string.IsNullOrEmpty(dataformats) != true)
         {
-            Presetvievmodel.Default.Dataformatlist.Add(dataformats);
+            
+            string pattern = "^\\.";
+            string replacement = "";
+
+            Regex rgx = new Regex(pattern);
+            string result = rgx.Replace(dataformats, replacement);
+            Presetvievmodel.Default.Dataformatlist.Add(result);
         }
 
         if (string.IsNullOrEmpty(folders) != true)
         {
             Presetvievmodel.Default.Folderlist.Add(folders);
         }
-
-        Presetvievmodel.Default.Dataformatstext = ".";
+        
         Presetvievmodel.Default.Folderstext = "";
     }
 
