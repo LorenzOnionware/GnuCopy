@@ -12,77 +12,95 @@
         xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Project1.MainWindow"
-        Title="GnuCopy" Width="800" Height="640" CanResize="False" Icon="../Assets/GnuCopy.ico" 
+        Title="GnuCopy" MinWidth="350" MinHeight="350" CanResize="True" Icon="../Assets/GnuCopy.ico"
         x:CompileBindings="True">
 
     <Window.Styles>
         <materialIcons:MaterialIconStyles />
     </Window.Styles>
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350"></ColumnDefinition>
-            <ColumnDefinition Width="100"></ColumnDefinition>
-            <ColumnDefinition Width="350"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
+    
+    <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
-            <RowDefinition Height="300"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Width="650" Grid.ColumnSpan="3" Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Name="Copyfrom" TextChanging="Copyfrom_OnTextChanged" Margin="5,20" Width="600" Text="{Binding Copyfromtext}" Watermark="Copy from"></TextBox>
-                <Button Width="40" MaxWidth="40" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,5" FontSize="18" Click="CopyDialog"></Button>
-                <Button Click="Settingb_OnClick" Height="37" Width="40" Margin="2,2" Content="{materialIcons:MaterialIconExt Kind=Settings}"></Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBox Name="Copyto" TextChanging="Copyto_OnTextChanged" Width="600" Margin="5,5" Watermark="Copy to" Text="{Binding Copytotext}"></TextBox>
-               <StackPanel Orientation="Vertical">
-                       <Button Width="40" MaxWidth="40" Margin="5,5" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" FontSize="18" Click="PasteDialog"></Button>
-               </StackPanel>
-            </StackPanel>
-            <Grid Margin="5,5">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Orientation="Vertical">
-                            <Label Content="P" Opacity="0,0"></Label>
-                            <ProgressBar Width="580" Opacity="{Binding Opaciprogress}" Margin="5,5"  Maximum="{Binding Progressmax}" Minimum="0" Value="{Binding Progressvalue}"></ProgressBar>
-                        </StackPanel>
-                        <Button Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy" Click="Copy_OnClick"></Button>
-                    </StackPanel>
-                </StackPanel>
+        <Button Grid.Row="0" Margin="5,-5" HorizontalAlignment="Right" Command="{Binding SettingsCommand}" Content="{materialIcons:MaterialIconExt Settings}"></Button>
+        <!-- ObersterTeil -->
+        <StackPanel Grid.Row="1">
+                <Label Content="Source"></Label>
+                <Grid ColumnDefinitions="*,Auto">
+                 <TextBox Text="{Binding Copyfromtext, Mode=TwoWay}" Watermark="Select folder that you want to copy"></TextBox>
+                <Button Height="{Binding #TargetPath.Bounds.Height}" Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18" Command="{Binding CopySourceDialogCommand}"></Button>
+            </Grid>
+              <Label Content="Target"></Label> 
+            <Grid ColumnDefinitions="*,Auto">
+                  <TextBox Text="{Binding Copytotext, Mode=TwoWay}" Name="TargetPath" Watermark="Copy to"></TextBox>
+                <Button Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Height="{Binding #TargetPath.Bounds.Height}" Margin="5,0" FontSize="18" Command="{Binding CopyTargetDialogCommand}"></Button>
             </Grid>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal">
+        
+        <!-- MittlererTeil -->
+        <Grid Margin="0,7" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
             <StackPanel>
-                <ListBox Width="250" Name="PresetList" SelectedIndex="{Binding Selectedpreset}" IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5" SelectionChanged="PresetList_OnSelectionChanged" Items="{Binding Folderitems}">
+                <WrapPanel Orientation="Horizontal">
+                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}" Click="AddPreset_OnClick"></Button>
+                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Delete}" Command="{Binding DeleteSelectedPresetCommand}"></Button>
+                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
+                </WrapPanel>
+                <ListBox Name="PresetList" SelectedIndex="{Binding Selectedpreset}"
+                         IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5"
+                         Items="{Binding Folderitems}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
                             <Border CornerRadius="4" Padding="4">
-                                <TextBlock TextWrapping="Wrap" Text="{Binding}"></TextBlock>
+                                <TextBlock Name="PresetTextBlock" TextWrapping="Wrap" Text="{Binding}"></TextBlock>
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </StackPanel>
-            <StackPanel Orientation="Vertical">
-                <Button Margin="2,2" Content="{materialIcons:MaterialIconExt Kind=Add}" Click="AddPreset_OnClick" Height="40" Width="40" FontSize="18"></Button>
-                <Button Content="{materialIcons:MaterialIconExt Kind=Delete}" Margin="2,2" Height="40" Width="40" Command="{Binding DeleteSelectedPresetCommand}" FontSize="18"></Button>
-                <Button Width="40" Height="40" Margin="2,2" Click="Button_OnClick" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
-            </StackPanel>
-        </StackPanel>
-        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="5,5" Grid.Column="0">
-            <ScrollViewer>
-                <ListBox Width="300" Name="jsonindexviev" SelectionChanged="SelectingItemsControl_OnSelectionChanged"
-                         Foreground="Black" Items="{Binding jsonindex}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <TextPresenter IsEnabled="False" TextWrapping="Wrap" Text="{Binding}"></TextPresenter>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </ScrollViewer>
+
+            <Grid Grid.Column="1" Grid.ColumnDefinitions="*,*" Margin="5,2">
+                <Border BorderThickness="2" CornerRadius="5,0,0,5" BorderBrush="Slategray">
+                    <ScrollViewer>
+                        <ItemsRepeater Items="{Binding Ignorefiles}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border BorderBrush="Slategray" BorderThickness="0,1">
+                                        <TextBlock Margin="0,5" HorizontalAlignment="Center" Text="{Binding}"></TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </ScrollViewer>
+                </Border>
+                <Border Grid.Column="1" BorderThickness="2" CornerRadius="0,5,5,0" BorderBrush="Slategray">
+                    <ScrollViewer>
+                        <ItemsRepeater Items="{Binding Ignorefolder}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border BorderBrush="Slategray" BorderThickness="0,1">
+                                        <TextBlock Margin="0,5" HorizontalAlignment="Center" Text="{Binding}"></TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- UntererTeil -->
+        <Grid Grid.Row="3" Grid.ColumnDefinitions="Auto,*,Auto">
+            <ProgressBar Grid.Column="1" Margin="5,5" Maximum="{Binding Progressmax}" Minimum="0" Value="{Binding Progressvalue}"></ProgressBar>
+            <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy" Command="{Binding CopybuttonCommand}"></Button>
         </Grid>
     </Grid>
 </Window>

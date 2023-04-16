@@ -5,6 +5,6 @@
     xmlns:style="using:FluentAvalonia.Styling"
     x:Class="Project1.App">
     <Application.Styles>
-        <style:FluentAvaloniaTheme/>
+        <style:FluentAvaloniaTheme PreferUserAccentColor="True"/>
     </Application.Styles>
 </Application>

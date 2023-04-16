@@ -10,18 +10,18 @@ namespace Project1;
 
 public class Copy
 {
-    public static async Task Settings(List<string> ignorefolders,List<string>ignorefiles)
+    public static async Task Settings()
     {
-        if (Readsettings.Read1((3)) >= 2)
+        if (IOC.Default.GetService<Settings>().Listingart ==true)
+        {await White();
+            
+        }else if (IOC.Default.GetService<Settings>().Listingart == false)
         {
-            await Without();
-        }else if (Readsettings.Read1(3) == 0)
-        {
-            await Black(ignorefolders,ignorefiles);
+            await Black();
         }
         else
         {
-            await White(ignorefolders,ignorefiles);
+            await Without();
         }
     }
 
@@ -32,7 +32,8 @@ public class Copy
         {
             try
             {
-                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: Readsettings.Read(0));
+                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                IOC.Default.GetService<IProgressBarService>().Progress();
             }
             catch (IOException e)
             {
@@ -49,25 +50,26 @@ public class Copy
             {
                 try
                 {
-                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: Readsettings.Read(0));
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
                 }
                 catch (IOException e)
                 {
                     continue;
                 }
 
-                MainViewmodel.Default.Progressvalue++;
+                IOC.Default.GetService<IProgressBarService>().Progress();
             }
         }
     }
-    private static async Task Black(List<string> ignorefolders,List<string>ignorefiles)
+    private static async Task Black()
     {
-        List<string> firstfiles = CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext).ToArray(),ignorefiles.ToArray()).ToList();
+        List<string> firstfiles = CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray()).ToList();
         foreach (var file in firstfiles)
         {
             try
             {
-                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: Readsettings.Read(0));
+                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                IOC.Default.GetService<IProgressBarService>().Progress();
             }
             catch (IOException e)
             {
@@ -75,34 +77,35 @@ public class Copy
             }
         }
 
-        List<string> folders = CleanupLoops.CLean(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext).ToArray(),ignorefolders.ToArray()).ToList();
+        List<string> folders = CleanupLoops.CLean(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray()).ToList();
         foreach (var folder in folders)
         {
             Directory.CreateDirectory(Path.Combine(MainViewmodel.Default.Copytotext, GetName(folder)));
-            List<string> files = CleanupLoops.CLean(Directory.EnumerateFiles(folder).ToArray(),ignorefiles.ToArray()).ToList();
+            List<string> files = CleanupLoops.CLean(Directory.EnumerateFiles(folder).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray()).ToList();
             foreach (var file in files)
             {
                 try
                 {
-                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: Readsettings.Read(0));
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
                 }
                 catch (IOException e)
                 {
                     continue;
                 }
 
-                MainViewmodel.Default.Progressvalue++;
+                IOC.Default.GetService<IProgressBarService>().Progress();
             }
         }
     }
-    private static async Task White(List<string> ignorefolders,List<string>ignorefiles)
+    private static async Task White()
     {
-        List<string> firstfiles = CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext).ToArray(),ignorefiles.ToArray()).ToList();
+        List<string> firstfiles = CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray()).ToList();
         foreach (var file in firstfiles)
         {
             try
             {
-                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: Readsettings.Read(0));
+                File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                IOC.Default.GetService<IProgressBarService>().Progress();
             }
             catch (IOException e)
             {
@@ -110,23 +113,23 @@ public class Copy
             }
         }
 
-        List<string> folders = CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext).ToArray(),ignorefolders.ToArray()).ToList();
+        List<string> folders = CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray()).ToList();
         foreach (var folder in folders)
         {
             Directory.CreateDirectory(Path.Combine(MainViewmodel.Default.Copytotext, GetName(folder)));
-            List<string> files = CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder).ToArray(),ignorefiles.ToArray()).ToList();
+            List<string> files = CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray()).ToList();
             foreach (var file in files)
             {
                 try
                 {
-                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: Readsettings.Read(0));
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext,GetName(folder),GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
                 }
                 catch (IOException e)
                 {
                     continue;
                 }
             }
-            MainViewmodel.Default.Progressvalue++;
+            IOC.Default.GetService<IProgressBarService>().Progress();
         }
     }
 

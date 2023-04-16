@@ -20,10 +20,10 @@ public class copypackaged
         var Folders = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext);
         var Firstfiles = Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext);
         bool firstfilesarecopied =false;
-        if (Readsettings.Read1((3)) >= 2)
+        if (IOC.Default.GetService<Settings>().Listingart == null)
         {
             
-        }else if (Readsettings.Read1(3) == 0)
+        }else if (IOC.Default.GetService<Settings>().Listingart == false)
         {
             //blacklist
             ignorefolders.Add(TempFolder);
@@ -84,8 +84,58 @@ public class copypackaged
         {
             //Whitelist
             ignorefolders.Add(TempFolder);
-            folders = CleanupLoops.CLeanWhite(Folders.ToArray(),folders.ToArray());
-            
+            folders = CleanupLoops.CLeanWhite(Folders.ToArray(),ignorefolders.ToArray());
+            Firstfiles = CleanupLoops.CLeanWhite(Firstfiles.ToArray(), ignorefiles.ToArray());
+            if (!firstfilesarecopied)
+            {
+                firstfilesarecopied = true;
+                foreach (var value in Firstfiles)
+                {
+                    File.Copy(value,Path.Combine(TempFolder,Path.GetFileName(value)));
+                }
+            }
+            foreach (var folder in folders)
+            { 
+                var files = CleanupLoops.CLeanWhite(Directory.GetFiles(folder).ToArray(),ignorefiles.ToArray()).ToList();
+                int ab = MainViewmodel.Default.Copyfromtext.Count(c=> c == '\\');
+               int i = 0;
+               string path1="";
+               foreach (var a in MainViewmodel.Default.Copyfromtext)
+               {
+                   if (a.ToString() =="\\" && i < ab)
+                   {
+                       i++;
+                   }
+                   else if(i==ab)
+                   {
+                       path1 += a;
+                   }
+               }
+               string path2 = new string(path1.ToString());
+               string[] value1 = folder.Split('\\');
+               bool yes = false;
+               int index = 0;
+               string path = "";
+               foreach (var va in value1)
+               {
+                   i++;
+                   if (va == path2)
+                   {
+                       yes = true;
+                   }else if (yes)
+                   {
+                       path += (va);
+                   }
+               }
+               Directory.CreateDirectory(Path.Combine(TempFolder,new string(path.ToArray())));
+               if (files.Count != 0)
+               {
+                   foreach (var value in files)
+                   {
+                       File.Copy(value,Path.Combine(TempFolder,new string(path.ToArray()),Path.GetFileName(value)));
+                   }
+               }
+            }
         }
     }
 }

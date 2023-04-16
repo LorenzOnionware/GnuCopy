@@ -42,7 +42,7 @@ public partial class AddPreset : Window
             if (MainWindow.isediting)
             {
                 this.Title = "EditPreset";
-                var l = MainWindow.IndexObject((MainWindow.PresetPath + @"\" + MainViewmodel.Default.Selectedlistitem));
+                var l = ReadPresets.IndexObject((MainWindow.PresetPath + @"\" + MainViewmodel.Default.Selectedlistitem));
                 var ll = l.ToArray();
                 Presetvievmodel.Default.Textbox2text = Regex.Replace(MainViewmodel.Default.Selectedlistitem, @"\..*$", "");
                 foreach (var a in ll)
