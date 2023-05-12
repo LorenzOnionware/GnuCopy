@@ -1,0 +1,67 @@
+﻿<controls:ContentDialog
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:Class="Project1.Presets.Addpresets"
+    xmlns:viewmodels="using:Project1.Viewmodels"
+    xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+    x:DataType="viewmodels:AddpresetsViewmodel"
+    x:CompileBindings="True"
+    PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" PrimaryButtonText="Save"
+    SecondaryButtonText="Cancel" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
+
+    <Control.Styles>
+        <avalonia:MaterialIconStyles />
+    </Control.Styles>
+
+    <Grid>
+        <Button Name="fickdich" IsVisible="False" Command="{Binding RemoveCommand}"></Button>
+        <Button Name="fickdich2" IsVisible="False" Command="{Binding Remove2Command}"></Button>
+        
+        <StackPanel>
+            <TextBox Watermark="Preset name" Text="{Binding Presetname}"></TextBox>
+            <Label Content="Files:"></Label>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Watermark="Files" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
+                <Button Command="{Binding FileAddCommand}" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
+            </StackPanel>
+            <ScrollViewer Height="200">
+                <ListBox SelectedItem="{Binding Selectedfile}" Items="{Binding Files}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Margin="0,5" Grid.Column="0" Text="{Binding}"></TextBlock>
+                                <Button Command="{Binding #fickdich.Command}" Grid.Column="1"
+                                        Content="{avalonia:MaterialIconExt Kind=Delete}">
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+            <Label Content="Folders:"></Label>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Watermark="Folder" Width="250" Text="{Binding Foldertext,Mode=TwoWay}"></TextBox>
+                <Button Command="{Binding FolderAddCommand}" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
+            </StackPanel>
+            <ScrollViewer Height="200">
+                <ListBox SelectedItem="{Binding Selectedfolder}" Items="{Binding Folder}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Margin="0,5" Grid.Column="0" Text="{Binding}"></TextBlock>
+                                <Button Command="{Binding #fickdich2.Command}" Grid.Column="1"
+                                        Content="{avalonia:MaterialIconExt Kind=Delete}">
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </StackPanel>
+    </Grid>
+    
+</controls:ContentDialog>

@@ -16,6 +16,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
+using Project1.Presets;
 using Path = Avalonia.Controls.Shapes.Path;
 using static Project1.IFileDialogService;
 
@@ -37,20 +38,24 @@ public partial class MainViewmodel
     [ObservableProperty]
     public int progressvalue;
 
+    public bool canedit => !String.IsNullOrEmpty(Selectedlistitem);
+    
     public List<string> Jsonfile => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(SettingsViewmodel.Default.settingspath));
     public ObservableCollection<string>? Folderitems { get; set; } = new();
     public static MainViewmodel Default = IOC.Default.GetService<MainViewmodel>();
     public static bool openwindow = false;
     public static bool openwindow1 = false;
     public static bool deleted = false;
-    [ObservableProperty]private static bool presetlistenable;
+    
+    public bool Presetlistenable => IOC.Default.GetService<Settings>().Listingart != null;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copytotext;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;   
     [ObservableProperty] private int selectedpreset;
     [ObservableProperty]public List<string> ignorefiles =new();
     [ObservableProperty]public List<string> ignorefolder =new();
-    
+    private PresetIndex presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
+
     public bool Isenable => Copyfromtext != "" && Copytotext != "";
 
     [ObservableProperty] private double opaciprogress = 0.0;
@@ -72,6 +77,14 @@ public partial class MainViewmodel
 
     #region Commands
 
+    [ICommand]
+    public async void AddPreset()
+    {
+        var window = new Project1.Presets.Addpresets();
+        await window.ShowAsync();
+        OnPropertyChanged(nameof(Folderitems));
+    }
+    
     [ICommand]
     public async Task DeleteSelectedPreset()
     {
@@ -112,9 +125,10 @@ public partial class MainViewmodel
   
     public void selectionchaged()
     {
-        
-        Ignorefiles = ReadPresets.Splitt(true, System.IO.Path.Combine(PPresetPath,Selectedlistitem)); 
-        Ignorefolder = ReadPresets.Splitt(false, System.IO.Path.Combine(PPresetPath,Selectedlistitem));
+        OnPropertyChanged(nameof(presetindex));
+        OnPropertyChanged(nameof(canedit));
+        Ignorefiles = presetindex.Files; 
+        Ignorefolder = presetindex.Folder;
     }
 
     [ICommand]
@@ -122,6 +136,15 @@ public partial class MainViewmodel
     {
         var window = new Project1.SettingsControl();
         await window.ShowAsync();
+        OnPropertyChanged(nameof(Presetlistenable));
     }
-     #endregion
+
+    [ICommand]
+    private async void EditPreset()
+    {
+        var window = new Project1.Presets.EditPresetsWindow();
+        await window.ShowAsync();
+    }
+
+    #endregion
 }

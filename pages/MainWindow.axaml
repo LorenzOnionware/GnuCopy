@@ -50,9 +50,9 @@
 
             <StackPanel>
                 <WrapPanel Orientation="Horizontal">
-                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}" Click="AddPreset_OnClick"></Button>
+                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}" Command="{Binding AddPresetCommand}"></Button>
                     <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Delete}" Command="{Binding DeleteSelectedPresetCommand}"></Button>
-                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
+                    <Button IsEnabled="{Binding canedit}" Margin="2" Command="{Binding EditPresetCommand}" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
                 </WrapPanel>
                 <ListBox Name="PresetList" SelectedIndex="{Binding Selectedpreset}"
                          IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5"

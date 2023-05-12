@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
         <StackPanel >
             <Label Content="Listing"></Label>
-            <CheckBox Margin="5,0" IsThreeState="True" IsChecked="{Binding Listingarts,Mode=TwoWay}" Content="{Binding Listingart}"></CheckBox>
+            <CheckBox Name="CheckBox" Margin="5,0" IsThreeState="True" IsChecked="{Binding Listingarts,Mode=TwoWay}" Content="{Binding Listingarts,Converter={StaticResource ListingConverter}}"></CheckBox>
         </StackPanel>
         <StackPanel Grid.Row="1">
             <Label Content="Overrite existing files"></Label>
@@ -38,7 +38,7 @@
         </StackPanel>
         <StackPanel Grid.Row="5">
             <Label Content="Package to"></Label>
-            <ComboBox SelectedItem="{Binding Selectedcomboboxitem,Mode=TwoWay}" SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
+            <ComboBox SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
                 <ComboBox.Items>
                     <ComboBoxItem Content="none"></ComboBoxItem>
                     <ComboBoxItem Content="7Zip"></ComboBoxItem>

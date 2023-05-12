@@ -23,18 +23,6 @@ public partial class SettingsControl : ContentDialog, IStyleable
     {
         DataContext = SettingsViewmodel.Default;
         InitializeComponent();
-        switch (IOC.Default.GetService<Settings>().Listingart)
-        {
-            case false:
-                SettingsViewmodel.Default.Listingart = "Black List";
-                break;
-            case true:
-                SettingsViewmodel.Default.Listingart = "White List";
-                break;
-            default:
-                SettingsViewmodel.Default.Listingart = "Copy All Content";
-                break;
-        }
     }
     private void InitializeComponent()
     {
@@ -42,8 +30,14 @@ public partial class SettingsControl : ContentDialog, IStyleable
     }
     private void ContentDialog_OnCloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-       IOC.Default.GetService<AktualiselSettingsInUI>().AktualisereSetting();
+        IOC.Default.GetService<AktualiselSettingsInUI>().AktualisereSetting();
        string path = Path.Combine(SettingsViewmodel.Default.settingspath);
+       settings.Clearaftercopy = SettingsViewmodel.Default.Clearafterchecked;
+       settings.Clearforcopy = SettingsViewmodel.Default.Clearforchecked;
+       settings.Listingart = SettingsViewmodel.Default.Listingarts;
+       settings.Savelastpaths = SettingsViewmodel.Default.Savepaths;
+       settings.Packageformat = SettingsViewmodel.Default.Comboboxselectedindex;
+       settings.Overrite = SettingsViewmodel.Default.Overritechecked;
        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
        File.WriteAllText(path,ab);
     }

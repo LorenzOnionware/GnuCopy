@@ -21,7 +21,7 @@ public class PackTo7Zip
             using (var archive = ZipArchive.Create())
             {
                 archive.AddAllFromDirectory(source);
-                archive.SaveTo(target, new WriterOptions(CompressionType.Deflate)
+                archive.SaveTo(target, new WriterOptions(CompressionType.LZMA)
                 {
                     LeaveStreamOpen = true
                 });

@@ -52,7 +52,7 @@ namespace Project1
             SystemEvents.UserPreferenceChanged += ThemeChanged;
 
         }
-
+        
         private void ThemeChanged(object sender, UserPreferenceChangedEventArgs e)
         {
 #if WINDOWS
@@ -96,17 +96,7 @@ namespace Project1
             foreach (var item in folderitems)
                 MainViewmodel.Default.Folderitems.Add(item);
         }
-
-        private void AddPreset_OnClick(object? sender, RoutedEventArgs e)
-        {
-            if (MainViewmodel.openwindow == false)
-            {
-                _blockMethod = true;
-                var window = new Project1.pages.AddPreset();
-                window.Show();
-                MainViewmodel.openwindow = true;
-            }
-        }
+        
 
         public static void AddSuccess()
         {

@@ -14,16 +14,18 @@ public class StartCopyService
         if (!System.IO.Path.Exists(IOC.Default.GetService<MainViewmodel>().Copyfromtext) && !System.IO.Path.Exists(IOC.Default.GetService<MainViewmodel>().Copytotext))
             return;
         IOC.Default.GetService<IProgressBarService>().ProgressMax();
-        if (IOC.Default.GetService<Settings>().Packageformat != "none")
+        if (IOC.Default.GetService<Settings>().Packageformat != 0)
         {
             switch (IOC.Default.GetService<Settings>().Packageformat)
             {
-                case "7Zip" :
+                case 1 :
+                    //7Zip
                     await copypackaged.Copy(MainViewmodel.Default.ignorefiles,MainViewmodel.Default.ignorefolder);
                     await StartPackaging(true);
                     MainViewmodel.Default.selectionchaged();
                     break;
-                case "Tar":
+                case 2:
+                    //Tar
                     await copypackaged.Copy(MainViewmodel.Default.ignorefiles,MainViewmodel.Default.ignorefolder);
                     await StartPackaging(false);
                     MainViewmodel.Default.selectionchaged();

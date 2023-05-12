@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Jab;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
+using Project1.Presets;
 using Project1.Viewmodels;
 
 namespace Project1;
@@ -14,10 +16,12 @@ namespace Project1;
 [Singleton<IProgressBarService>]
 [Singleton<AktualiselSettingsInUI>]
 [Singleton<Settings>(Instance = nameof(JsonAppSettings))]
+[Singleton<PresetIndex>]
+[Singleton<GetSetPresetIndex>]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }
-    
+
     public ServiceProvider()
     {
        
