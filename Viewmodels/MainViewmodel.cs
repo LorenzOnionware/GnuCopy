@@ -12,6 +12,7 @@ using Avalonia.Generics.Extensions;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using Microsoft.CodeAnalysis;
@@ -108,6 +109,8 @@ public partial class MainViewmodel
     [ICommand]
     public async void Copybutton()
     {
+        IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
+        IOC.Default.GetService<Settings>().Pathto = copytotext;
         await IOC.Default.GetService<StartCopyService>().Start();
     }
 
@@ -115,12 +118,14 @@ public partial class MainViewmodel
     private async Task CopySourceDialog()
     {
         Copyfromtext = await _fileDialogService.PickFolder();
+        IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
     }
     
     [ICommand]
     private async Task CopyTargetDialog()
     {
         Copytotext = await _fileDialogService.PickFolder();
+        IOC.Default.GetService<Settings>().Pathto = copytotext;
     }
   
     public void selectionchaged()

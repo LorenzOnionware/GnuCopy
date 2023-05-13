@@ -26,9 +26,6 @@ namespace Project1
 {
     public partial class MainWindow : Window
     {
-        public static bool? Listing = false;
-        public static bool isediting = false;
-        public bool selectionchange = false;
         private bool _eventHandlerBlocked = false;
         private int _blockDuration = 500;
         public static string PresetPath = MainViewmodel.PPresetPath;
@@ -108,10 +105,14 @@ namespace Project1
         #endregion
         
         #region something-other
-        
-        
-        //Edit presets button
+        private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
+        {
+            string path = Path.Combine(SettingsViewmodel.Default.settingspath);
+            string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+            File.WriteAllText(path,ab);
+        }
 
         #endregion
+        
     }
 }

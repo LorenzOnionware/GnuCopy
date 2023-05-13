@@ -9,7 +9,7 @@
     xmlns:viewmodels="using:Project1.Viewmodels"
     xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
     x:DataType="viewmodels:EditPresetsViewmodel"
-    x:CompileBindings="True" CloseButtonClick="ContentDialog_OnCloseButtonClick" CloseButtonText="Save">
+    x:CompileBindings="True" Title="EditPreset" CloseButtonClick="ContentDialog_OnCloseButtonClick" CloseButtonText="Save">
 
     <!--attention humbug code -->
     

@@ -11,7 +11,7 @@
     x:DataType="viewmodels:AddpresetsViewmodel"
     x:CompileBindings="True"
     PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" PrimaryButtonText="Save"
-    SecondaryButtonText="Cancel" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
+    SecondaryButtonText="Cancel" Title="AddPreset" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
 
     <Control.Styles>
         <avalonia:MaterialIconStyles />
