@@ -4,6 +4,6 @@
 A simple app to copy directors with folder- filetypefilters
 and a Function to package 7z or tar archive
 
-![Screenshots of GnuCopy](https://user-images.githubusercontent.com/77418440/228918216-fc73fe3d-0b12-407f-baf6-81be8e877df2.png)
-![](https://user-images.githubusercontent.com/77418440/228918314-315bf244-75dd-45c6-bd03-7855630e9bfd.png)
-
+![Screenshots of GnuCopy](![Screenshot 2023-05-14 193228](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/65afa766-efda-4f90-971d-e2fb1edd4b25))
+![Screenshot 2023-05-14 193038](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/9dbd758e-1d11-42f3-9a0f-d226fb79b64d)
+![Screenshot 2023-05-14 193053](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/c1b83613-5e62-407b-afa3-ee36460b6af8)
