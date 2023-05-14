@@ -22,7 +22,8 @@
         <Button Name="fickdich2" IsVisible="False" Command="{Binding Remove2Command}"></Button>
         
         <StackPanel>
-            <TextBox Watermark="Preset name" Text="{Binding Presetname}"></TextBox>
+            <Label Content="Not Allowed Character" Foreground="Firebrick" IsVisible="{Binding Labelenable}"></Label>
+            <TextBox Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
             <Label Content="Files:"></Label>
             <StackPanel Orientation="Horizontal">
                 <TextBox Watermark="Files" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>

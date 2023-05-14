@@ -38,6 +38,7 @@ public partial class SettingsControl : ContentDialog, IStyleable
        settings.Savelastpaths = SettingsViewmodel.Default.Savepaths;
        settings.Packageformat = SettingsViewmodel.Default.Comboboxselectedindex;
        settings.Overrite = SettingsViewmodel.Default.Overritechecked;
+       settings.DateAsName = SettingsViewmodel.Default.Dateasname;
        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
        File.WriteAllText(path,ab);
     }

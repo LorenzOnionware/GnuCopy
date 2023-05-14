@@ -83,6 +83,7 @@ public partial class MainViewmodel
     {
         var window = new Project1.Presets.Addpresets();
         await window.ShowAsync();
+        await IOC.Default.GetService<MainWindow>().AddItemsToList();
         OnPropertyChanged(nameof(Folderitems));
     }
     
@@ -147,6 +148,7 @@ public partial class MainViewmodel
     [ICommand]
     private async void EditPreset()
     {
+        EditPresetsViewmodel.Default = new();
         var window = new Project1.Presets.EditPresetsWindow();
         await window.ShowAsync();
     }

@@ -8,4 +8,6 @@
     public string Pathto { get; set; }
     public int Packageformat { get; set; }
     public bool Overrite { get; set; }
+    
+    public bool DateAsName { get; set; }
 }

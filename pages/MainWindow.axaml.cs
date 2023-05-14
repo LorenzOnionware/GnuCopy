@@ -94,14 +94,6 @@ namespace Project1
                 MainViewmodel.Default.Folderitems.Add(item);
         }
         
-
-        public static void AddSuccess()
-        {
-            MainWindow window1 = new MainWindow();
-            window1._eventHandlerBlocked = true;
-            Task.Delay(500).ContinueWith(t => window1._eventHandlerBlocked = false);
-            window1.AddItemsToList();
-        }
         #endregion
         
         #region something-other

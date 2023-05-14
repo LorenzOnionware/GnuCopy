@@ -22,4 +22,29 @@ public partial class Addpresets : ContentDialog, IStyleable
         DataContext = AddpresetsViewmodel.Default;
         AvaloniaXamlLoader.Load(this);
     }
+
+    private void TextBox_OnTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        AddpresetsViewmodel.Default. b = false;
+        char[] notallowed = new char[] { '"','<', '>', ':', '/', '\\', '|', '?', '*' };
+        foreach (var a in AddpresetsViewmodel.Default.Presetname)
+        {
+            foreach (var ab in notallowed)
+            {
+                if (ab == a)
+                {
+                    AddpresetsViewmodel.Default. b = true;
+                }
+            }
+        }
+
+        if (AddpresetsViewmodel.Default.b)
+        {
+            AddpresetsViewmodel.Default.Labelenable = true;
+        }
+        else
+        {
+            AddpresetsViewmodel.Default.Labelenable = false;
+        }
+    }
 }

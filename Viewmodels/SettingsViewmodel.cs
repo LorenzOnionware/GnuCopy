@@ -21,6 +21,6 @@ public partial class SettingsViewmodel
     [ObservableProperty] private bool clearafterchecked = IOC.Default.GetService<Settings>().Clearaftercopy;
     [ObservableProperty] private bool savepaths = IOC.Default.GetService<Settings>().Savelastpaths;
     [ObservableProperty] private int comboboxselectedindex = IOC.Default.GetService<Settings>().Packageformat;
-    
+    [ObservableProperty] private bool dateasname = IOC.Default.GetService<Settings>().DateAsName;
     [ObservableProperty] private bool? listingarts = IOC.Default.GetService<Settings>().Listingart;
 }

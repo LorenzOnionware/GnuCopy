@@ -45,6 +45,7 @@
                     <ComboBoxItem Content="Tar"></ComboBoxItem>
                 </ComboBox.Items>
             </ComboBox>
+            <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set Date as Name</CheckBox>
         </StackPanel>
     </Grid>
     

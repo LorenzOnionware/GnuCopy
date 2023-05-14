@@ -18,6 +18,7 @@ namespace Project1;
 [Singleton<Settings>(Instance = nameof(JsonAppSettings))]
 [Singleton<PresetIndex>]
 [Singleton<GetSetPresetIndex>]
+[Singleton<MainWindow>]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }

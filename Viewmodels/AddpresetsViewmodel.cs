@@ -73,21 +73,28 @@ public partial class AddpresetsViewmodel
     [ICommand]
     public void PrimaryButtonClick()
     {
-        if (String.IsNullOrEmpty(AddpresetsViewmodel.Default.presetname))
-            AddpresetsViewmodel.Default.presetname = "Please write presetname";
-        else
+        if (!b)
         {
-            PresetIndex preset = new PresetIndex
+            if (String.IsNullOrEmpty(AddpresetsViewmodel.Default.presetname))
+                AddpresetsViewmodel.Default.presetname = "Please write presetname";
+            else
             {
-                Folder = AddpresetsViewmodel.Default.Folder.ToList(),
-                Files = AddpresetsViewmodel.Default.Files.ToList()
-            };
-            var index = JsonConvert.SerializeObject(preset);
-            File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"GnuCopy", AddpresetsViewmodel.Default.presetname+".json"),index);
+                PresetIndex preset = new PresetIndex
+                {
+                    Folder = AddpresetsViewmodel.Default.Folder.ToList(),
+                    Files = AddpresetsViewmodel.Default.Files.ToList()
+                };
+                var index = JsonConvert.SerializeObject(preset);
+                File.WriteAllText(
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy",
+                        AddpresetsViewmodel.Default.presetname + ".json"), index);
+            }
+
+            Folder.Clear();
+            Files.Clear();
+            Presetname = String.Empty;
         }
-        Folder.Clear();
-        Files.Clear();
-        Presetname = String.Empty;
+
     }
 
     //Cancel
@@ -98,4 +105,9 @@ public partial class AddpresetsViewmodel
         Files.Clear();
         Presetname = String.Empty;
     }
+
+
+    [ObservableProperty]private bool labelenable = false;
+    public bool b = false;
+    
 }

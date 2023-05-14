@@ -31,6 +31,7 @@ public partial class EditPresetsViewmodel
     
     public ObservableCollection<string> Folder { get; } = new ObservableCollection<string>(index.Folder);
     public ObservableCollection<string> Files { get; } = new ObservableCollection<string>(index.Files);
+    [ObservableProperty] public bool labelenable = false;
 
     [ObservableProperty] private string filetext;
     [ObservableProperty] private string foldertext;
