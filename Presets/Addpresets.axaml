@@ -27,7 +27,7 @@
             <Label Content="Files:"></Label>
             <StackPanel Orientation="Horizontal">
                 <TextBox Watermark="Files" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
-                <Button Command="{Binding FileAddCommand}" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
+                <Button Command="{Binding FileAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">
                 <ListBox SelectedItem="{Binding Selectedfile}" Items="{Binding Files}">
@@ -46,7 +46,7 @@
             <Label Content="Folders:"></Label>
             <StackPanel Orientation="Horizontal">
                 <TextBox Watermark="Folder" Width="250" Text="{Binding Foldertext,Mode=TwoWay}"></TextBox>
-                <Button Command="{Binding FolderAddCommand}" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
+                <Button Command="{Binding FolderAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">
                 <ListBox SelectedItem="{Binding Selectedfolder}" Items="{Binding Folder}">

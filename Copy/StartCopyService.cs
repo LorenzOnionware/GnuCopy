@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Project1.Viewmodels;
 using SharpCompress.Archives;
@@ -45,10 +46,11 @@ public class StartCopyService
         {
             archive.AddAllFromDirectory(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"));
             var a = DateTime.Now.ToString("g").Replace(':','-');
+            var b = String.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName) ? "Compresstdirection" : IOC.Default.GetService<Settings>().ZipName;
             if (IOC.Default.GetService<Settings>().DateAsName)
                 archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,$"{a}.{(use7z ? "7z" : "tar")}"), use7z ? CompressionType.LZMA : CompressionType.None);
             else
-                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,$"Compresseddirection.{(use7z ? "7z" : "tar")}"), use7z ? CompressionType.LZMA : CompressionType.None);
+                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,$"{b}.{(use7z ? "7z" : "tar")}"), use7z ? CompressionType.LZMA : CompressionType.None);
             
             
         }

@@ -45,6 +45,8 @@
                     <ComboBoxItem Content="Tar"></ComboBoxItem>
                 </ComboBox.Items>
             </ComboBox>
+            <Label Content="File Name"></Label>
+            <TextBox MaxLength="50" Text="{Binding Zipname}" IsEnabled="{Binding nameenabled}"></TextBox>
             <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set Date as Name</CheckBox>
         </StackPanel>
     </Grid>

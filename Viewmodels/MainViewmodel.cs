@@ -40,15 +40,10 @@ public partial class MainViewmodel
     public int progressvalue;
 
     public bool canedit => !String.IsNullOrEmpty(Selectedlistitem);
-    
-    public List<string> Jsonfile => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(SettingsViewmodel.Default.settingspath));
     public ObservableCollection<string>? Folderitems { get; set; } = new();
     public static MainViewmodel Default = IOC.Default.GetService<MainViewmodel>();
-    public static bool openwindow = false;
-    public static bool openwindow1 = false;
-    public static bool deleted = false;
-    
-    public bool Presetlistenable => IOC.Default.GetService<Settings>().Listingart != null;
+
+    public bool Presetlistenable => IOC.Default.GetService<Settings>().Listingart == null || IOC.Default.GetService<Settings>().Listingart ==true;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copytotext;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;   

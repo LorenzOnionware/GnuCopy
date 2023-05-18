@@ -39,6 +39,7 @@ public partial class SettingsControl : ContentDialog, IStyleable
        settings.Packageformat = SettingsViewmodel.Default.Comboboxselectedindex;
        settings.Overrite = SettingsViewmodel.Default.Overritechecked;
        settings.DateAsName = SettingsViewmodel.Default.Dateasname;
+       settings.ZipName = SettingsViewmodel.Default.Zipname;
        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
        File.WriteAllText(path,ab);
     }

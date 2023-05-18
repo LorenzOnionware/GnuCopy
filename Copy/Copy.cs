@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DynamicData;
 using Project1.Viewmodels;
 using static Project1.MainWindow;
 
@@ -13,19 +14,21 @@ public class Copy
     private static string TempFolder = Path.Combine(MainViewmodel.Default.Copyfromtext, "OnionwareTemp");
     public static async Task Settings(bool zip)
     {
-        IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
         if(zip){ Directory.CreateDirectory(TempFolder);}
         if (IOC.Default.GetService<Settings>().Listingart ==true)
         {
-            await White(zip);
-            
+           // await White(zip);
+           await White(zip);
         }else if (IOC.Default.GetService<Settings>().Listingart == false)
         {
-            await Black(zip);
+           // await Black(zip);
+           await Without(zip);
         }
         else
         {
-            await Without(zip);
+           // await Without(zip);
+           await Black(zip);
+           IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
         }
     }
 
@@ -46,6 +49,7 @@ public class Copy
         }
 
         List<string> folders = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext).ToList();
+        if(zip){folders.Remove(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"));}
         foreach (var folder in folders)
         {
             Directory.CreateDirectory(Path.Combine(FolderPath(folder,zip)));

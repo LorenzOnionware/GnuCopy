@@ -11,11 +11,11 @@ public class ListingConverter : IValueConverter
         switch (value as bool?)
         {
             case false:
-                return "BlackList";
+                return "Copy all Content";
             case true:
                 return "WhiteList";
             case null:
-                return "Copy all Content";
+                return "BlackList";
         }
     }
 

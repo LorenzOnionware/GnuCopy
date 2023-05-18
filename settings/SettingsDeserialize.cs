@@ -10,4 +10,6 @@
     public bool Overrite { get; set; }
     
     public bool DateAsName { get; set; }
+    
+    public string? ZipName { get; set; }
 }
