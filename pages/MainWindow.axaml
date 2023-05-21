@@ -48,11 +48,12 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <StackPanel>
-                <WrapPanel Orientation="Horizontal">
+            <StackPanel MinWidth="150" Orientation="Horizontal">
+                <WrapPanel Orientation="Vertical">
                     <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}" Command="{Binding AddPresetCommand}"></Button>
                     <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Delete}" Command="{Binding DeleteSelectedPresetCommand}"></Button>
                     <Button IsEnabled="{Binding canedit}" Margin="2" Command="{Binding EditPresetCommand}" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
+                    <Button Content="{materialIcons:MaterialIconExt Kind=Export}" Margin="2"></Button>
                 </WrapPanel>
                 <ListBox Name="PresetList" SelectedIndex="{Binding Selectedpreset}"
                          IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5"
@@ -99,7 +100,7 @@
 
         <!-- UntererTeil -->
         <Grid Grid.Row="3" Grid.ColumnDefinitions="Auto,*,Auto">
-            <ProgressBar Grid.Column="1" Margin="5,5" Maximum="{Binding Progressmax}" Minimum="0" Value="{Binding Progressvalue}"></ProgressBar>
+            <ProgressBar Grid.Column="1" Margin="5,5" Maximum="{Binding Progressmax}" Minimum="0"  Value="{Binding Progressvalue}"></ProgressBar>
             <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy" Command="{Binding CopybuttonCommand}"></Button>
         </Grid>
     </Grid>

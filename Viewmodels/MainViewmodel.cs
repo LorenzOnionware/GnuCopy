@@ -30,14 +30,17 @@ public partial class MainViewmodel
     public MainViewmodel(IFileDialogService FileDialogservice)
     {
         _fileDialogService = FileDialogservice;
+        progress = new Progress<float>(p => { Progressvalue = p; });
     }
 
     private IFileDialogService _fileDialogService;
  
     [ObservableProperty]
     public int progressmax = 100;
-    [ObservableProperty]
-    public int progressvalue;
+
+    [ObservableProperty] private float progressvalue;
+
+    private Progress<float> progress;
 
     public bool canedit => !String.IsNullOrEmpty(Selectedlistitem);
     public ObservableCollection<string>? Folderitems { get; set; } = new();
@@ -50,7 +53,7 @@ public partial class MainViewmodel
     [ObservableProperty] private int selectedpreset;
     [ObservableProperty]public List<string> ignorefiles =new();
     [ObservableProperty]public List<string> ignorefolder =new();
-    private PresetIndex presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
+    private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     public bool Isenable => Copyfromtext != "" && Copytotext != "";
 
@@ -103,11 +106,12 @@ public partial class MainViewmodel
     }
 
     [ICommand]
-    public async void Copybutton()
+    public async Task Copybutton()
     {
+        Progressvalue = new();
         IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
         IOC.Default.GetService<Settings>().Pathto = copytotext;
-        await IOC.Default.GetService<StartCopyService>().Start();
+        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(progress));
     }
 
     [ICommand]
@@ -128,8 +132,11 @@ public partial class MainViewmodel
     {
         OnPropertyChanged(nameof(presetindex));
         OnPropertyChanged(nameof(canedit));
-        Ignorefiles = presetindex.Files; 
-        Ignorefolder = presetindex.Folder;
+        if (IOC.Default.GetService<Settings>().Listingart != false)
+        {
+            Ignorefiles = presetindex.Files;
+            Ignorefolder = presetindex.Folder;
+        }
     }
 
     [ICommand]

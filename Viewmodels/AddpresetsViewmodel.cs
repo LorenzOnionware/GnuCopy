@@ -30,17 +30,23 @@ public partial class AddpresetsViewmodel
     [ICommand]
     private void FileAdd()
     {
-        if(String.IsNullOrEmpty(Filetext))
+        if (String.IsNullOrEmpty(Filetext))
             return;
         Regex regex = new Regex(@"^[^\.]");
         if (regex.IsMatch(filetext))
         {
             var output = "." + filetext; 
-            Files.Add(output);
+            if (!Files.Contains(output))
+            { 
+                Files.Add(output);
+            }
         }
         else
         {
-            Files.Add(filetext);
+            if (!Files.Contains("."+Filetext))
+            {
+                Files.Add(filetext);
+            }
         }
         Filetext = String.Empty;
         OnPropertyChanged(nameof(filetext));
@@ -52,7 +58,10 @@ public partial class AddpresetsViewmodel
     {
         if(String.IsNullOrEmpty(Foldertext))
             return;
-        Folder.Add(foldertext);
+        if (!Folder.Contains(Foldertext))
+        {
+                    Folder.Add(foldertext);
+        }
         Foldertext=String.Empty;
         OnPropertyChanged(nameof(Foldertext));
     }

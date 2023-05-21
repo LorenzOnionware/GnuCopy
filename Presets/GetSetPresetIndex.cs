@@ -9,7 +9,7 @@ public class GetSetPresetIndex
 {
     public PresetIndex getpresetindex()
     {
-        var x=  JsonConvert.DeserializeObject<PresetIndex>(File.ReadAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"GnuCopy",IOC.Default.GetService<MainViewmodel>().Selectedlistitem)));
+        var x=  JsonConvert.DeserializeObject<PresetIndex>(File.ReadAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"GnuCopy", IOC.Default.GetService<MainViewmodel>().Selectedlistitem)));
         return x;
     }
 }

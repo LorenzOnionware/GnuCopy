@@ -13,7 +13,6 @@ namespace Project1;
 [Singleton<MainViewmodel>]
 [Singleton<IFileDialogService,Avaloniafiledialogservice>]
 [Singleton<StartCopyService>]
-[Singleton<IProgressBarService>]
 [Singleton<AktualiselSettingsInUI>]
 [Singleton<Settings>(Instance = nameof(JsonAppSettings))]
 [Singleton<PresetIndex>]
@@ -27,6 +26,12 @@ sealed partial class ServiceProvider
     {
        
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings", "Settings.json");
+        if (!Directory.Exists(path))
+        {
+                    Directory.CreateDirectory(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"GnuCopy"));
+                    Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings"));
+        }
         JsonAppSettings = File.Exists(path) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path)) ?? new() : new();
     }
 }

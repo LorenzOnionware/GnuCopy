@@ -43,6 +43,7 @@
                     <ComboBoxItem Content="none"></ComboBoxItem>
                     <ComboBoxItem Content="7Zip"></ComboBoxItem>
                     <ComboBoxItem Content="Tar"></ComboBoxItem>
+                    <ComboBoxItem Content="zip"></ComboBoxItem>
                 </ComboBox.Items>
             </ComboBox>
             <Label Content="File Name"></Label>
