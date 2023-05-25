@@ -56,6 +56,7 @@ public class StartCopyService
                 archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,$"{a}.{(use7z ? "7z" : (useTar ? "tar" : "zip" ))}"), use7z ? CompressionType.LZMA : CompressionType.None);
             else
                 archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext,$"{b}.{(use7z ? "7z" : (useTar ? "tar" : "zip" ))}"), use7z ? CompressionType.LZMA : CompressionType.None);
+            
         }
         Directory.Delete(Path.Combine(MainViewmodel.Default.Copyfromtext,"OnionwareTemp"),true);
     }

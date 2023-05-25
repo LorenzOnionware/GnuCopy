@@ -1,54 +1,120 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 using DynamicData;
 using FluentAvalonia.Core;
+using HarfBuzzSharp;
+using Microsoft.CodeAnalysis;
 
 namespace Project1;
 
 public class CleanupLoops
 {
-    public static string[] CLean(string[] arraytoclean, string[] cleanfromat)
-    { 
-        bool allow = false;
-        List<string> output = new();
-        foreach (var element in arraytoclean)
+    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat, bool length,bool folder)
+    {
+        int chunksize = 3;
+        List<string> output = new List<string>();
+
+        var chunks = arraytoclean.Chunk(chunksize).ToList();
+        await Task.Run(() =>
         {
-            allow = false;
-            foreach (var value in cleanfromat)
+            Parallel.ForEach(chunks, chunk =>
             {
-                if (element.Contains(value))
+                foreach (var element in chunk)
                 {
-                    allow = true;
+                    bool allow = false;
+                    if (folder)
+                    {
+                        foreach (var value in cleanfromat)
+                        {
+                            if (GetName(element) == value)
+                            {
+                                allow = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var value in cleanfromat)
+                        {
+                            if (element.Contains(value))
+                            {
+                                allow = true;
+                            }
+                        }
+                    }
+
+                    if (!allow)
+                    {
+                        output.Add(element);
+                        if (length)
+                            IOC.Default.GetService<cleanwerth>().Datalengt++;
+                    }
                 }
-            }
-            if (allow == false)
-            {
-                output.Add(element);
-            }
-        }
+            });
+        });
 
         return output.ToArray();
     }
-    public static string[] CLeanWhite(string[] arraytoclean, string[] cleanfromat)
-    { 
-        bool allow = false;
-        List<string> output = new();
-        foreach (var element in arraytoclean)
+
+    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat, bool length,bool folder)
+    {
+        int chunksize = 3;
+        List<string> output = new List<string>();
+
+        var chunks = arraytoclean.Chunk(chunksize).ToList();
+        await Task.Run(() =>
         {
-            allow = false;
-            foreach (var value in cleanfromat)
+            Parallel.ForEach(chunks, chunk =>
             {
-                if (element.Contains(value))
+                foreach (var element in chunk)
                 {
-                    allow = true;
+                    bool allow = false;
+                    allow = false;
+                    foreach (var value in cleanfromat)
+                    {
+                        if (folder)
+                        {
+                            if (GetName(element) == value)
+                            {
+                                allow = true;
+                            }
+                        }
+                        else
+                        {
+                            if (element.Contains(value))
+                            {
+                                allow = true;
+                            }
+                        }
+                    }
+
+                    if (allow)
+                    {
+                        output.Add(element);
+                        if (length)
+                            IOC.Default.GetService<cleanwerth>().Datalengt++;
+                    }
                 }
-            }
-            if (allow)
-            {
-                output.Add(element);
-            }
+
+            });
+        });
+        return output.ToArray();
+    }
+
+    private static string GetName(string element)
+    {
+        string output = string.Empty;
+        int lastIndex = element.LastIndexOf("\\");
+        if (lastIndex >= 0 && lastIndex < element.Length - 1)
+        {
+            output = element.Substring(lastIndex + 1);
         }
 
-        return output.ToArray();
+        return output;
     }
 }

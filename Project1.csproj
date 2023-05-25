@@ -21,7 +21,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove=".gitignore" />
-    <None Remove="av_libglesv2.dll" />
     <None Remove="Presets\jadensoreset.json" />
   </ItemGroup>
   <ItemGroup>
@@ -110,12 +109,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="pages\License.txt" />
-    <Content Include="av_libglesv2.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="pages\License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Remove="pages\SettingWindow.axaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="av_libglesv2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

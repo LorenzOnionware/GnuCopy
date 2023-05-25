@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Jab;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
@@ -18,20 +19,31 @@ namespace Project1;
 [Singleton<PresetIndex>]
 [Singleton<GetSetPresetIndex>]
 [Singleton<MainWindow>]
+[Singleton<cleanwerth>(Instance = nameof(length))]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }
+    public cleanwerth length { get; set; }
 
     public ServiceProvider()
     {
-       
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings", "Settings.json");
-        if (!Directory.Exists(path))
+        Task.Run(() =>
         {
-                    Directory.CreateDirectory(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"GnuCopy"));
-                    Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings"));
-        }
+            cleanwerth a = new cleanwerth()
+            {
+                Datalengt = 0
+            };
+            length = a;
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy"));
+                Directory.CreateDirectory(Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings"));
+            }
+        });
+
         JsonAppSettings = File.Exists(path) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path)) ?? new() : new();
     }
 }
