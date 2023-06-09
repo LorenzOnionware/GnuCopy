@@ -1,4 +1,3 @@
-
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -26,18 +25,46 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" Margin="5,-5" HorizontalAlignment="Right" Command="{Binding SettingsCommand}" Content="{materialIcons:MaterialIconExt Settings}"></Button>
+        <Button Grid.Row="0" Margin="5,-5" HorizontalAlignment="Right" Command="{Binding SettingsCommand}"
+                Content="{materialIcons:MaterialIconExt Settings}">
+        </Button>
         <!-- ObersterTeil -->
         <StackPanel Grid.Row="1">
-                <Label Content="Source"></Label>
-                <Grid ColumnDefinitions="*,Auto">
-                 <TextBox Text="{Binding Copyfromtext, Mode=TwoWay}" Watermark="Select folder that you want to copy"></TextBox>
-                <Button Height="{Binding #TargetPath.Bounds.Height}" Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18" Command="{Binding CopySourceDialogCommand}"></Button>
+            <Button Name="RButton" IsVisible="False" Command="{Binding MultiListRemoveCommand}"></Button>
+            <Label Content="Source"></Label>
+            <Grid ColumnDefinitions="*,Auto" Grid.RowDefinitions="*,Auto">
+                <TextBox Name="copyfrom" Text="{Binding Copyfromtext, Mode=TwoWay}"
+                         Watermark="Select folder that you want to copy">
+                </TextBox>
+                <Button Grid.Row="0" Grid.Column="1" Height="{Binding #TargetPath.Bounds.Height}" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18" Command="{Binding CopySourceDialogCommand}"></Button>
+                <Expander IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="1" Grid.Column="0">
+                    <Expander.Header>
+                        <TextBlock Text="{Binding Headertext}"></TextBlock>
+                    </Expander.Header>
+                    <Expander.Content>
+                        <ListBox SelectedItem="{Binding Selectedmultifolder}" Margin="-10" MaxHeight="100" Items="{Binding Expanderpaths}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Margin="0,5" Grid.Column="0" Text="{Binding}"></TextBlock>
+                                        <Button Command="{Binding #RButton.Command}" Grid.Column="1"
+                                                Content="{materialIcons:MaterialIconExt Kind=Delete}">
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Expander.Content>
+                </Expander>
+                <Button IsVisible="{Binding Ismultiplevisable}" Grid.Column="1" Grid.Row="1" Command="{Binding AddPathCommand}" Margin="5,0" Content="{materialIcons:MaterialIconExt Kind=Add}"></Button>
             </Grid>
-              <Label Content="Target"></Label> 
+            <Label Content="Target"></Label>
             <Grid ColumnDefinitions="*,Auto">
-                  <TextBox Text="{Binding Copytotext, Mode=TwoWay}" Name="TargetPath" Watermark="Copy to"></TextBox>
-                <Button Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Height="{Binding #TargetPath.Bounds.Height}" Margin="5,0" FontSize="18" Command="{Binding CopyTargetDialogCommand}"></Button>
+                <TextBox Text="{Binding Copytotext, Mode=TwoWay}" Name="TargetPath" Watermark="Copy to"></TextBox>
+                <Button Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
+                        Height="{Binding #TargetPath.Bounds.Height}" Margin="5,0" FontSize="18"
+                        Command="{Binding CopyTargetDialogCommand}">
+                </Button>
             </Grid>
         </StackPanel>
         
@@ -48,28 +75,66 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <StackPanel MinWidth="150" Orientation="Horizontal">
-                <WrapPanel Orientation="Vertical">
-                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}" Command="{Binding AddPresetCommand}"></Button>
-                    <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Delete}" Command="{Binding DeleteSelectedPresetCommand}"></Button>
-                    <Button IsEnabled="{Binding canedit}" Margin="2" Command="{Binding EditPresetCommand}" Content="{materialIcons:MaterialIconExt Kind=Edit}"></Button>
-                    <Button Content="{materialIcons:MaterialIconExt Kind=Export}" Margin="2"></Button>
-                </WrapPanel>
-                <ListBox Name="PresetList" SelectedIndex="{Binding Selectedpreset}"
-                         IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}" Margin="5,5"
-                         Items="{Binding Folderitems}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <Border CornerRadius="4" Padding="4">
-                                <TextBlock Name="PresetTextBlock" TextWrapping="Wrap" Text="{Binding}"></TextBlock>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
+            <Grid RowDefinitions="*,Auto">
+                <StackPanel MinWidth="150" Orientation="Horizontal">
+                    <WrapPanel Orientation="Vertical">
+                        <Button Margin="2" Content="{materialIcons:MaterialIconExt Kind=Add}"
+                                Command="{Binding AddPresetCommand}">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Create new preset."></TextBlock>
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Margin="2" IsEnabled="{Binding canedit}"
+                                Content="{materialIcons:MaterialIconExt Kind=Delete}"
+                                Command="{Binding DeleteSelectedPresetCommand}">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Delete selected Preset."></TextBlock>
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button IsEnabled="{Binding canedit}" Margin="2" Command="{Binding EditPresetCommand}"
+                                Content="{materialIcons:MaterialIconExt Kind=Edit}">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Edit selected preset."></TextBlock>
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button IsEnabled="{Binding Isnotempty}" Content="{materialIcons:MaterialIconExt Kind=Export}"
+                                Command="{Binding ExportCommand}" Margin="2">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Export Presets."></TextBlock>
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Command="{Binding ImportCommand}" Content="{materialIcons:MaterialIconExt Kind=Import}"
+                                Margin="2">
+                            <ToolTip.Tip>
+                                <TextBlock Text="Import a Preset"></TextBlock>
+                            </ToolTip.Tip>
+                        </Button>
+                    </WrapPanel>
+                    <ListBox MaxWidth="150" Name="PresetList" SelectedIndex="{Binding Selectedpreset}"
+                             IsEnabled="{Binding Presetlistenable}" SelectedItem="{Binding Selectedlistitem}"
+                             Margin="5,5" Items="{Binding Folderitems}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border CornerRadius="4" Padding="4">
+                                    <TextBlock TextTrimming="CharacterEllipsis" Name="PresetTextBlock" Text="{Binding }">
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+                
+                <StackPanel Grid.Row="1">
+                    <CheckBox IsThreeState="True" Command="{Binding ListingPropertyChangedCommand}" IsChecked="{Binding Listing}" 
+                              Content="{Binding Listing,Converter={StaticResource ListingConverter}}"></CheckBox>
+                </StackPanel>
+            </Grid>
 
-            <Grid Grid.Column="1" Grid.ColumnDefinitions="*,*" Margin="5,2">
-                <Border BorderThickness="2" CornerRadius="5,0,0,5" BorderBrush="Slategray">
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" Grid.ColumnDefinitions="*,*" Margin="5,2">
+
+                <Label FontSize="20" Content="Files"></Label>
+                <Border Grid.Row="1" Grid.Column="0" BorderThickness="2" CornerRadius="5,0,0,5" BorderBrush="Slategray">
                     <ScrollViewer>
                         <ItemsRepeater Items="{Binding Ignorefiles}">
                             <ItemsRepeater.ItemTemplate>
@@ -82,7 +147,8 @@
                         </ItemsRepeater>
                     </ScrollViewer>
                 </Border>
-                <Border Grid.Column="1" BorderThickness="2" CornerRadius="0,5,5,0" BorderBrush="Slategray">
+                <Label FontSize="20" Grid.Row="0" Grid.Column="1" Content="Folder"></Label>
+                <Border Grid.Row="1" Grid.Column="1" BorderThickness="2" CornerRadius="0,5,5,0" BorderBrush="Slategray">
                     <ScrollViewer>
                         <ItemsRepeater Items="{Binding Ignorefolder}">
                             <ItemsRepeater.ItemTemplate>
@@ -100,7 +166,7 @@
 
         <!-- UntererTeil -->
         <Grid Grid.Row="3" Grid.ColumnDefinitions="Auto,*,Auto">
-            <ProgressBar Grid.Column="1" Margin="5,5" Maximum="{Binding Progressmax}" Minimum="0"  Value="{Binding Progressvalue}"></ProgressBar>
+            <ProgressBar Maximum="{Binding Progressmax}" Value="{Binding Progress}" Opacity="{Binding Optaci}" Grid.Column="1" Margin="5,5"></ProgressBar>
             <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy" Command="{Binding CopybuttonCommand}"></Button>
         </Grid>
     </Grid>

@@ -4,15 +4,19 @@ using Avalonia.Interactivity;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
+  using System.Reactive.Linq;
+  using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Media;
+  using Avalonia.Controls.Primitives;
+  using Avalonia.Input;
+  using Avalonia.Media;
 using Avalonia.Skia;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using DynamicData;
+  using CommunityToolkit.Mvvm.DependencyInjection;
+  using DynamicData;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
@@ -42,13 +46,25 @@ namespace Project1
             AddItemsToList();
             if (IOC.Default.GetService<Settings>().Savelastpaths)
             {
+                if (IOC.Default.GetService<Settings>().MultipleSources)
+                {
+                    Addsources();
+                }
                 MainViewmodel.Default.Copytotext = IOC.Default.GetService<Settings>().Pathto;
                 MainViewmodel.Default.Copyfromtext = IOC.Default.GetService<Settings>().Pathfrom;
+                MainViewmodel.Default.AddPath();
             }
             IOC.Default.GetService<AktualiselSettingsInUI>().AktualisereSetting();
+            MainViewmodel.Default.ChageProperties();
             SystemEvents.UserPreferenceChanged += ThemeChanged;
 
         }
+
+        public void Addsources()
+        {
+            MainViewmodel.Default.Expanderpaths.Replace(IOC.Default.GetService<Settings>().Sources);
+        }
+        
         
         private void ThemeChanged(object sender, UserPreferenceChangedEventArgs e)
         {
@@ -78,22 +94,18 @@ namespace Project1
         public async Task AddItemsToList()
         {
             var folderitems = new HashSet<string>();
-            System.IO.DirectoryInfo Items = new System.IO.DirectoryInfo(PresetPath);
-            var fs = Items.GetFiles();
-            for(var index = 0; index < fs.Length; index++)
+            var files = Directory.EnumerateFiles(PresetPath);
+            foreach (var file in files)
             {
-                FileInfo f = fs[index];
-                if (f.Name.Contains(".json") || f.Name.Contains(".Json"))
+                if (Path.GetExtension(file).ToLower() == ".json")
                 {
-                    if(File.Exists(fs[index].ToString())) 
-                        folderitems.Add(f.Name.ToString());
+                    folderitems.Add(Path.GetFileNameWithoutExtension(file));
                 }
             }
-            MainViewmodel.Default.Folderitems.Clear();
-            foreach (var item in folderitems)
-                MainViewmodel.Default.Folderitems.Add(item);
+
+            MainViewmodel.Default.Folderitems.Replace(folderitems);
         }
-        
+
         #endregion
         
         #region something-other

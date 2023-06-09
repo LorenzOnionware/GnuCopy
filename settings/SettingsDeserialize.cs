@@ -1,4 +1,6 @@
-﻿public class Settings
+﻿using System.Collections.Generic;
+
+public class Settings
 {
     public bool Clearaftercopy { get; set; }
     public bool Clearforcopy { get; set; }
@@ -12,4 +14,12 @@
     public bool DateAsName { get; set; }
     
     public string? ZipName { get; set; }
+    
+    public string? TempfolderPath { get; set; }
+    
+    public bool MultipleSources { get; set; }
+    public List<string> Sources { get; set; } = new();
+    public bool? CreateOwnFolder { get; set; }
+    public string? OwnFolderName { get; set; }
+    public bool OwnFolderDate { get; set; }
 }

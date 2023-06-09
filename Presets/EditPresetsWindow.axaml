@@ -23,7 +23,7 @@
         
         <StackPanel>
             <Label IsVisible="{Binding Labelenable}" Content="Not Allowed Character" Foreground="Firebrick"></Label>
-            <TextBox Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
+            <TextBlock  Text="{Binding Presetname}"></TextBlock>
             <Label Content="Files:"></Label>
             <StackPanel Orientation="Horizontal">
                 <TextBox Watermark="Files" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>

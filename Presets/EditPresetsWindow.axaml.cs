@@ -29,45 +29,17 @@ public partial class EditPresetsWindow : ContentDialog,IStyleable
     
     private void ContentDialog_OnCloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (!b)
-        {
-            PresetIndex preset = new PresetIndex()
+        PresetIndex preset = new PresetIndex()
             {
                 Folder = EditPresetsViewmodel.Default.Folder.ToList(),
                 Files = EditPresetsViewmodel.Default.Files.ToList()
             };
             var a = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var ab = JsonConvert.SerializeObject(preset);
-            File.WriteAllBytes(Path.Combine(a, "GnuCopy", EditPresetsViewmodel.Default.Presetname), new byte[0]);
-            File.WriteAllText(Path.Combine(a, "GnuCopy", EditPresetsViewmodel.Default.Presetname), ab);
+            string name = (MainViewmodel.Default.Selectedlistitem + ".json");
+            File.Delete(Path.Combine(a,"GnuCopy",name));
+            string s = EditPresetsViewmodel.Default.Presetname + ".json";
+            File.WriteAllText(Path.Combine(a, "GnuCopy", s), ab);
             IOC.Default.GetService<MainViewmodel>().selectionchaged();
-        }
-    }
-
-    
-    public bool b = false;
-    private void TextBox_OnTextChanged(object? sender, TextChangedEventArgs e)
-    {
-        b = false;
-        char[] notallowed = new char[] { '"','<', '>', ':', '/', '\\', '|', '?', '*' };
-        foreach (var a in EditPresetsViewmodel.Default.Presetname)
-        {
-            foreach (var ab in notallowed)
-            {
-                if (ab == a)
-                {
-                    b = true;
-                }
-            }
-        }
-
-        if (b)
-        {
-            EditPresetsViewmodel.Default.Labelenable = true;
-        }
-        else
-        {
-            EditPresetsViewmodel.Default.Labelenable = false;
-        }
     }
 }

@@ -96,8 +96,7 @@ public class CleanupLoops
                     if (allow)
                     {
                         output.Add(element);
-                        if (length)
-                            IOC.Default.GetService<cleanwerth>().Datalengt++;
+                        if (length) IOC.Default.GetService<cleanwerth>().Datalengt++;
                     }
                 }
 

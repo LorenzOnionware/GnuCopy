@@ -4,9 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Project1.SettingsControl" xmlns:viewmodels="using:Project1.Viewmodels" 
+             x:Class
+             ="Project1.SettingsControl" xmlns:viewmodels="using:Project1.Viewmodels"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:DataType="viewmodels:SettingsViewmodel"
              x:CompileBindings="True" CloseButtonText="Close" Title="Settings" CloseButtonClick="ContentDialog_OnCloseButtonClick">
+    
+    
+    <controls:ContentDialog.Styles>
+        <materialIcons:MaterialIconStyles />
+    </controls:ContentDialog.Styles>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -16,40 +24,107 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel >
-            <Label Content="Listing"></Label>
-            <CheckBox Name="CheckBox" Margin="5,0" IsThreeState="True" IsChecked="{Binding Listingarts,Mode=TwoWay}" Content="{Binding Listingarts,Converter={StaticResource ListingConverter}}"></CheckBox>
-        </StackPanel>
-        <StackPanel Grid.Row="1">
-            <Label Content="Overrite existing files"></Label>
-            <ToggleSwitch  IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
-        </StackPanel>
-        <StackPanel Grid.Row="2">
-            <Label Content="Clear target Directory for copy"></Label>
-            <ToggleSwitch IsChecked="{Binding Clearforchecked,Mode=TwoWay}" Name="Clearforcopy" ></ToggleSwitch>
-        </StackPanel>
-        <StackPanel Grid.Row="3">
-            <Label Content="Clear source Directory after copy"></Label>
-            <ToggleSwitch IsChecked="{Binding Clearafterchecked,Mode=TwoWay}" Name="Clearaftercopy"></ToggleSwitch>
-        </StackPanel>
-        <StackPanel Grid.Row="4">
-            <Label Content="save Last Paths"></Label>
-            <ToggleSwitch IsChecked="{Binding Savepaths,Mode=TwoWay}"></ToggleSwitch>
-        </StackPanel>
-        <StackPanel Grid.Row="5">
-            <Label Content="Package to"></Label>
-            <ComboBox SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
-                <ComboBox.Items>
-                    <ComboBoxItem Content="none"></ComboBoxItem>
-                    <ComboBoxItem Content="7Zip"></ComboBoxItem>
-                    <ComboBoxItem Content="Tar"></ComboBoxItem>
-                    <ComboBoxItem Content="zip"></ComboBoxItem>
-                </ComboBox.Items>
-            </ComboBox>
-            <Label Content="File Name"></Label>
-            <TextBox MaxLength="50" Text="{Binding Zipname}" IsEnabled="{Binding nameenabled}"></TextBox>
-            <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set Date as Name</CheckBox>
-        </StackPanel>
+        
+        <Border Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Text="Copy settings">
+                    </TextBlock>
+                </Expander.Header>
+                <Expander.Content>
+                    <StackPanel>
+                        <Label Content="Overrite existing files"></Label>
+                        <ToggleSwitch IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
+                        <Label Content="Clear target Directory for copy"></Label>
+                        <ToggleSwitch IsChecked="{Binding Clearforchecked,Mode=TwoWay}" Name="Clearforcopy"></ToggleSwitch>
+                        <Label Content="Clear source Directory after copy"></Label>
+                        <ToggleSwitch IsChecked="{Binding Clearafterchecked,Mode=TwoWay}" Name="Clearaftercopy"></ToggleSwitch>
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+        </Border>
+
+        <Border Grid.Row="1" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Text="Paths"></TextBlock>
+                </Expander.Header>
+                <Expander.Content>
+                    <StackPanel>
+                        <Label Content="save Last Paths"></Label>
+                        <ToggleSwitch IsChecked="{Binding Savepaths,Mode=TwoWay}"></ToggleSwitch>
+                        <Label Content="Create Folder"></Label>
+                        <ToggleSwitch IsChecked="{Binding Createfolder}"></ToggleSwitch>
+                        <TextBox IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
+                        <CheckBox IsVisible="{Binding ownfolderviseble }" Content="Set date as name" IsChecked="{Binding Ownfolderdate}"></CheckBox>
+                        <Label IsVisible="False" Content="Multiple source path"></Label>
+                        <ToggleSwitch IsVisible="False" IsChecked="{Binding Multiplesources}"></ToggleSwitch>
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+        </Border>
+        <Border Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Text="Packages"></TextBlock>
+                </Expander.Header>
+                <Expander.Content>
+                    <StackPanel>
+                        <Label Content="Package to"></Label>
+                        <ComboBox SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
+                            <ComboBox.Items>
+                                <ComboBoxItem Content="none"></ComboBoxItem>
+                                <ComboBoxItem Content="Tar"></ComboBoxItem>
+                                <ComboBoxItem Content="zip"></ComboBoxItem>
+                            </ComboBox.Items>
+                        </ComboBox>
+                        <Label Content="File Name"></Label>
+                        <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set Date as Name</CheckBox>
+                        <TextBox Watermark="Zip Name" Name="Zipname" MaxLength="50" Text="{Binding Zipname}"
+                                 IsEnabled="{Binding nameenabled}">
+                        </TextBox>
+                        <Label Content="Custom TempPath"></Label>
+                        <Grid Grid.ColumnDefinitions="*,Auto">
+                            <TextBox Height="{Binding #Zipname.Bounds.Height}" Grid.Column="0"
+                                     Text="{Binding Costumepath}"
+                                     Watermark="Set Custom Tempfolder">
+                            </TextBox>
+                            <Button BorderBrush="Black" BorderThickness="1" Grid.Column="1" Margin="5"
+                                    Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
+                                    Command="{Binding PickFolderCommand}">
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+        </Border>
+        
+        <Border Grid.Row="3" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1" >
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Text="License"></TextBlock>
+                </Expander.Header>
+                <Expander.Content>
+                    <ScrollViewer HorizontalScrollBarVisibility="Visible">
+                        <TextBox FontSize="13" IsReadOnly="True" MaxHeight="350" Text="{Binding License}"></TextBox>
+                    </ScrollViewer>
+                </Expander.Content>
+            </Expander>
+        </Border>
+        <Border Margin="5" Grid.Row="4" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Text="Info"></TextBlock>
+                </Expander.Header>
+                <Expander.Content>
+                    <StackPanel>
+                        <Label Foreground="Blue" Tapped="InputElement_OnTapped">Contact</Label>
+                        <Label Foreground="Blue" Tapped="InputElement_OnTapped2">Github</Label>
+                        <TextBlock MaxHeight="350" Text="Version:  "></TextBlock>
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+        </Border>
     </Grid>
     
 </controls:ContentDialog>
