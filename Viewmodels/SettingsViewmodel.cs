@@ -1,15 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.Net.Mime;
+using System.Resources;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
-using Avalonia.Media.Imaging;
+using Avalonia;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Project1.Viewmodels;
@@ -38,15 +36,23 @@ public partial class SettingsViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(ownfolderviseble))] private bool? createfolder = IOC.Default.GetService<Settings>().CreateOwnFolder;
     [ObservableProperty] private string createfoldername = IOC.Default.GetService<Settings>().OwnFolderName;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(owndateenabled))] private bool ownfolderdate = IOC.Default.GetService<Settings>().OwnFolderDate;
-     public bool owndateenabled => !ownfolderdate;
+    public bool owndateenabled => !ownfolderdate;
      public bool? ownfolderviseble => createfolder;
     public string License => File.ReadAllText(@"pages\License.txt");
+
+
 
     [ICommand]
     private async Task PickFolderAsync()
     {
         Costumepath = await _fileDialogService.PickFolder();
         OnPropertyChanged(nameof(Costumepath));
+    }
+
+    [ICommand]
+    public void LicenseExt()
+    {
+
     }
     
     public bool nameenabled => !Dateasname;

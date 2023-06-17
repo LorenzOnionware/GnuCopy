@@ -9,7 +9,7 @@
     xmlns:viewmodels="using:Project1.Viewmodels"
     xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
     x:DataType="viewmodels:EditPresetsViewmodel"
-    x:CompileBindings="True" Title="EditPreset" CloseButtonClick="ContentDialog_OnCloseButtonClick" CloseButtonText="Save">
+    x:CompileBindings="True" SecondaryButtonText="Cancel" Closing="ContentDialog_OnClosing" Title="EditPreset" PrimaryButtonClick="ContentDialog_OnCloseButtonClick" PrimaryButtonText="Save">
 
     <!--attention humbug code -->
     
@@ -22,6 +22,7 @@
         <Button Name="fickdich2" IsVisible="False" Command="{Binding Remove2Command}"></Button>
         
         <StackPanel>
+            <Button IsVisible="False" Command="{Binding CallAllCommand}" HotKey="Enter"></Button>
             <Label IsVisible="{Binding Labelenable}" Content="Not Allowed Character" Foreground="Firebrick"></Label>
             <TextBlock  Text="{Binding Presetname}"></TextBlock>
             <Label Content="Files:"></Label>

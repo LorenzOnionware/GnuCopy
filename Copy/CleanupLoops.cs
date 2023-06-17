@@ -1,20 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
-using DynamicData;
-using FluentAvalonia.Core;
-using HarfBuzzSharp;
-using Microsoft.CodeAnalysis;
 
 namespace Project1;
 
 public class CleanupLoops
 {
-    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat, bool length,bool folder)
+    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat, bool length,bool folder,CancellationToken token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -56,12 +49,12 @@ public class CleanupLoops
                     }
                 }
             });
-        });
+        },token);
 
         return output.ToArray();
     }
 
-    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat, bool length,bool folder)
+    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat, bool length,bool folder,CancellationToken token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -101,7 +94,7 @@ public class CleanupLoops
                 }
 
             });
-        });
+        },token);
         return output.ToArray();
     }
 

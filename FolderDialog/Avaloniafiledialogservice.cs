@@ -33,4 +33,16 @@ public sealed class Avaloniafiledialogservice: IFileDialogService
         var result = await dialog.ShowAsync(App.MainWindow);
         return result?.ToArray();
     }
+
+    public async override Task<string> SaveFile()
+    {
+        var dialog = new SaveFileDialog();
+        dialog.Filters.Add( new FileDialogFilter
+        {
+            Name ="zip",
+            Extensions = {"Zip"}
+        });
+        var result = await dialog.ShowAsync(App.MainWindow);
+        return (result+".zip");
+    }
 }

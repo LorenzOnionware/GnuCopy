@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
@@ -41,5 +37,10 @@ public partial class EditPresetsWindow : ContentDialog,IStyleable
             string s = EditPresetsViewmodel.Default.Presetname + ".json";
             File.WriteAllText(Path.Combine(a, "GnuCopy", s), ab);
             IOC.Default.GetService<MainViewmodel>().selectionchaged();
+    }
+
+    private void ContentDialog_OnClosing(ContentDialog sender, ContentDialogClosingEventArgs args)
+    {
+        EditPresetsViewmodel.Default = new EditPresetsViewmodel();
     }
 }

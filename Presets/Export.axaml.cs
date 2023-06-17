@@ -1,11 +1,8 @@
 ﻿using System;
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using FluentAvalonia.UI.Controls;
-using Project1.Viewmodels;
 using static Project1.Viewmodels.ExportViewmodel;
 
 namespace Project1.Presets;

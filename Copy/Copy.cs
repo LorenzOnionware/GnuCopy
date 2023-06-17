@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
 using Project1.Viewmodels;
-using static Project1.MainWindow;
-using static Project1.CopyMultiple;
 
 namespace Project1;
 
@@ -15,7 +12,7 @@ public class Copy
 {
     private static string TempFolder = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
 
-    public static async Task Settings(bool zip)
+    public static async Task Settings(bool zip,CancellationToken token)
     {
         if (zip)
         {
@@ -26,7 +23,7 @@ public class Copy
             }
         }
 
-        await IOC.Default.GetService<IProgressBarService>().Progressmax();
+        await IOC.Default.GetService<IProgressBarService>().Progressmax(token);
 
         if (zip)
         {
@@ -36,22 +33,22 @@ public class Copy
         if (IOC.Default.GetService<Settings>().Listingart == true)
         {
             // await White(zip);
-            await White(zip);
+            await White(zip,token);
         }
         else if (IOC.Default.GetService<Settings>().Listingart == false)
         {
             // await Black(zip);
-            await Without(zip);
+            await Without(zip,token);
         }
         else
         {
             // await Without(zip);
-            await Black(zip);
+            await Black(zip,token);
             IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
         }
     }
 
-    private static async Task Without(bool zip)
+    private static async Task Without(bool zip,CancellationToken token)
     { 
         var copytask = Task.Run(() =>
         {
@@ -69,9 +66,9 @@ public class Copy
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        });
-
-
+        },token);
+        
+        
         List<string> folders = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",SearchOption.AllDirectories).ToList();
         if (zip)
         {
@@ -98,11 +95,13 @@ public class Copy
            
         }
         await copytask;
+   //     var aa =MainViewmodel.Default.Progressmax % MainViewmodel.Default.progress;
+     //   MainViewmodel.Default.progress += aa;
     }
 
-    private static async Task Black(bool zip)
+    private static async Task Black(bool zip,CancellationToken token)
     { 
-        string[] firstfiles = await CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*").ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false);
+        string[] firstfiles = await CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*").ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
 
         var copytask = Task.Run(() =>
         {
@@ -118,9 +117,9 @@ public class Copy
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        });
+        },token);
 
-        string[] folderss = await CleanupLoops.CLean(Directory.GetDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories), IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true);
+        string[] folderss = await CleanupLoops.CLean(Directory.GetDirectories(MainViewmodel.Default.Copyfromtext, "*", SearchOption.AllDirectories), IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true,token);
         List<string> folders = folderss.ToList();
         if (zip)
         {
@@ -130,7 +129,7 @@ public class Copy
         {
             var a = FolderPath(folder, zip);
             Directory.CreateDirectory(a);
-            string[] files = await CleanupLoops.CLean(Directory.EnumerateFiles(folder).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false);
+            string[] files = await CleanupLoops.CLean(Directory.EnumerateFiles(folder).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
             foreach (var file in files)
             {
                 try
@@ -146,11 +145,13 @@ public class Copy
             
         }
         await copytask;
+    //    var aa = MainViewmodel.Default.progress % MainViewmodel.Default.Progressmax;
+      //  MainViewmodel.Default.progress += aa;
     }
 
-    private static async Task White(bool zip)
+    private static async Task White(bool zip,CancellationToken token)
     { 
-        string[] firstfiles = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*").ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false);
+        string[] firstfiles = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*").ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
         var copytask = Task.Run(() =>
         { 
             foreach (var file in firstfiles)
@@ -166,8 +167,8 @@ public class Copy
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        });
-        string[] folderss = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*").ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true);
+        },token);
+        string[] folderss = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*").ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true,token);
         List<string> folders = folderss.ToList();
         if (zip)
         {
@@ -177,7 +178,7 @@ public class Copy
         {
            
             Directory.CreateDirectory(Path.Combine(FolderPath(folder,zip)));
-            string[] files = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false);
+            string[] files = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
             foreach (var file in files)
             {
                 try
@@ -193,6 +194,8 @@ public class Copy
            
         }
         await copytask;
+   //     var aa = MainViewmodel.Default.progress % MainViewmodel.Default.Progressmax;
+     //   MainViewmodel.Default.progress += aa;
     }
 
 

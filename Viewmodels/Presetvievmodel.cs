@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Project1.Viewmodels;

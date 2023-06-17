@@ -11,7 +11,7 @@ namespace Project1
         {
             AvaloniaXamlLoader.Load(this);
         }
-
+        
         public static Window MainWindow;
         public override void OnFrameworkInitializationCompleted()
         {

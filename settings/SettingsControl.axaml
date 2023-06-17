@@ -98,29 +98,26 @@
                 </Expander.Content>
             </Expander>
         </Border>
-        
-        <Border Grid.Row="3" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1" >
-            <Expander>
-                <Expander.Header>
-                    <TextBlock Text="License"></TextBlock>
-                </Expander.Header>
-                <Expander.Content>
-                    <ScrollViewer HorizontalScrollBarVisibility="Visible">
-                        <TextBox FontSize="13" IsReadOnly="True" MaxHeight="350" Text="{Binding License}"></TextBox>
-                    </ScrollViewer>
-                </Expander.Content>
-            </Expander>
-        </Border>
         <Border Margin="5" Grid.Row="4" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
-            <Expander>
+            <Expander Name="Info">
                 <Expander.Header>
                     <TextBlock Text="Info"></TextBlock>
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <Label Foreground="Blue" Tapped="InputElement_OnTapped">Contact</Label>
-                        <Label Foreground="Blue" Tapped="InputElement_OnTapped2">Github</Label>
-                        <TextBlock MaxHeight="350" Text="Version:  "></TextBlock>
+                        <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">License</TextBlock>
+                        </Label>
+                        <Label Cursor="Hand" Tapped="InputElement_OnTapped3">
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">ThirdParty</TextBlock>
+                        </Label>
+                        <Label Cursor="Hand" Tapped="InputElement_OnTapped">
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">Contact</TextBlock>
+                        </Label>
+                        <Label Cursor="Hand" Tapped="InputElement_OnTapped2">
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">Github</TextBlock>
+                        </Label>
+                        <TextBlock MaxHeight="350" Text="Version: 23.06.2 "></TextBlock>
                     </StackPanel>
                 </Expander.Content>
             </Expander>

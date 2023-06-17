@@ -166,6 +166,10 @@
 
         <!-- UntererTeil -->
         <Grid Grid.Row="3" Grid.ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Opacity="{Binding Optaci}" Orientation="Horizontal">
+                <Label>Files:  </Label>
+                <Label Content="{Binding progresstext}"></Label>
+            </StackPanel>
             <ProgressBar Maximum="{Binding Progressmax}" Value="{Binding Progress}" Opacity="{Binding Optaci}" Grid.Column="1" Margin="5,5"></ProgressBar>
             <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy" Command="{Binding CopybuttonCommand}"></Button>
         </Grid>

@@ -3,10 +3,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FluentAvalonia.UI.Controls;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
@@ -45,7 +43,7 @@ public partial class ExportViewmodel
     [ICommand]
     public async Task ExportClick()
     {
-        string ZipPath = await _fileDialogService.PickFolder();
+        string ZipPath = await _fileDialogService.SaveFile();
         var Temp = Directory.CreateTempSubdirectory("temp");
         await Task.Run(() =>
         {
@@ -58,11 +56,12 @@ public partial class ExportViewmodel
         using (var archive = ZipArchive.Create())
         {
             archive.AddAllFromDirectory(Temp.FullName);
-            archive.SaveTo(Path.Combine(ZipPath, "Export.zip"), CompressionType.None);
+            archive.SaveTo(ZipPath, CompressionType.None);
            
         }
         Directory.Delete(Temp.FullName,true);
         Exportto = String.Empty;
+        selectedpresets.Clear();
     }
 
     [ICommand]

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Project1.Viewmodels;
 using SharpCompress.Archives;
@@ -10,7 +11,7 @@ namespace Project1;
 
 public class StartCopyService
 {
-    public async Task Start()
+    public async Task Start(CancellationToken token)
     {
         if (!System.IO.Path.Exists(IOC.Default.GetService<MainViewmodel>().Copyfromtext) && !System.IO.Path.Exists(IOC.Default.GetService<MainViewmodel>().Copytotext))
             return;
@@ -20,32 +21,34 @@ public class StartCopyService
             {
                 case 1:
                     //Tar
-                    await Project1.Copy.Settings(true);
-                    await StartPackaging(true);
+                    await Project1.Copy.Settings(true,token);
+                    await StartPackaging(true,token);
                     MainViewmodel.Default.selectionchaged();
                     break;
                 case 2:
                     //TZip
-                    await Project1.Copy.Settings(true);
-                    await StartPackaging(false);
+                    await Project1.Copy.Settings(true,token);
+                    await StartPackaging(false,token);
                     MainViewmodel.Default.selectionchaged();
                     break;
             }
         }
         else
         {
-            await CopyUnPackaged();
+            await CopyUnPackaged(token);
         }
     }
-    private async Task StartPackaging(bool useTar)
+    private async Task StartPackaging(bool useTar,CancellationToken token)
     {
         var Temp = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
 
         using (var archive = ZipArchive.Create())
         {
+            var namee = IOC.Default.GetService<MainViewmodel>().Copyfromtext;
+            var abb = Path.GetDirectoryName(namee);
             archive.AddAllFromDirectory(Temp);
             var a = DateTime.Now.ToString("g").Replace(':','-');
-            var b = String.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName) ? "Compresstdirection" : IOC.Default.GetService<Settings>().ZipName;
+            var b = String.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName) ? abb : IOC.Default.GetService<Settings>().ZipName;
 
             if (IOC.Default.GetService<Settings>().DateAsName)
             {
@@ -63,11 +66,11 @@ public class StartCopyService
         MainViewmodel.Default.Progress += 10;
     }
 
-    private async Task CopyUnPackaged()
+    private async Task CopyUnPackaged(CancellationToken token)
     {
         if (Path.Exists(MainViewmodel.Default.Copyfromtext) && Path.Exists(MainViewmodel.Default.Copytotext))
         {
-            await Copy.Settings(false);
+            await Copy.Settings(false,token);
         }
     }
     

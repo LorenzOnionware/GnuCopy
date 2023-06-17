@@ -1,46 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices.ObjectiveC;
-using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Avalonia;
-using MessageBox.Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
-using Avalonia.Controls.Shapes;
-using Avalonia.Controls.Notifications;
-using Avalonia.Generics.Controls;
-using Avalonia.Threading;
-using Avalonia.Generics.Extensions;
-using Avalonia.Interactivity;
-using Avalonia.Platform;
-using Avalonia.Threading;
-using Avalonia.Win32;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
-using MessageBox.Avalonia.Enums;
-using MessageBox.Avalonia.Views;
-using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using Project1.Presets;
-using SharpCompress;
 using SharpCompress.Archives;
 using SharpCompress.Common;
-using Path = Avalonia.Controls.Shapes.Path;
-using static Project1.IFileDialogService;
-using MessageBox = Avalonia.Generics.Dialogs.MessageBox;
 using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
+using static Project1.USBMonitor;
+using static Project1.USBEventArgs;
 
 
 namespace Project1.Viewmodels;
@@ -52,11 +28,39 @@ public partial class MainViewmodel
     
     public MainViewmodel(IFileDialogService FileDialogservice)
     {
+        IOC.Default.GetService<WindowClosingService>().Closed += (o, e) => cancelall();
         _fileDialogService = FileDialogservice;
+
+        USBMonitor usbMonitor = new USBMonitor();
+
+        usbMonitor.USBInserted += UsbInsertedHandler;
+        usbMonitor.USBRemoved += UsbRemovedHandler;
+
+        usbMonitor.StartMonitoring();
     }
 
     private IFileDialogService _fileDialogService;
+    
+    private static void UsbInsertedHandler(object sender, USBEventArgs e)
+    {
+        
+    }
 
+    private void UsbRemovedHandler(object sender, USBEventArgs e)
+    {
+        if (!Path.Exists(copytotext) || !Path.Exists(copyfromtext))
+        {
+            cancel.Dispose();
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            OnPropertyChanged(nameof(Isenable));
+            isenabled2 = true;
+            OnPropertyChanged(nameof(Isenable));
+            var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
+            taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+        }
+    
+    }
     public bool canedit => !String.IsNullOrEmpty(Selectedlistitem);
     public ObservableCollection<string>? Folderitems { get; set; } = new();
     public static MainViewmodel Default = IOC.Default.GetService<MainViewmodel>();
@@ -71,6 +75,7 @@ public partial class MainViewmodel
                IOC.Default.GetService<Settings>().Listingart == true;
     }
 
+    
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copytotext;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;   
@@ -85,8 +90,10 @@ public partial class MainViewmodel
     public ObservableCollection<string> Expanderpaths { get; set; } = new(); 
     public string Headertext => Expanderpaths?.Any()==true?Expanderpaths[0]:"Paths";
     public bool Isnotempty => Folderitems.Count != 0;
-    [ObservableProperty] public int progress;
-    [ObservableProperty] public int progressmax;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
+    public string progresstext => progressmax.ToString() + "/" + progress.ToString();
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     [ICommand]
@@ -206,11 +213,45 @@ public partial class MainViewmodel
         OnPropertyChanged(nameof(canedit));
         OnPropertyChanged(nameof(Isnotempty));
         
-    }
+    } 
+    CancellationTokenSource cancel = new CancellationTokenSource(); 
+    CancellationToken token = default;
 
-    [ICommand]
-    public async Task Copybutton()
+    public void cancelall()
     {
+        cancel.Dispose();
+    }
+    [ICommand]
+    private async Task Copybutton()
+    {
+
+        if (!System.IO.Path.Exists(copyfromtext))
+        {
+            ContentDialog dlg1 = new ContentDialog();
+            dlg1.Title = "Error";
+            dlg1.Content = "Source path doesnt exist";
+            dlg1.PrimaryButtonText = "Ok";
+            await dlg1.ShowAsync();
+            return;
+        }
+
+        if (!System.IO.Path.Exists(copytotext))
+        {
+            try
+            {
+                Directory.CreateDirectory(copytotext);
+            }
+            catch (Exception e)
+            {
+                ContentDialog dlg1 = new ContentDialog();
+                dlg1.Title = "Error";
+                dlg1.Content = "Couldnt find or create path";
+                dlg1.PrimaryButtonText = "Ok";
+                await dlg1.ShowAsync();
+                return;
+            }
+            
+        }
         isenabled2 = false;
         OnPropertyChanged(nameof(Isenable));
         var Pathh = copytotext;
@@ -218,7 +259,6 @@ public partial class MainViewmodel
         OnPropertyChanged(nameof(Optaci));
         if (IOC.Default.GetService<Settings>().Packageformat == 0 && IOC.Default.GetService<Settings>().CreateOwnFolder == true)
         {
-            
             var name = IOC.Default.GetService<Settings>().OwnFolderDate ? DateTime.Now.ToString("g").Replace(':','-') : IOC.Default.GetService<Settings>().OwnFolderName;
             Directory.CreateDirectory(System.IO.Path.Combine(Pathh, name));
             copytotext = System.IO.Path.Combine(Pathh, name);
@@ -240,18 +280,102 @@ public partial class MainViewmodel
         }
         IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
         IOC.Default.GetService<Settings>().Pathto =  IOC.Default.GetService<Settings>().CreateOwnFolder==true ? Pathh : copytotext;
-        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start());
-        Optaci = 0;
-        OnPropertyChanged(nameof(Optaci));
+        bool iscancel = false;
+        if (IOC.Default.GetService<Settings>().Clearaftercopy)
+        {
+            ContentDialog dlg1 = new ContentDialog();
+            dlg1.Title = "Clear";
+            dlg1.Content = "GnuCopy Deletes everything in the source folder. After copying.";
+            dlg1.PrimaryButtonText = "Ok";
+            dlg1.SecondaryButtonText = "Cancel";
+            ContentDialogResult result = await dlg1.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                iscancel = true;
+            }
+        }
+        
+        if (IOC.Default.GetService<Settings>().Clearforcopy)
+        {
+            bool denied = false;
+            var a = Directory.EnumerateDirectories(Copytotext,"*");
+            var b = Directory.EnumerateFiles(copytotext, "*");
+            if (a.Any() || b.Any())
+            {
+                ContentDialog dlg1 = new ContentDialog();
+                dlg1.Title = "Clear";
+                dlg1.Content = "GnuCopy Deletes everything in the selected target folder.";
+                dlg1.PrimaryButtonText = "Ok";
+                dlg1.SecondaryButtonText = "Cancel";
+                ContentDialogResult result = await dlg1.ShowAsync();
+
+                if (result == ContentDialogResult.Secondary)
+                {
+                    denied = true;
+                }
+            }
+
+            if (!denied)
+            {
+                await Task.Run(() =>
+                {
+                    if (a.Any())
+                    {
+                        foreach (var folder in a)
+                        {
+                            Directory.Delete(folder,true);
+                        }
+                    }
+
+                    if (b.Any())
+                    {
+                        foreach (var file in b)
+                        {
+                            File.Delete(file);
+                        }
+                    }
+                },token);
+            }
+        }
+        
+        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(token),token);
+
+        if (iscancel)
+        {
+            await Task.Run(() =>
+            {
+                var a = Directory.EnumerateDirectories(Copyfromtext,"*");
+                var b = Directory.EnumerateFiles(copyfromtext, "*");
+                if (a.Any())
+                {
+                    foreach (var folder in a)
+                    {
+                        Directory.Delete(folder, true);
+                    }
+                }
+
+                if (b.Any())
+                {
+                    foreach (var file in b)
+                    {
+                        File.Delete(file);
+                    }
+                }
+            },token);   
+        }
 
         ContentDialog dlg = new ContentDialog();
         dlg.Title = "Done";
         dlg.Content = "GnuCopy finished operation.";
         dlg.PrimaryButtonText = "Close";
         await dlg.ShowAsync();
+        A:
+        Optaci = 0;
+        OnPropertyChanged(nameof(Optaci));
         OnPropertyChanged(nameof(Isenable));
         copytotext = Pathh;
         isenabled2 = true;
+        iscancel = false;
         OnPropertyChanged(nameof(Isenable));
         var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
         taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
@@ -318,6 +442,8 @@ public partial class MainViewmodel
     [ICommand]
     private async void EditPreset()
     {
+        if(selectedpreset == -1)
+            return;
         EditPresetsViewmodel.Default = new();
         var window = new Project1.Presets.EditPresetsWindow();
         await window.ShowAsync();

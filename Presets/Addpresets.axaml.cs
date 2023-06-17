@@ -1,5 +1,4 @@
 ﻿using System;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
@@ -11,6 +10,7 @@ namespace Project1.Presets;
 public partial class Addpresets : ContentDialog, IStyleable
 {
     Type IStyleable.StyleKey => typeof(ContentDialog);
+    private bool _Blocker = false;
 
     public Addpresets()
     {
@@ -25,17 +25,14 @@ public partial class Addpresets : ContentDialog, IStyleable
 
     private void TextBox_OnTextChanged(object? sender, TextChangedEventArgs e)
     {
-        AddpresetsViewmodel.Default. b = false;
-        char[] notallowed = new char[] { '"','<', '>', ':', '/', '\\', '|', '?', '*' };
-        foreach (var a in AddpresetsViewmodel.Default.Presetname)
+        if(_Blocker)
+            return;
+        AddpresetsViewmodel.Default.b = false;
+        var a =System.IO.Path.GetInvalidFileNameChars();
+        foreach (var c in a)
         {
-            foreach (var ab in notallowed)
-            {
-                if (ab == a)
-                {
-                    AddpresetsViewmodel.Default. b = true;
-                }
-            }
+            if(AddpresetsViewmodel.Default.Presetname.Contains(c))
+                AddpresetsViewmodel.Default.b = true;
         }
 
         if (AddpresetsViewmodel.Default.b)
@@ -46,5 +43,11 @@ public partial class Addpresets : ContentDialog, IStyleable
         {
             AddpresetsViewmodel.Default.Labelenable = false;
         }
+    }
+
+    private void ContentDialog_OnClosing(ContentDialog sender, ContentDialogClosingEventArgs args)
+    {
+        _Blocker = true;
+        AddpresetsViewmodel.Default = new AddpresetsViewmodel();
     }
 }

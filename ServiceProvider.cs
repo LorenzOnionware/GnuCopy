@@ -1,10 +1,7 @@
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Jab;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Project1.Presets;
 using Project1.Viewmodels;
@@ -24,6 +21,7 @@ namespace Project1;
 [Singleton<MainWindow>]
 [Singleton<cleanwerth>(Instance = nameof(length))]
 [Singleton<IProgressBarService>]
+[Singleton<WindowClosingService>]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }
@@ -49,7 +47,6 @@ sealed partial class ServiceProvider
             }
         });
         
-
         JsonAppSettings = File.Exists(path) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path)) ?? new() : new();
     }
 }

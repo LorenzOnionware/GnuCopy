@@ -2,12 +2,10 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
-using Project1.Presets;
 
 namespace Project1.Viewmodels;
 
@@ -21,6 +19,7 @@ public partial class AddpresetsViewmodel
 
     [ObservableProperty] private string filetext;
     [ObservableProperty] private string foldertext;
+    public bool primary => !Labelenable;
 
     [ObservableProperty] private string selectedfolder;
     [ObservableProperty] private string selectedfile;
@@ -51,8 +50,14 @@ public partial class AddpresetsViewmodel
         Filetext = String.Empty;
         OnPropertyChanged(nameof(filetext));
     }
-    
 
+    [ICommand]
+    private void CallAll()
+    {
+        FolderAdd();
+        FileAdd();
+    }
+    
     [ICommand]
     private void FolderAdd()
     {
@@ -116,7 +121,7 @@ public partial class AddpresetsViewmodel
     }
 
 
-    [ObservableProperty]private bool labelenable = false;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(primary))]private bool labelenable = false;
     public bool b = false;
     
 }

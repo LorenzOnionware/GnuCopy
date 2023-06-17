@@ -1,32 +1,16 @@
   using System;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using System.IO;
+  using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-  using System.Reactive.Linq;
-  using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-  using Avalonia.Controls.Primitives;
-  using Avalonia.Input;
+  using System.Threading.Tasks;
   using Avalonia.Media;
-using Avalonia.Skia;
-using Avalonia.Styling;
-using Avalonia.Threading;
-  using CommunityToolkit.Mvvm.DependencyInjection;
-  using DynamicData;
-using Microsoft.Win32;
+  using Avalonia.Styling;
+  using Microsoft.Win32;
 using Newtonsoft.Json;
-using Project1.Viewmodels;
-using SharpCompress.Archives;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Zip;
-using SharpCompress.Common;
+  using Project1.Viewmodels;
 
 
-namespace Project1
+  namespace Project1
 {
     public partial class MainWindow : Window
     {
@@ -41,6 +25,8 @@ namespace Project1
         {
             DataContext = MainViewmodel.Default;
             InitializeComponent();
+            IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
+            
             ThemeChanged(null,null);
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             AddItemsToList();

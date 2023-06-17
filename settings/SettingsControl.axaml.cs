@@ -1,17 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Net.Mime;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Styling;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using DynamicData;
 using FluentAvalonia.UI.Controls;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
@@ -81,4 +78,26 @@ public partial class SettingsControl : ContentDialog, IStyleable
             }));
         }
     }
+
+    private void InputElement_OnTapped3(object? sender, TappedEventArgs e)
+    {
+        //Thirdparty
+        string filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"pages\Third-Party.txt");
+
+        ProcessStartInfo psi = new ProcessStartInfo(filePath);
+        psi.UseShellExecute = true;
+
+        Process.Start(psi);
+    }
+
+    private void InputElement_OnTapped4(object? sender, TappedEventArgs e)
+    {
+        string filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"pages\License.txt");
+
+        ProcessStartInfo psi = new ProcessStartInfo(filePath);
+        psi.UseShellExecute = true;
+
+        Process.Start(psi);
+    }
+
 }

@@ -10,5 +10,6 @@ public abstract class IFileDialogService
     public abstract Task<string[]> PickFolders();
 
     public abstract Task<string[]?> PickFile();
+    public abstract Task<string> SaveFile();
 
 }

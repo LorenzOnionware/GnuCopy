@@ -1,25 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
-using Avalonia.Generics.Extensions;
-using Avalonia.Interactivity;
-using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FluentAvalonia.UI.Controls;
-using Microsoft.CodeAnalysis;
-using Newtonsoft.Json;
 using Project1.Presets;
-using Path = Avalonia.Controls.Shapes.Path;
-using static Project1.IFileDialogService;
 
 namespace Project1.Viewmodels;
 
@@ -61,6 +45,14 @@ public partial class EditPresetsViewmodel
         OnPropertyChanged(nameof(filetext));
     }
 
+    
+    [ICommand]
+    private void CallAll()
+    {
+        FolderAdd();
+        FileAdd();
+    }
+    
     [ICommand]
     private void FolderAdd()
     {

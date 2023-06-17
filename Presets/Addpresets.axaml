@@ -10,8 +10,8 @@
     xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
     x:DataType="viewmodels:AddpresetsViewmodel"
     x:CompileBindings="True"
-    PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" PrimaryButtonText="Save"
-    SecondaryButtonText="Cancel" Title="AddPreset" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
+    PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" IsPrimaryButtonEnabled="{Binding primary}" PrimaryButtonText="Save"
+    SecondaryButtonText="Cancel" Title="AddPreset"  Closing="ContentDialog_OnClosing" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
 
     <Control.Styles>
         <avalonia:MaterialIconStyles />
@@ -22,6 +22,7 @@
         <Button Name="fickdich2" IsVisible="False" Command="{Binding Remove2Command}"></Button>
         
         <StackPanel>
+            <Button IsVisible="False" Command="{Binding CallAllCommand}" HotKey="Enter"></Button>
             <Label Content="Not Allowed Character" Foreground="Firebrick" IsVisible="{Binding Labelenable}"></Label>
             <TextBox Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
             <Label Content="Files:"></Label>
