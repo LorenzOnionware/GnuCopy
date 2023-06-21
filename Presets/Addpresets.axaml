@@ -11,7 +11,7 @@
     x:DataType="viewmodels:AddpresetsViewmodel"
     x:CompileBindings="True"
     PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" IsPrimaryButtonEnabled="{Binding primary}" PrimaryButtonText="Save"
-    SecondaryButtonText="Cancel" Title="AddPreset"  Closing="ContentDialog_OnClosing" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
+    SecondaryButtonText="Cancel" Title="Add Preset"  Closing="ContentDialog_OnClosing" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
 
     <Control.Styles>
         <avalonia:MaterialIconStyles />
@@ -24,7 +24,7 @@
         <StackPanel>
             <Button IsVisible="False" Command="{Binding CallAllCommand}" HotKey="Enter"></Button>
             <Label Content="Not Allowed Character" Foreground="Firebrick" IsVisible="{Binding Labelenable}"></Label>
-            <TextBox Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
+            <TextBox Name="FileName" Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
             <Label Content="Files:"></Label>
             <StackPanel Orientation="Horizontal">
                 <TextBox Watermark="Files" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
@@ -46,7 +46,7 @@
             </ScrollViewer>
             <Label Content="Folders:"></Label>
             <StackPanel Orientation="Horizontal">
-                <TextBox Watermark="Folder" Width="250" Text="{Binding Foldertext,Mode=TwoWay}"></TextBox>
+                <TextBox Name="folderName" Watermark="Folder" Width="250" Text="{Binding Foldertext,Mode=TwoWay}"></TextBox>
                 <Button Command="{Binding FolderAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">

@@ -93,7 +93,7 @@ public partial class MainViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
-    public string progresstext => progressmax.ToString() + "/" + progress.ToString();
+    public string progresstext => progress.ToString()+ " of " + progressmax.ToString();
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     [ICommand]

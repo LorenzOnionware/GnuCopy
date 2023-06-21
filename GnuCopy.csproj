@@ -97,4 +97,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\GnuCopy.png" />
+    <AvaloniaResource Include="Assets\GnuCopy.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
 </Project>

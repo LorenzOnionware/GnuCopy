@@ -28,16 +28,19 @@
         <Border Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
             <Expander>
                 <Expander.Header>
-                    <TextBlock Text="Copy settings">
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <materialIcons:MaterialIcon Kind="ContentCopy" Margin="5,0"></materialIcons:MaterialIcon>
+                        <TextBlock Text="Copy settings"></TextBlock>
+                    </StackPanel>
+                  
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
                         <Label Content="Overrite existing files"></Label>
                         <ToggleSwitch IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
-                        <Label Content="Clear target Directory for copy"></Label>
+                        <Label Content="Clear target directory for copy"></Label>
                         <ToggleSwitch IsChecked="{Binding Clearforchecked,Mode=TwoWay}" Name="Clearforcopy"></ToggleSwitch>
-                        <Label Content="Clear source Directory after copy"></Label>
+                        <Label Content="Clear source directory after copy"></Label>
                         <ToggleSwitch IsChecked="{Binding Clearafterchecked,Mode=TwoWay}" Name="Clearaftercopy"></ToggleSwitch>
                     </StackPanel>
                 </Expander.Content>
@@ -47,7 +50,10 @@
         <Border Grid.Row="1" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
             <Expander>
                 <Expander.Header>
-                    <TextBlock Text="Paths"></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <materialIcons:MaterialIcon Kind="FolderSettings" Margin="5,0"></materialIcons:MaterialIcon>
+                        <TextBlock Text="Paths"></TextBlock>
+                    </StackPanel>
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
@@ -66,7 +72,10 @@
         <Border Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
             <Expander>
                 <Expander.Header>
-                    <TextBlock Text="Packages"></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <materialIcons:MaterialIcon Kind="FolderZip" Margin="5,0"></materialIcons:MaterialIcon>
+                        <TextBlock Text="Packages"></TextBlock>
+                    </StackPanel>
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
@@ -74,13 +83,13 @@
                         <ComboBox SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
                             <ComboBox.Items>
                                 <ComboBoxItem Content="none"></ComboBoxItem>
-                                <ComboBoxItem Content="Tar"></ComboBoxItem>
+                                <ComboBoxItem Content="tar"></ComboBoxItem>
                                 <ComboBoxItem Content="zip"></ComboBoxItem>
                             </ComboBox.Items>
                         </ComboBox>
-                        <Label Content="File Name"></Label>
-                        <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set Date as Name</CheckBox>
-                        <TextBox Watermark="Zip Name" Name="Zipname" MaxLength="50" Text="{Binding Zipname}"
+                        <Label Content="File name"></Label>
+                        <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set date as Name</CheckBox>
+                        <TextBox Watermark="Zip name" Name="Zipname" MaxLength="50" Text="{Binding Zipname}"
                                  IsEnabled="{Binding nameenabled}">
                         </TextBox>
                         <Label Content="Custom TempPath"></Label>
@@ -98,26 +107,59 @@
                 </Expander.Content>
             </Expander>
         </Border>
-        <Border Margin="5" Grid.Row="4" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
-            <Expander Name="Info">
+        <Border IsVisible="{Binding win}" Margin="5" Grid.Row="4" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander IsVisible="{Binding win}">
                 <Expander.Header>
-                    <TextBlock Text="Info"></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <materialIcons:MaterialIcon Kind="Design" Margin="5,0"></materialIcons:MaterialIcon>
+                        <TextBlock Text="Design"></TextBlock>
+                    </StackPanel>
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
+                         <CheckBox IsChecked="{Binding Custommica}" Name="Mica">Use Mica</CheckBox>
+                        <Label IsVisible="{Binding #Mica.IsChecked}">Intensy</Label>
+                        <ComboBox IsVisible="{Binding #Mica.IsChecked}" SelectedIndex="{Binding Micaintensy}">
+                            <ComboBox.Items>
+                                <ComboBoxItem>Decent</ComboBoxItem>
+                                <ComboBoxItem>Medium</ComboBoxItem>
+                                <ComboBoxItem>Hard</ComboBoxItem>
+                            </ComboBox.Items>
+                        </ComboBox>
+                        <Label>After design change you must</Label>
+                        <Label>restart GnuCopy.</Label>
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+        </Border>
+        <Border Margin="5" Grid.Row="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+            <Expander Name="Info">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialIcons:MaterialIcon Kind="Information" Margin="5,0"></materialIcons:MaterialIcon>
+                        <TextBlock Text="Info"></TextBlock>
+                    </StackPanel>
+                    
+                </Expander.Header>
+                <Expander.Content>
+                    <StackPanel>
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 23.6.7.0 "></TextBlock>
+                        <TextBlock Margin="5" Text="Copyright © OnionWare, Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
-                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">License</TextBlock>
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>
                         </Label>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped3">
-                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">ThirdParty</TextBlock>
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">ThirdParty</TextBlock>
                         </Label>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped">
-                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">Contact</TextBlock>
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">Contact</TextBlock>
                         </Label>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped2">
-                            <TextBlock Foreground="{DynamicResource SystemAccentColor}" TextDecorations="Underline">Github</TextBlock>
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">Github</TextBlock>
                         </Label>
-                        <TextBlock MaxHeight="350" Text="Version: 23.06.2 "></TextBlock>
+                        <Label Cursor="Hand" Tapped="Thanks_OnTapped">
+                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">Special Thanks</TextBlock>
+                        </Label>
                     </StackPanel>
                 </Expander.Content>
             </Expander>

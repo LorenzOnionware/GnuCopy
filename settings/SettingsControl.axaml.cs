@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -45,6 +46,8 @@ public partial class SettingsControl : ContentDialog, IStyleable
        settings.CreateOwnFolder = SettingsViewmodel.Default.Createfolder;
        settings.OwnFolderName = SettingsViewmodel.Default.Createfoldername;
        settings.OwnFolderDate = SettingsViewmodel.Default.Ownfolderdate;
+       settings.CustomMica = SettingsViewmodel.Default.Custommica;
+       settings.MicaIntensy = SettingsViewmodel.Default.Micaintensy;
        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
        File.WriteAllText(path,ab);
     }
@@ -99,5 +102,10 @@ public partial class SettingsControl : ContentDialog, IStyleable
 
         Process.Start(psi);
     }
-
+   
+    private async void Thanks_OnTapped(object? sender, TappedEventArgs e)
+    {
+        var window = new GnuCopy.pages.Thanks();
+        await window.ShowAsync();
+    }
 }

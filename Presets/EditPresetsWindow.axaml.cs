@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using FluentAvalonia.UI.Controls;
 using Newtonsoft.Json;
 using Project1.Viewmodels;
@@ -11,7 +14,7 @@ namespace Project1.Presets;
 
 public partial class EditPresetsWindow : ContentDialog,IStyleable
 {
-    
+
     Type IStyleable.StyleKey => typeof(ContentDialog);
     public EditPresetsWindow()
     {
@@ -22,7 +25,7 @@ public partial class EditPresetsWindow : ContentDialog,IStyleable
     {
         AvaloniaXamlLoader.Load(this);
     }
-    
+
     private void ContentDialog_OnCloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         PresetIndex preset = new PresetIndex()

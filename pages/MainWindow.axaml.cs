@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using System.Collections.Generic;
   using System.Threading.Tasks;
   using Avalonia.Media;
+  using Avalonia.Platform;
   using Avalonia.Styling;
   using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -50,28 +51,51 @@ using Newtonsoft.Json;
         {
             MainViewmodel.Default.Expanderpaths.Replace(IOC.Default.GetService<Settings>().Sources);
         }
-        
-        
-        private void ThemeChanged(object sender, UserPreferenceChangedEventArgs e)
+
+
+        public void ThemeChanged(object sender, UserPreferenceChangedEventArgs e)
         {
 #if WINDOWS
 
             if (Environment.OSVersion.Version.Build >= 22000)
             {
-                if (this.ActualThemeVariant == ThemeVariant.Dark)
+
+                if (IOC.Default.GetService<Settings>().CustomMica)
                 {
-                    this.TransparencyLevelHint =
-                        WindowTransparencyLevel.Mica;
-                    this.Background =
-                        new SolidColorBrush(Color.Parse("#991e1e1e"));
+                    var mica = IOC.Default.GetService<Settings>().MicaIntensy;
+                    byte dark = 235;
+                    byte light = 235;
+                    switch (mica)
+                    {
+                        case 0:
+                            light = 238;
+                            dark = 210;
+                            break;
+                        case 1 :
+                            light = 200;
+                            dark = 200;
+                            break;
+                        case 2:
+                            light = 180;
+                            dark = 180;
+                            break;
+                    }
+                    if (this.ActualThemeVariant == ThemeVariant.Dark)
+                    {
+                        this.TransparencyLevelHint =
+                            WindowTransparencyLevel.Mica;
+                        this.Background =
+                            new SolidColorBrush(Color.FromArgb(dark, 30, 30, 30));
+                    }
+                    else
+                    {
+                        this.TransparencyLevelHint =
+                            WindowTransparencyLevel.Mica;
+                        this.Background =
+                            new SolidColorBrush(Color.FromArgb(light, 238, 244, 249));
+                    }
                 }
-                else
-                {
-                    this.TransparencyLevelHint =
-                        WindowTransparencyLevel.Mica;
-                    this.Background =
-                        new SolidColorBrush(Color.Parse("#eeeef4f9"));
-                }
+
             }
 #endif
         }

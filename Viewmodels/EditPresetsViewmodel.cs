@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Project1.Presets;
 
 namespace Project1.Viewmodels;
@@ -22,12 +26,14 @@ public partial class EditPresetsViewmodel
 
     [ObservableProperty] private string selectedfolder;
     [ObservableProperty] private string selectedfile;
+    [ObservableProperty] private bool focusfolder;
+    [ObservableProperty] private bool focusfiles;
     
     [ObservableProperty]
     private string presetname = IOC.Default.GetService<MainViewmodel>().Selectedlistitem;
 
     [ICommand]
-    private void FileAdd()
+    private async void FileAdd()
     {
         if(String.IsNullOrEmpty(Filetext))
             return;
@@ -61,6 +67,7 @@ public partial class EditPresetsViewmodel
         Folder.Add(foldertext);
         Foldertext=String.Empty;
         OnPropertyChanged(nameof(Foldertext));
+
     }
     
     [ICommand]

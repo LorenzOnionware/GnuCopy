@@ -12,9 +12,9 @@ public class Settings
     public bool Overrite { get; set; } = true;
 
     public bool DateAsName { get; set; } = true;
-    
+
     public string? ZipName { get; set; }
-    
+
     public string? TempfolderPath { get; set; }
 
     public bool MultipleSources { get; set; } = false;
@@ -22,4 +22,10 @@ public class Settings
     public bool? CreateOwnFolder { get; set; } = false;
     public string? OwnFolderName { get; set; }
     public bool OwnFolderDate { get; set; } = false;
+    
+    public bool CustomMica { get; set; } = true;
+
+    public byte MicaIntensy { get; set; } = 0;
 }
+
+    

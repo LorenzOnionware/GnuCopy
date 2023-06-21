@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 namespace Project1.Viewmodels;
 
@@ -36,10 +37,13 @@ public partial class SettingsViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(ownfolderviseble))] private bool? createfolder = IOC.Default.GetService<Settings>().CreateOwnFolder;
     [ObservableProperty] private string createfoldername = IOC.Default.GetService<Settings>().OwnFolderName;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(owndateenabled))] private bool ownfolderdate = IOC.Default.GetService<Settings>().OwnFolderDate;
+    [ObservableProperty] private bool custommica = IOC.Default.GetService<Settings>().CustomMica;
+    [ObservableProperty] private byte micaintensy = IOC.Default.GetService<Settings>().MicaIntensy;
+
+    public bool win => Environment.OSVersion.Version.Build >= 22000;
     public bool owndateenabled => !ownfolderdate;
      public bool? ownfolderviseble => createfolder;
     public string License => File.ReadAllText(@"pages\License.txt");
-
 
 
     [ICommand]

@@ -22,6 +22,7 @@ namespace Project1;
 [Singleton<cleanwerth>(Instance = nameof(length))]
 [Singleton<IProgressBarService>]
 [Singleton<WindowClosingService>]
+[Singleton<EditPresetsWindow>]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }

@@ -1,0 +1,30 @@
+﻿<controls:ContentDialog xmlns="https://github.com/avaloniaui"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+                        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                        x:Class="GnuCopy.pages.Thanks" xmlns:viewmodels="using:Project1.Viewmodels"
+                        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                        x:DataType="viewmodels:SettingsViewmodel"
+                        x:CompileBindings="True" CloseButtonText="Close" Title="Thanks">
+   
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="Special thanks go to"></TextBlock>
+            <TextBlock Text="        "></TextBlock>
+            <TextBlock Text="BobaFett012345:"></TextBlock>
+            <TextBlock Text="Intensive testing"></TextBlock>
+            <TextBlock Text="Design concepts"></TextBlock>
+            <TextBlock Text="Feedback and bug reports"></TextBlock>
+            <TextBlock Text="        "></TextBlock>
+            <TextBlock Text="OnionWare-Jaden:"></TextBlock>
+            <TextBlock Text="App idea"></TextBlock>
+            <TextBlock Text="Coding assistence"></TextBlock>
+            <TextBlock Text="        "></TextBlock>
+            <TextBlock Text="Marvin Miltkau:"></TextBlock>
+            <TextBlock Text="Design concepts"></TextBlock>
+            <TextBlock Text="Feedback and bug reports"></TextBlock>
+        </StackPanel>
+    </Grid>
+</controls:ContentDialog>
