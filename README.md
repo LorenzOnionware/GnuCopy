@@ -1,9 +1,67 @@
-# GnuCopy
+# GnuCopy - Copy and compres files easy with filetype and folder filter
+
 ![GnuCopy](https://github.com/neutralezwiebel/GnuCopy/blob/main/GnuCopy.ico)
 
-A simple app to copy directors with folder- filetypefilters
-and a Function to package 7z or tar archive
+A simple app to copy directors with folder / filetypefilters
+and a Function to package zip or tar archive
 
-![Screenshots of GnuCopy](![Screenshot 2023-05-14 193228](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/65afa766-efda-4f90-971d-e2fb1edd4b25))
-![Screenshot 2023-05-14 193038](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/9dbd758e-1d11-42f3-9a0f-d226fb79b64d)
-![Screenshot 2023-05-14 193053](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/c1b83613-5e62-407b-afa3-ee36460b6af8)
+# Overview
+![main_dark](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/5766c9d1-2d45-496b-9c96-618a38de3974)
+
+
+![main_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/2a12ffd1-f47d-4fe9-a0d3-df479569deb1)
+
+You want to copy directories and data,
+but you don't need certain items.
+No problem, just type in the path to the directory and the target path.
+
+![preset_dark](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/8d1f3f98-f649-4487-97ec-dd7a1775870e)
+
+
+![preset_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/241cf404-df47-48ec-be8d-9c5a9f6ef2b7)
+
+
+Create a preset with the files or folders you don't need and start the copy process.
+
+# Settings
+
+![settings_dark_1](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/efaadc8b-4c40-4bb8-ac29-751fdb17728c)
+
+
+![settings_light_1](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/b79a0644-0bad-43f7-a9dc-3621a785f766)
+
+
+![settings_dark_2](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/9c1237d9-2a06-415f-89d3-c7afe801edfb)
+
+
+![settings_light_2](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/1e8e6fb1-4b7b-40d4-a749-aa52699c0c22)
+
+- #### Features
+ - Create zip and tar Files
+ - Use custom TempFolder
+ - Use Fyletype and Folder Filter
+ - Clear the TargetDirectory for or the source directory after The Copy Process
+ - Export and Import Presets
+
+#### Download from Microsoft Store
+You can find GnuCopy in the Microsoft Store, that is preinstalled in Windows 10 and Windows 11.
+
+<a href="https://www.microsoft.com/store/productId/9N6Z4PPWZDLS">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Get_it_from_Microsoft_Badge.svg" alt="Click here to download GnuCopy from the Microsoft Store" width="250"/>
+</a>
+
+#### Download directly from GitHub
+[Go to the Releases page and find all releases of GnuCupy to download!]([https://github.com/onionware-github/OnionMedia/releases](https://github.com/LorenzOnionware/GnuCopy/releases))
+
+
+## Info
+Copyright © Lorenz Daniel Otto
+
+ 
+## More information
+You still have open questions? [Join our Discord Server](https://discord.gg/3ahqCzQxs8)
+
+
+## Licensed under Gpl V3
+
+<img src="https://github.com/LorenzOnionware/GnuCopy/blob/main/Assets/gpl-v3-logo.svg" width="250" valign="middle" margin-right="10"/>
