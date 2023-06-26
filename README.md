@@ -6,20 +6,23 @@ A simple app to copy directors with folder / filetypefilters
 and a Function to package zip or tar archive
 
 # Overview
-![main_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/2a12ffd1-f47d-4fe9-a0d3-df479569deb1)
+
+![main_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/4ce5c8e9-a902-4b3c-a63c-7ed6ea7ada84)
 
 You want to copy directories and data,
 but you don't need certain items.
 No problem, just type in the path to the directory and the target path.
 
- ![preset_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/241cf404-df47-48ec-be8d-9c5a9f6ef2b7)
+![preset_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/ffb3400e-3958-401a-9ae7-83a279f4821d)
+
 
 
 Create a preset with the files or folders you don't need and start the copy process.
 
 # Settings
-![settings_light_1](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/b79a0644-0bad-43f7-a9dc-3621a785f766)
-![settings_light_2](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/1e8e6fb1-4b7b-40d4-a749-aa52699c0c22)
+![settings_light_1](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/f4e00346-0551-4da0-a35c-e8c39958a78c)
+
+![settings_light_2](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/52c2beda-a6b1-4874-806a-1fb01b1468c9)
 
 - #### Features
  - Create zip and tar Files
