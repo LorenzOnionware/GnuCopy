@@ -2,8 +2,7 @@
 
 ![GnuCopy](https://github.com/neutralezwiebel/GnuCopy/blob/main/GnuCopy.ico)
 
-A simple app to copy directors with folder / filetypefilters
-and a Function to package zip or tar archive
+Copy directories and files with in- and exclusions and the option to archive your data
 
 # Overview
 
