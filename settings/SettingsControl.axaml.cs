@@ -85,7 +85,7 @@ public partial class SettingsControl : ContentDialog, IStyleable
     private void InputElement_OnTapped3(object? sender, TappedEventArgs e)
     {
         //Thirdparty
-        string filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"pages\Third-Party.txt");
+        string filePath = System.IO.Path.Combine(AppContext.BaseDirectory, @"pages\Third-Party.txt");
 
         ProcessStartInfo psi = new ProcessStartInfo(filePath);
         psi.UseShellExecute = true;
@@ -95,7 +95,7 @@ public partial class SettingsControl : ContentDialog, IStyleable
 
     private void InputElement_OnTapped4(object? sender, TappedEventArgs e)
     {
-        string filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"pages\License.txt");
+        string filePath = System.IO.Path.Combine(AppContext.BaseDirectory, @"pages\License.txt");
 
         ProcessStartInfo psi = new ProcessStartInfo(filePath);
         psi.UseShellExecute = true;

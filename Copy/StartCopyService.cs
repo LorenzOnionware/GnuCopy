@@ -52,13 +52,13 @@ public class StartCopyService
 
             if (IOC.Default.GetService<Settings>().DateAsName)
             {
-                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext, $"{a}.{(useTar ? "tar" : "zip")}"),CompressionType.None);
+                archive.SaveTo(Path.Combine(MainViewmodel.Default.Copytotext, $"{a}.{(useTar ? "tar" : "zip")}"), useTar?CompressionType.None: CompressionType.Deflate);
             }
             else
             {
 
                 archive.SaveTo(
-                    Path.Combine(MainViewmodel.Default.Copytotext, $"{b}.{(useTar ? "tar" : "zip")}"),CompressionType.None);
+                    Path.Combine(MainViewmodel.Default.Copytotext, $"{b}.{(useTar ? "tar" : "zip")}"), useTar?CompressionType.None: CompressionType.Deflate);
             }
         }
 
