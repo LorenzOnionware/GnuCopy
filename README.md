@@ -1,9 +1,54 @@
-# GnuCopy
+# GnuCopy - Copy and compres files easy with filetype and folder filter
+
 ![GnuCopy](https://github.com/neutralezwiebel/GnuCopy/blob/main/GnuCopy.ico)
 
-A simple app to copy directors with folder- filetypefilters
-and a Function to package 7z or tar archive
+Copy directories and files with in- and exclusions and the option to archive your data
 
-![Screenshots of GnuCopy](![Screenshot 2023-05-14 193228](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/65afa766-efda-4f90-971d-e2fb1edd4b25))
-![Screenshot 2023-05-14 193038](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/9dbd758e-1d11-42f3-9a0f-d226fb79b64d)
-![Screenshot 2023-05-14 193053](https://github.com/neutralezwiebel/GnuCopy/assets/77418440/c1b83613-5e62-407b-afa3-ee36460b6af8)
+# Overview
+
+![main_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/4ce5c8e9-a902-4b3c-a63c-7ed6ea7ada84)
+
+You want to copy directories and data,
+but you don't need certain items.
+No problem, just type in the path to the directory and the target path.
+
+![preset_light](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/ffb3400e-3958-401a-9ae7-83a279f4821d)
+
+
+
+Create a preset with the files or folders you don't need and start the copy process.
+
+# Settings
+![settings_light_1](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/f4e00346-0551-4da0-a35c-e8c39958a78c)
+
+![settings_light_2](https://github.com/LorenzOnionware/GnuCopy/assets/77418440/52c2beda-a6b1-4874-806a-1fb01b1468c9)
+
+- #### Features
+ - Create zip and tar Files
+ - Use custom TempFolder
+ - Use Filetype and Folder Filter
+ - Clear the TargetDirectory before or the source directory after the Copyprocess
+ - Export and Import Presets
+
+#### Download from Microsoft Store
+You can find GnuCopy in the Microsoft Store, that is preinstalled in Windows 10 and Windows 11.
+
+<a href="https://www.microsoft.com/store/productId/9N6Z4PPWZDLS">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Get_it_from_Microsoft_Badge.svg" alt="Click here to download GnuCopy from the Microsoft Store" width="250"/>
+</a>
+
+#### Download directly from GitHub
+[Go to the Releases page and find all releases of GnuCopy to download!]([https://github.com/onionware-github/OnionMedia/releases](https://github.com/LorenzOnionware/GnuCopy/releases))
+
+
+## Info
+Copyright © Lorenz Daniel Otto
+
+ 
+## More information
+You still have open questions? [Join our Discord Server](https://discord.gg/3ahqCzQxs8)
+
+
+## Licensed under Gpl V3
+
+<img src="https://github.com/LorenzOnionware/GnuCopy/blob/main/Assets/gpl-v3-logo.svg" width="250" valign="middle" margin-right="10"/>
