@@ -108,4 +108,12 @@ public partial class SettingsControl : ContentDialog, IStyleable
         var window = new GnuCopy.pages.Thanks();
         await window.ShowAsync();
     }
+    private async void Thanks_OnTapped2(object? sender, TappedEventArgs e)
+    {
+        await Task.Run(() => Process.Start(new ProcessStartInfo
+        {
+            FileName = "https://www.paypal.com/donate/?hosted_button_id=5TABD3FZYH452",
+            UseShellExecute = true
+        }));
+    }
 }

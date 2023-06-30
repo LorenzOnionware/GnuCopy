@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Project1.Viewmodels;
 
@@ -10,41 +11,53 @@ namespace Project1;
 public class CopyMultiple
 {
     private static string TempFolder = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
-    public static async Task MAll(bool zip)
+    public static async Task MAll(bool zip,CancellationToken token)
     {
+        zip = false;
         HashSet<string> Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths.ToHashSet();
-        foreach (var source in Source)
+        string Temp = System.IO.Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
+        if (zip)
         {
-            var copytask = Task.Run(() =>
+            Directory.CreateDirectory(Temp);
+        }
+        foreach (var Folder in Source)
+        {
+            var path = (!zip ? Path.Combine(MainViewmodel.Default.Copytotext, GetLastPartFromPath(Folder)) : Path.Combine(Temp,GetLastPartFromPath(Folder)));
+            Directory.CreateDirectory(path);
+
+            var First = Task.Run(() =>
             {
-                List<string> firstfiles = Directory.EnumerateFiles(source).ToList();
-                foreach (var file in firstfiles)
+                var files = Directory.EnumerateFiles(Folder);
+                foreach (var file in files)
+                {
+                    File.Copy(file, Path.Combine(path,Path.GetFileName(file)));
+                }
+            },token);
+            
+            List<string> folders = Directory.EnumerateDirectories(Folder,"*",SearchOption.AllDirectories).ToList();
+            if (zip)
+            {
+                folders.Remove(TempFolder);
+            }
+
+            foreach (var folder in folders)
+            {
+                Directory.CreateDirectory(Path.Combine(Path.Combine(FolderPath(Folder,folder,path))));
+                List<string> files = Directory.EnumerateFiles(folder).ToList();
+                foreach (var file in files)
                 {
                     try
                     {
-                        File.Copy(file, zip == false ? Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)) : Path.Combine(TempFolder, GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
-                    
+                        File.Copy(file, Path.Combine(FolderPath(Folder,folder,path), GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
                     }
                     catch (IOException e)
                     {
                         continue;
                     }
-                }
-            });
-
-            var folder = Directory.EnumerateDirectories(source, "*", SearchOption.AllDirectories);
-            foreach (var Folder in folder)
-            {
-                var a = FolderPath(Folder, zip);
-                Directory.CreateDirectory(a);
-                var Files = Directory.EnumerateFiles(Folder,"*");
-                foreach (var File in Files)
-                {
-                    System.IO.File.Copy(File,Path.Combine(a, GetName(File)));
+                    IOC.Default.GetService<IProgressBarService>().Progress();
                 }
             }
-
-            await copytask;
+            await First;
         }
     }
 
@@ -60,9 +73,15 @@ public class CopyMultiple
     
     public static string GetName(string path) => File.Exists(path) ? Path.GetFileName(path) : new DirectoryInfo(path).Name;
     
-    public static string FolderPath(string folder, bool zip)
+    public static string FolderPath(string replace,string folder,string path)
     {
-        var a = folder.Replace(MainViewmodel.Default.Copyfromtext, !zip ? MainViewmodel.Default.Copytotext : TempFolder);
+        var a = folder.Replace(replace, Path.Combine(path));
         return a;
+    }
+    static string GetLastPartFromPath(string path)
+    {
+        string[] parts = path.Split('\\');
+        string lastPart = parts[parts.Length - 1];
+        return lastPart;
     }
 }

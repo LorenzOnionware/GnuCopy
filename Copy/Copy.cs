@@ -12,7 +12,7 @@ public class Copy
 {
     private static string TempFolder = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
 
-    public static async Task Settings(bool zip,CancellationToken token)
+    public static async Task Settings(bool zip, CancellationToken token)
     {
         if (zip)
         {
@@ -23,28 +23,46 @@ public class Copy
             }
         }
 
-        await IOC.Default.GetService<IProgressBarService>().Progressmax(token);
+        if (IOC.Default.GetService<Settings>().MultipleSources)
+        {
+            if (zip)
+            {
+                MainViewmodel.Default.Progressmax += 10;
+            }
 
-        if (zip)
-        {
-            MainViewmodel.Default.Progressmax += 10;
-        }
-        
-        if (IOC.Default.GetService<Settings>().Listingart == true)
-        {
-            // await White(zip);
-            await White(zip,token);
-        }
-        else if (IOC.Default.GetService<Settings>().Listingart == false)
-        {
-            // await Black(zip);
-            await Without(zip,token);
+            if (IOC.Default.GetService<Settings>().Listingart == false)
+            {
+                // await White(zip);
+                await CopyMultiple.MAll(zip, token);
+            }
         }
         else
         {
-            // await Without(zip);
-            await Black(zip,token);
-            IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
+
+
+            await IOC.Default.GetService<IProgressBarService>().Progressmax(token);
+
+            if (zip)
+            {
+                MainViewmodel.Default.Progressmax += 10;
+            }
+
+            if (IOC.Default.GetService<Settings>().Listingart == true)
+            {
+                // await White(zip);
+                await White(zip, token);
+            }
+            else if (IOC.Default.GetService<Settings>().Listingart == false)
+            {
+                // await Black(zip);
+                await Without(zip, token);
+            }
+            else
+            {
+                // await Without(zip);
+                await Black(zip, token);
+                IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
+            }
         }
     }
 
