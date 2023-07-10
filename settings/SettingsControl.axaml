@@ -63,8 +63,8 @@
                         <ToggleSwitch IsChecked="{Binding Createfolder}"></ToggleSwitch>
                         <TextBox IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
                         <CheckBox IsVisible="{Binding ownfolderviseble }" Content="Set date as name" IsChecked="{Binding Ownfolderdate}"></CheckBox>
-                        <Label IsVisible="False" Content="Multiple source path"></Label>
-                        <ToggleSwitch IsVisible="False" IsChecked="{Binding Multiplesources}"></ToggleSwitch>
+                        <Label Content="Multiple source path"></Label>
+                        <ToggleSwitch IsChecked="{Binding Multiplesources}"></ToggleSwitch>
                     </StackPanel>
                 </Expander.Content>
             </Expander>
@@ -143,7 +143,7 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 23.6.10.0 "></TextBlock>
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: visualstudiotest "></TextBlock>
                         <TextBlock Margin="5" Text="Copyright © OnionWare, Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>

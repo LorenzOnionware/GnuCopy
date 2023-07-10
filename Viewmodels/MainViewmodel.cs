@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -10,6 +11,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Newtonsoft.Json;
 using Project1.Presets;
 using SharpCompress.Archives;
@@ -86,14 +88,15 @@ public partial class MainViewmodel
     [ObservableProperty] private string selectedmultifolder;
     public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources;
 
-
     public ObservableCollection<string> Expanderpaths { get; set; } = new(); 
     public string Headertext => Expanderpaths?.Any()==true?Expanderpaths[0]:"Paths";
     public bool Isnotempty => Folderitems.Count != 0;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress2;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
-    public string progresstext => progress.ToString()+ " of " + progressmax.ToString();
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public bool evaluating;
+    public string progresstext => evaluating?(progress2+10)!=progressmax2?(progress2).ToString()+ " of " + (Math.Max(progressmax2 - 10, 0)).ToString():IOC.Default.GetService<Settings>().Packageformat!=0?"Packaging files":"":"evaluating";
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     [ICommand]
@@ -103,6 +106,13 @@ public partial class MainViewmodel
         {
               Expanderpaths.Add(Copyfromtext);
         }
+
+        if (Expanderpaths.Any())
+        {
+            copyfromtext = Expanderpaths[0];
+        }
+        
+        OnPropertyChanged(nameof(Copyfromtext));
         OnPropertyChanged(nameof(Headertext));
     }
 
@@ -132,7 +142,7 @@ public partial class MainViewmodel
     }
 
     public bool isenabled2 = true;
-    public bool Isenable=> Copyfromtext != "" && Copytotext != "" && isenabled2==true;
+    public bool Isenable => Copyfromtext != "" && Copytotext != "" && isenabled2==true ||IOC.Default.GetService<Settings>().MultipleSources==true && Copytotext != "" && Expanderpaths.Any() && isenabled2==true;
 
     [ObservableProperty] private double opaciprogress = 0.0;
  
@@ -224,8 +234,15 @@ public partial class MainViewmodel
     [ICommand]
     private async Task Copybutton()
     {
-
-        if (!System.IO.Path.Exists(copyfromtext))
+        if (IOC.Default.GetService<Settings>().Listingart != false && string.IsNullOrEmpty(Selectedlistitem))
+        {
+            ContentDialog dlg1 = new ContentDialog();
+            dlg1.Title = "Please select a preset.";
+            dlg1.PrimaryButtonText = "Ok";
+            await dlg1.ShowAsync();
+            return;
+        }
+        if (!System.IO.Path.Exists(copyfromtext) && !IOC.Default.GetService<Settings>().MultipleSources)
         {
             ContentDialog dlg1 = new ContentDialog();
             dlg1.Title = "Error";
@@ -257,27 +274,34 @@ public partial class MainViewmodel
         var Pathh = copytotext;
         Optaci = 10;
         OnPropertyChanged(nameof(Optaci));
+        if (String.IsNullOrEmpty(copyfromtext) && IOC.Default.GetService<Settings>().MultipleSources)
+        {
+            copyfromtext = Expanderpaths[0];
+        }
         if (IOC.Default.GetService<Settings>().Packageformat == 0 && IOC.Default.GetService<Settings>().CreateOwnFolder == true)
         {
             var name = IOC.Default.GetService<Settings>().OwnFolderDate ? DateTime.Now.ToString("g").Replace(':','-') : IOC.Default.GetService<Settings>().OwnFolderName;
             Directory.CreateDirectory(System.IO.Path.Combine(Pathh, name));
             copytotext = System.IO.Path.Combine(Pathh, name);
         }
-        if (copyfromtext.EndsWith(":"))
-        {
-            copyfromtext = "Please selct a folder.";
-            return;
-        }
+
         if (copyfromtext.EndsWith("\\"))
         {
             string a = copyfromtext.Remove(copyfromtext.Length - 1);
             Copyfromtext = a;
         }
 
+        if (copyfromtext.EndsWith(":"))
+        {
+            copyfromtext += "\\";
+        }
+
+
         if (!Copytotext.EndsWith("\\"))
         {
             copytotext += "\\";
         }
+        OnPropertyChanged(nameof(Copyfromtext));
         IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
         IOC.Default.GetService<Settings>().Pathto =  IOC.Default.GetService<Settings>().CreateOwnFolder==true ? Pathh : copytotext;
         bool iscancel = false;
@@ -338,6 +362,7 @@ public partial class MainViewmodel
             }
         }
         
+
         await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(token),token);
 
         if (iscancel)
@@ -368,7 +393,14 @@ public partial class MainViewmodel
         dlg.Title = "Done";
         dlg.Content = "GnuCopy finished operation.";
         dlg.PrimaryButtonText = "Close";
-        await dlg.ShowAsync();
+        dlg.SecondaryButtonText = "Goto target";
+        if (await dlg.ShowAsync() is ContentDialogResult.Secondary)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo(copytotext);
+            psi.UseShellExecute = true;
+
+            Process.Start(psi);
+        }
         A:
         Optaci = 0;
         OnPropertyChanged(nameof(Optaci));

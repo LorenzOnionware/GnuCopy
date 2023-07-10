@@ -38,8 +38,10 @@ public class StartCopyService
             await CopyUnPackaged(token);
         }
     }
-    private async Task StartPackaging(bool useTar,CancellationToken token)
+    public static async Task StartPackaging(bool useTar,CancellationToken token)
     {
+        
+        MainViewmodel.Default.Progress += 1;
         var Temp = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
 
         using (var archive = ZipArchive.Create())
@@ -63,7 +65,7 @@ public class StartCopyService
         }
 
         Directory.Delete(Temp,recursive:true);
-        MainViewmodel.Default.Progress += 10;
+        MainViewmodel.Default.Progress += 9;
     }
 
     private async Task CopyUnPackaged(CancellationToken token)
