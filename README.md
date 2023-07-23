@@ -41,7 +41,7 @@ You can find GnuCopy in the Microsoft Store, that is preinstalled in Windows 10 
 <a href="https://sourceforge.net/projects/gnucopy/"><img alt="Download GnuCopy" src="https://a.fsdn.com/con/app/sf-download-button" width=276 height=48 srcset="https://a.fsdn.com/con/app/sf-download-button?button_size=2x 2x"></a>
 
 
-#### Download directly from GitHubno (No Auto-Update)
+#### Download directly from GitHub (No Auto-Update)
 [Go to the Releases page and find all releases of GnuCopy to download!]([https://github.com/onionware-github/OnionMedia/releases](https://github.com/LorenzOnionware/GnuCopy/releases))
 
 
