@@ -92,17 +92,6 @@
                         <TextBox Watermark="Zip name" Name="Zipname" MaxLength="50" Text="{Binding Zipname}"
                                  IsEnabled="{Binding nameenabled}">
                         </TextBox>
-                        <Label Content="Custom TempPath"></Label>
-                        <Grid Grid.ColumnDefinitions="*,Auto">
-                            <TextBox Height="{Binding #Zipname.Bounds.Height}" Grid.Column="0"
-                                     Text="{Binding Costumepath}"
-                                     Watermark="Set Custom Tempfolder">
-                            </TextBox>
-                            <Button BorderBrush="Black" BorderThickness="1" Grid.Column="1" Margin="5"
-                                    Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
-                                    Command="{Binding PickFolderCommand}">
-                            </Button>
-                        </Grid>
                     </StackPanel>
                 </Expander.Content>
             </Expander>

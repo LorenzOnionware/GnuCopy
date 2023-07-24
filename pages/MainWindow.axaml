@@ -26,24 +26,35 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Margin="2,-10,120,10" BorderBrush="Transparent" Background="Transparent" Height="30" Width="30" HorizontalAlignment="Right" Command="{Binding SettingsCommand}"
+        <Button Margin="2,-12,130,10" BorderBrush="Transparent" Background="Transparent" Height="30" Width="30" HorizontalAlignment="Right" Command="{Binding SettingsCommand}"
                 Content="{materialIcons:MaterialIconExt Settings}">
         </Button>
         <Label Margin="25,-7,2,10" Content="GnuCopy" VerticalAlignment="Top" HorizontalAlignment="Left"></Label>
-        <Image HorizontalAlignment="Left" Width="30" Height="20" Margin="2,-7,2,10" Source="../Assets/GnuCopy.png"></Image>
+        <Image HorizontalAlignment="Left" Width="40" Height="10" Margin="2,-7,2,10" Source="../Assets/GnuCopy.png"></Image>
         
         <!-- ObersterTeil -->
         <StackPanel Grid.Row="1">
             <Button Name="RButton" IsVisible="False" Command="{Binding MultiListRemoveCommand}"></Button>
             <Label Content="Source"></Label>
             <Grid ColumnDefinitions="*,Auto" Grid.RowDefinitions="*,Auto">
-                <TextBox Name="copyfrom" Text="{Binding Copyfromtext, Mode=TwoWay}"
+                <TextBox IsVisible="{Binding Copyfrom}" Name="copyfrom" Text="{Binding Copyfromtext, Mode=TwoWay}"
                          Watermark="Select folder that you want to copy">
                 </TextBox>
-                <Button Grid.Row="0" Grid.Column="1" Height="{Binding #TargetPath.Bounds.Height}" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18" Command="{Binding CopySourceDialogCommand}"></Button>
-                <Expander IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="1" Grid.Column="0">
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <Button  Height="{Binding #TargetPath.Bounds.Height}"
+                             Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18"
+                             Command="{Binding CopySourceDialogCommand}">
+                    </Button>
+                    <Button VerticalAlignment="Top" IsVisible="{Binding Ismultiplevisable}"
+                            Command="{Binding AddPathCommand}" Margin="5,7"
+                            Content="{materialIcons:MaterialIconExt Kind=Add}">
+                    </Button>
+                </StackPanel>
+                <Expander Name="Expander" IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="0" Grid.Column="0">
                     <Expander.Header>
-                        <TextBlock Text="{Binding Headertext}"></TextBlock>
+                        <Grid Width="{Binding  ElementName=Expander, Path=Bounds.Width}">
+                            <TextBox Margin="30,5,30,5" Watermark="{Binding #copyfrom.Watermark}" Text="{Binding Copyfromtext, Mode=TwoWay}"/>
+                        </Grid>
                     </Expander.Header>
                     <Expander.Content>
                         <ListBox SelectedItem="{Binding Selectedmultifolder}" Margin="-10" MaxHeight="100" Items="{Binding Expanderpaths}">
@@ -60,7 +71,6 @@
                         </ListBox>
                     </Expander.Content>
                 </Expander>
-                <Button IsVisible="{Binding Ismultiplevisable}" Grid.Column="1" Grid.Row="1" Command="{Binding AddPathCommand}" Margin="5,0" Content="{materialIcons:MaterialIconExt Kind=Add}"></Button>
             </Grid>
             <Label Content="Target"></Label>
             <Grid ColumnDefinitions="*,Auto">
@@ -172,14 +182,14 @@
         <Grid Grid.Row="3" Grid.ColumnDefinitions="Auto,*,Auto">
             <StackPanel Orientation="Vertical" Grid.Column="1">
                 <StackPanel Opacity="{Binding Optaci}" Orientation="Horizontal">
-                    <Label>Files:  </Label>
+                    <Label>Progress:  </Label>
                     <Label Content="{Binding progresstext}"></Label>
                 </StackPanel>
                 <ProgressBar Maximum="{Binding Progressmax}" Value="{Binding Progress}" Opacity="{Binding Optaci}"
                               Margin="5,5">
                 </ProgressBar>
             </StackPanel>
-            <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable}" Content="Copy"
+            <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable2}" Content="Copy"
                     Command="{Binding CopybuttonCommand}">
             </Button>
         </Grid>

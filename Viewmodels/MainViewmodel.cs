@@ -55,9 +55,7 @@ public partial class MainViewmodel
             cancel.Dispose();
             Optaci = 0;
             OnPropertyChanged(nameof(Optaci));
-            OnPropertyChanged(nameof(Isenable));
-            isenabled2 = true;
-            OnPropertyChanged(nameof(Isenable));
+            OnPropertyChanged(nameof(Isenable2));
             var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
             taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
         }
@@ -77,17 +75,22 @@ public partial class MainViewmodel
                IOC.Default.GetService<Settings>().Listingart == true;
     }
 
-    
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copytotext;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable))] private string copyfromtext;
+    private bool isenable =true;
+    public  bool Isenable2
+    {
+        get => isenable ? IOC.Default.GetService<Settings>().MultipleSources ? Expanderpaths.Any()?true:false : String.IsNullOrEmpty(copyfromtext)?false:true: false;
+    }
+
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copytotext;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;   
     [ObservableProperty][AlsoNotifyChangeFor(nameof(canedit))] private int selectedpreset;
     [ObservableProperty]public List<string> ignorefiles =new();
     [ObservableProperty]public List<string> ignorefolder =new();
     [ObservableProperty] private bool? listing = IOC.Default.GetService<Settings>().Listingart;
     [ObservableProperty] private string selectedmultifolder;
-    public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources;
-
+    public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources; 
+    public bool Copyfrom => !Ismultiplevisable;
     public ObservableCollection<string> Expanderpaths { get; set; } = new(); 
     public string Headertext => Expanderpaths?.Any()==true?Expanderpaths[0]:"Paths";
     public bool Isnotempty => Folderitems.Count != 0;
@@ -96,9 +99,10 @@ public partial class MainViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public bool evaluating;
-    public string progresstext => evaluating?(progress2+10)!=progressmax2?(progress2).ToString()+ " of " + (Math.Max(progressmax2 - 10, 0)).ToString():IOC.Default.GetService<Settings>().Packageformat!=0?"Packaging files":"":"evaluating";
+    
+    public string progresstext => !evaluating ? "Evaluating" : progress>=progressmax?"Done":progress.ToString() + " of " + progressmax2.ToString();
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
-
+    
     [ICommand]
     public void AddPath()
     {
@@ -109,11 +113,10 @@ public partial class MainViewmodel
 
         if (Expanderpaths.Any())
         {
-            copyfromtext = Expanderpaths[0];
+            copyfromtext = "";
         }
         
         OnPropertyChanged(nameof(Copyfromtext));
-        OnPropertyChanged(nameof(Headertext));
     }
 
     [ICommand]
@@ -140,9 +143,6 @@ public partial class MainViewmodel
             OnPropertyChanged(nameof(Presetlistenable));
         });
     }
-
-    public bool isenabled2 = true;
-    public bool Isenable => Copyfromtext != "" && Copytotext != "" && isenabled2==true ||IOC.Default.GetService<Settings>().MultipleSources==true && Copytotext != "" && Expanderpaths.Any() && isenabled2==true;
 
     [ObservableProperty] private double opaciprogress = 0.0;
  
@@ -234,6 +234,7 @@ public partial class MainViewmodel
     [ICommand]
     private async Task Copybutton()
     {
+        isenable = false;
         if (IOC.Default.GetService<Settings>().Listingart != false && string.IsNullOrEmpty(Selectedlistitem))
         {
             ContentDialog dlg1 = new ContentDialog();
@@ -269,8 +270,7 @@ public partial class MainViewmodel
             }
             
         }
-        isenabled2 = false;
-        OnPropertyChanged(nameof(Isenable));
+        OnPropertyChanged(nameof(Isenable2));
         var Pathh = copytotext;
         Optaci = 10;
         OnPropertyChanged(nameof(Optaci));
@@ -362,7 +362,6 @@ public partial class MainViewmodel
             }
         }
         
-
         await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(token),token);
 
         if (iscancel)
@@ -393,7 +392,7 @@ public partial class MainViewmodel
         dlg.Title = "Done";
         dlg.Content = "GnuCopy finished operation.";
         dlg.PrimaryButtonText = "Close";
-        dlg.SecondaryButtonText = "Goto target";
+        dlg.SecondaryButtonText = "Go to target";
         if (await dlg.ShowAsync() is ContentDialogResult.Secondary)
         {
             ProcessStartInfo psi = new ProcessStartInfo(copytotext);
@@ -404,15 +403,19 @@ public partial class MainViewmodel
         A:
         Optaci = 0;
         OnPropertyChanged(nameof(Optaci));
-        OnPropertyChanged(nameof(Isenable));
+        isenable = true;
+        OnPropertyChanged(nameof(Isenable2));
         copytotext = Pathh;
-        isenabled2 = true;
         iscancel = false;
-        OnPropertyChanged(nameof(Isenable));
         var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
         taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+        if (IOC.Default.GetService<Settings>().MultipleSources)
+        {
+            copyfromtext = "";
+            OnPropertyChanged(nameof(Copyfromtext));
+        }
     }
-    
+
     [ICommand]
     private async Task CopySourceDialog()
     {
@@ -464,10 +467,10 @@ public partial class MainViewmodel
         await window.ShowAsync();
         OnPropertyChanged(nameof(Presetlistenable));
         OnPropertyChanged(nameof(Ismultiplevisable));
+        OnPropertyChanged(nameof(Copyfrom));
         if (Ismultiplevisable)
         {
             IOC.Default.GetService<MainWindow>().Addsources();
-            
         }
     }
 

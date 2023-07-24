@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DynamicData;
 using Project1.Viewmodels;
 using SharpCompress.Archives.Zip;
 
@@ -15,7 +16,6 @@ public class IProgressBarService
     public void Progress()
     {
         MainViewmodel.Default.Progress++;
-        MainViewmodel.Default.Progress2 = MainViewmodel.Default.Progress2 = Math.Max(MainViewmodel.Default.Progress - 10, 0);;
         if(TaskBar)
         {           
             var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
@@ -25,7 +25,6 @@ public class IProgressBarService
         }
     }
     
-
     public async Task Progressmax(CancellationToken token, bool Zip)
     {
         if (IOC.Default.GetService<Settings>().MultipleSources)
@@ -37,39 +36,51 @@ public class IProgressBarService
             {
                 case false:
                 //copy all kontent
-                int files = 0;
+                List<string> f2 = new();
                 foreach (var folder in MainViewmodel.Default.Expanderpaths)
                 {
                     var a = Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray();
-                    files += a.Length;
+                    foreach (var a1 in a)
+                    {
+                        f2.Add(a1);
+                    }
                 }
                 MainViewmodel.Default.evaluating = true;
-                MainViewmodel.Default.Progressmax = files;
-                MainViewmodel.Default.Progressmax2 = files;
+                MainViewmodel.Default.Progressmax = f2.Count;
+                MainViewmodel.Default.Progressmax2 = f2.Count;
                 break;
                 case true:
                     //Whitelist
                     int filess = 0;
+                    List<string> f1 = new();
                     foreach (var folder in MainViewmodel.Default.Expanderpaths)
                     {
-                        var a = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), MainViewmodel.Default.ignorefiles.ToArray(),false,false,token);
-                        filess += a.Length;
+                        var a = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), MainViewmodel.Default.ignorefiles.ToArray(),false,token);
+                        foreach (var a1 in a )
+                        {
+                            f1.Add(a1);
+                        }
                     }
                     MainViewmodel.Default.evaluating = true;
-                    MainViewmodel.Default.Progressmax = filess;
-                    MainViewmodel.Default.Progressmax2 = filess;
+                    MainViewmodel.Default.Progressmax = f1.Count;
+                    MainViewmodel.Default.Progressmax2 = f1.Count;
                     break;
                 case null:
                     //Blacklist
-                    int filesss = 0;
+                    List<string> f = new List<string>();
                     foreach (var folder in MainViewmodel.Default.Expanderpaths)
                     {
-                        var a = await CleanupLoops.CLean(Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), MainViewmodel.Default.ignorefiles.ToArray(),false,false,token);
-                        filesss += a.Length;
+                        var a = await CleanupLoops.CLean(Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), MainViewmodel.Default.ignorefiles.ToArray(),false,token);
+                        foreach (var a1 in a)
+                        {
+                            f.Add(a);
+                        }
                     }
+
+              
                     MainViewmodel.Default.evaluating = true;
-                    MainViewmodel.Default.Progressmax = filesss;
-                    MainViewmodel.Default.Progressmax2 = filesss;
+                    MainViewmodel.Default.Progressmax = f.Count;
+                    MainViewmodel.Default.Progressmax2 = f.Count;
                     break;
             }
         }
@@ -91,12 +102,12 @@ public class IProgressBarService
                     //Whitelist
                     var b = await CleanupLoops.CLeanWhite(
                         Directory.EnumerateDirectories(source, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),
-                        MainViewmodel.Default.Ignorefolder.ToArray(), false, true, token);
+                        MainViewmodel.Default.Ignorefolder.ToArray(), true, token);
                     List<string> Files = new();
                     foreach (var Folder in b)
                     {
                         var ab = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Folder, "*").ToArray(),
-                            MainViewmodel.Default.Ignorefiles.ToArray(), false, false, token);
+                            MainViewmodel.Default.Ignorefiles.ToArray(),  false, token);
                         foreach (var n in ab)
                         {
                             Files.Add(n);
@@ -110,12 +121,12 @@ public class IProgressBarService
                     //Blacklist
                     var bb = await CleanupLoops.CLean(
                         Directory.EnumerateDirectories(source, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),
-                        MainViewmodel.Default.Ignorefolder.ToArray(), false, true, token);
+                        MainViewmodel.Default.Ignorefolder.ToArray(), true, token);
                     List<string> Filess = new();
                     foreach (var Folder in bb)
                     {
                         var ab = await CleanupLoops.CLean(Directory.EnumerateFiles(Folder, "*").ToArray(),
-                            MainViewmodel.Default.Ignorefiles.ToArray(), false, false, token);
+                            MainViewmodel.Default.Ignorefiles.ToArray(), false, token);
                         foreach (var n in ab)
                         {
                             Filess.Add(n);

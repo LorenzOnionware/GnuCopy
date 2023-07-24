@@ -7,7 +7,7 @@ namespace Project1;
 
 public class CleanupLoops
 {
-    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat, bool length,bool folder,CancellationToken token)
+    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationToken token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -44,8 +44,6 @@ public class CleanupLoops
                     if (!allow)
                     {
                         output.Add(element);
-                        if (length)
-                            IOC.Default.GetService<cleanwerth>().Datalengt++;
                     }
                 }
             });
@@ -54,7 +52,7 @@ public class CleanupLoops
         return output.ToArray();
     }
 
-    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat, bool length,bool folder,CancellationToken token)
+    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationToken token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -89,7 +87,6 @@ public class CleanupLoops
                     if (allow)
                     {
                         output.Add(element);
-                        if (length) IOC.Default.GetService<cleanwerth>().Datalengt++;
                     }
                 }
 

@@ -11,19 +11,8 @@ namespace Project1;
 
 public class Copy
 {
-    private static string TempFolder = Path.Combine(String.IsNullOrEmpty(IOC.Default.GetService<Settings>().TempfolderPath)? MainViewmodel.Default.Copyfromtext: IOC.Default.GetService<Settings>().TempfolderPath, "OnionwareTemp");
-
     public static async Task Settings(bool zip, CancellationToken token)
     {
-        if (zip)
-        {
-            Directory.CreateDirectory(TempFolder);
-            if (!Path.Exists(TempFolder))
-            {
-                throw new TempPathNotExistException("no valid temp path");
-            }
-        }
-
         if (IOC.Default.GetService<Settings>().MultipleSources)
         {
             await IOC.Default.GetService<IProgressBarService>().Progressmax(token,false);
@@ -50,14 +39,7 @@ public class Copy
         }
         else
         {
-
-
             await IOC.Default.GetService<IProgressBarService>().Progressmax(token,false);
-
-            if (zip)
-            {
-                MainViewmodel.Default.Progressmax += 10;
-            }
 
             if (IOC.Default.GetService<Settings>().Listingart == true)
             {
@@ -76,6 +58,8 @@ public class Copy
                 IOC.Default.GetService<MainViewmodel>().ignorefolder.Add("OnionwareTemp");
             }
         }
+        
+        
     }
 
     private static async Task Without(bool zip,CancellationToken token)
@@ -89,7 +73,7 @@ public class Copy
                 A:
                 try
                 {
-                    File.Copy(file, zip == false ? Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)) : Path.Combine(TempFolder, GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
                     
                 }
                 catch (IOException e)
@@ -115,10 +99,6 @@ public class Copy
         
         
         List<string> folders = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToList();
-        if (zip)
-        {
-            folders.Remove(TempFolder);
-        }
 
         int exc = 1;
         foreach (var folder in folders)
@@ -159,7 +139,7 @@ public class Copy
 
     private static async Task Black(bool zip,CancellationToken token)
     { 
-        string[] firstfiles = await CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
+        string[] firstfiles = await CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
 
         var copytask = Task.Run(async () =>
         {
@@ -169,7 +149,7 @@ public class Copy
                 A:
                 try
                 {
-                    File.Copy(file, !zip ? Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)) : Path.Combine(TempFolder, GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
                 }
                 catch (IOException e)
                 {
@@ -192,18 +172,14 @@ public class Copy
             }
         },token);
 
-        string[] folderss = await CleanupLoops.CLean(Directory.GetDirectories(MainViewmodel.Default.Copyfromtext, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}), IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true,token);
+        string[] folderss = await CleanupLoops.CLean(Directory.GetDirectories(MainViewmodel.Default.Copyfromtext, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}), IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),true,token);
         List<string> folders = folderss.ToList();
-        if (zip)
-        {
-            folders.Remove(TempFolder);
-        }
         foreach (var folder in folders)
         {
             int exc = 0;
             var a = FolderPath(folder, zip);
             Directory.CreateDirectory(a);
-            string[] files = await CleanupLoops.CLean(Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
+            string[] files = await CleanupLoops.CLean(Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
             foreach (var file in files)
             {
                 A:
@@ -239,7 +215,7 @@ public class Copy
 
     private static async Task White(bool zip,CancellationToken token)
     { 
-        string[] firstfiles = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
+        string[] firstfiles = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
         var copytask = Task.Run(async () =>
         {
             int exc = 0;
@@ -248,7 +224,7 @@ public class Copy
                 A:
                 try
                 {
-                    File.Copy(file, zip == false ? Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)) : Path.Combine(TempFolder, GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
+                    File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
            
                 }
                 catch (IOException e)
@@ -271,17 +247,13 @@ public class Copy
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
         },token);
-        string[] folderss = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),false,true,token);
+        string[] folderss = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),true,token);
         List<string> folders = folderss.ToList();
-        if (zip)
-        {
-            folders.Remove(TempFolder);
-        }
         foreach (var folder in folders)
         {
             int exc = 0;
             Directory.CreateDirectory(Path.Combine(FolderPath(folder,zip)));
-            string[] files = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,false,token);
+            string[] files = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
             foreach (var file in files)
             {
                 A:
@@ -320,7 +292,7 @@ public class Copy
 
     public static string FolderPath(string folder, bool zip)
     {
-        var a = folder.Replace(MainViewmodel.Default.Copyfromtext, !zip ? MainViewmodel.Default.Copytotext : TempFolder);
+        var a = folder.Replace(MainViewmodel.Default.Copyfromtext, MainViewmodel.Default.Copytotext);
         return a;
     }
     

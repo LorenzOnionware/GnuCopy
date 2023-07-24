@@ -19,26 +19,18 @@ namespace Project1;
 [Singleton<GetSetPresetIndex>]
 [Singleton<ExportViewmodel>]
 [Singleton<MainWindow>]
-[Singleton<cleanwerth>(Instance = nameof(length))]
 [Singleton<IProgressBarService>]
 [Singleton<WindowClosingService>]
 [Singleton<EditPresetsWindow>]
 sealed partial class ServiceProvider
 {
     public Settings JsonAppSettings { get; }
-    public cleanwerth length { get; set; }
+   
     public ServiceProvider()
     {
-
-
         string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings", "Settings.json");
         Task.Run(() =>
         {
-            cleanwerth a = new cleanwerth()
-            {
-                Datalengt = 0
-            };
-            length = a;
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(

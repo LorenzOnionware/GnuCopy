@@ -36,10 +36,14 @@ using Newtonsoft.Json;
                 if (IOC.Default.GetService<Settings>().MultipleSources)
                 {
                     Addsources();
+                    MainViewmodel.Default.AddPath();
+                }
+                else
+                { 
+                    MainViewmodel.Default.Copyfromtext = IOC.Default.GetService<Settings>().Pathfrom;
                 }
                 MainViewmodel.Default.Copytotext = IOC.Default.GetService<Settings>().Pathto;
-                MainViewmodel.Default.Copyfromtext = IOC.Default.GetService<Settings>().Pathfrom;
-                MainViewmodel.Default.AddPath();
+                
             }
             IOC.Default.GetService<AktualiselSettingsInUI>().AktualisereSetting();
             MainViewmodel.Default.ChageProperties();
