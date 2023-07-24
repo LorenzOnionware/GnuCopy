@@ -30,15 +30,20 @@ Create a preset with the files or folders you don't need and start the copy proc
  - Clear the TargetDirectory before or the source directory after the Copyprocess
  - Export and Import Presets
 
-#### Download from Microsoft Store
+#### Download from Microsoft Store (Auto-Update)
 You can find GnuCopy in the Microsoft Store, that is preinstalled in Windows 10 and Windows 11.
 
 <a href="https://www.microsoft.com/store/productId/9N6Z4PPWZDLS">
   <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Get_it_from_Microsoft_Badge.svg" alt="Click here to download GnuCopy from the Microsoft Store" width="250"/>
 </a>
 
-#### Download directly from GitHub
+#### Download from Sourceforge (No Auto-Update)
+<a href="https://sourceforge.net/projects/gnucopy/"><img alt="Download GnuCopy" src="https://a.fsdn.com/con/app/sf-download-button" width=276 height=48 srcset="https://a.fsdn.com/con/app/sf-download-button?button_size=2x 2x"></a>
+
+
+#### Download directly from GitHub (No Auto-Update)
 [Go to the Releases page and find all releases of GnuCopy to download!]([https://github.com/onionware-github/OnionMedia/releases](https://github.com/LorenzOnionware/GnuCopy/releases))
+
 
 
 ## Info
