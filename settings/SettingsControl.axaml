@@ -57,9 +57,9 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <Label Content="save Last Paths"></Label>
+                        <Label Content="Save last paths"></Label>
                         <ToggleSwitch IsChecked="{Binding Savepaths,Mode=TwoWay}"></ToggleSwitch>
-                        <Label Content="Create Folder"></Label>
+                        <Label Content="Create folder"></Label>
                         <ToggleSwitch IsChecked="{Binding Createfolder}"></ToggleSwitch>
                         <TextBox IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
                         <CheckBox IsVisible="{Binding ownfolderviseble }" Content="Set date as name" IsChecked="{Binding Ownfolderdate}"></CheckBox>
@@ -83,12 +83,12 @@
                         <ComboBox SelectedIndex="{Binding Comboboxselectedindex,Mode=TwoWay}">
                             <ComboBox.Items>
                                 <ComboBoxItem Content="none"></ComboBoxItem>
-                                <ComboBoxItem Content="tar"></ComboBoxItem>
-                                <ComboBoxItem Content="zip"></ComboBoxItem>
+                                <ComboBoxItem Content="Tar"></ComboBoxItem>
+                                <ComboBoxItem Content="Zip"></ComboBoxItem>
                             </ComboBox.Items>
                         </ComboBox>
                         <Label Content="File name"></Label>
-                        <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set date as Name</CheckBox>
+                        <CheckBox Margin="5,5" IsChecked="{Binding Dateasname}">Set date as name</CheckBox>
                         <TextBox Watermark="Zip name" Name="Zipname" MaxLength="50" Text="{Binding Zipname}"
                                  IsEnabled="{Binding nameenabled}">
                         </TextBox>
@@ -115,8 +115,8 @@
                                 <ComboBoxItem>Hard</ComboBoxItem>
                             </ComboBox.Items>
                         </ComboBox>
-                        <Label>After design change you must</Label>
-                        <Label>restart GnuCopy.</Label>
+                        <Label>Restart GnuCopy</Label>
+                        <Label>after design change.</Label>
                     </StackPanel>
                 </Expander.Content>
             </Expander>
@@ -132,8 +132,8 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: visualstudiotest "></TextBlock>
-                        <TextBlock Margin="5" Text="Copyright © OnionWare, Lorenz Otto"></TextBlock>
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 23.7.1.0 "></TextBlock>
+                        <TextBlock Margin="5" Text="Copyright © Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>
                         </Label>

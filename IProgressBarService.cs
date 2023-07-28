@@ -67,20 +67,19 @@ public class IProgressBarService
                     break;
                 case null:
                     //Blacklist
-                    List<string> f = new List<string>();
+                    int filesss = 0;
+                    List<string> f11 = new();
                     foreach (var folder in MainViewmodel.Default.Expanderpaths)
                     {
                         var a = await CleanupLoops.CLean(Directory.EnumerateFiles(folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), MainViewmodel.Default.ignorefiles.ToArray(),false,token);
-                        foreach (var a1 in a)
+                        foreach (var a1 in a )
                         {
-                            f.Add(a);
+                            f11.Add(a1);
                         }
                     }
-
-              
                     MainViewmodel.Default.evaluating = true;
-                    MainViewmodel.Default.Progressmax = f.Count;
-                    MainViewmodel.Default.Progressmax2 = f.Count;
+                    MainViewmodel.Default.Progressmax = f11.Count;
+                    MainViewmodel.Default.Progressmax2 = f11.Count;
                     break;
             }
         }

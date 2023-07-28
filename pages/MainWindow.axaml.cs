@@ -2,6 +2,7 @@
 using Avalonia.Controls;
   using System.IO;
 using System.Collections.Generic;
+  using System.Linq;
   using System.Threading.Tasks;
   using Avalonia.Media;
   using Avalonia.Platform;
@@ -28,6 +29,7 @@ using Newtonsoft.Json;
             InitializeComponent();
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
             
+            
             ThemeChanged(null,null);
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             AddItemsToList();
@@ -53,7 +55,7 @@ using Newtonsoft.Json;
 
         public void Addsources()
         {
-            MainViewmodel.Default.Expanderpaths.Replace(IOC.Default.GetService<Settings>().Sources);
+            MainViewmodel.Default.Expanderpaths.Replace((from path in IOC.Default.GetService<Settings>().Sources orderby path select path).ToArray());
         }
 
 

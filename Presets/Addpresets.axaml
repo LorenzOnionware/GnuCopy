@@ -27,7 +27,7 @@
             <TextBox Name="FileName" Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
             <Label Content="Files:"></Label>
             <StackPanel Orientation="Horizontal">
-                <TextBox Watermark="File-Extension" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
+                <TextBox Watermark="File extension" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
                 <Button Command="{Binding FileAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">

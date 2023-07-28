@@ -91,14 +91,15 @@ public partial class MainViewmodel
     [ObservableProperty] private string selectedmultifolder;
     public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources; 
     public bool Copyfrom => !Ismultiplevisable;
-    public ObservableCollection<string> Expanderpaths { get; set; } = new(); 
-    public string Headertext => Expanderpaths?.Any()==true?Expanderpaths[0]:"Paths";
+    public ObservableCollection<string> Expanderpaths { get; set; } = new();
+
     public bool Isnotempty => Folderitems.Count != 0;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress2;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public bool evaluating;
+    public bool Expanderexpand => Expanderpaths.Any();
     
     public string progresstext => !evaluating ? "Evaluating" : progress>=progressmax?"Done":progress.ToString() + " of " + progressmax2.ToString();
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
@@ -109,6 +110,8 @@ public partial class MainViewmodel
         if (!Expanderpaths.Contains(Copyfromtext) && Directory.Exists(Copyfromtext))
         {
               Expanderpaths.Add(Copyfromtext);
+              OnPropertyChanged(nameof(Expanderexpand));
+              Expanderpaths.Replace((from path in Expanderpaths orderby path select path).ToArray());
         }
 
         if (Expanderpaths.Any())
@@ -123,7 +126,8 @@ public partial class MainViewmodel
     private void MultiListRemove()
     {
         Expanderpaths.Remove(Selectedmultifolder);
-        OnPropertyChanged(nameof(Headertext));
+        Expanderpaths.Replace((from path in Expanderpaths orderby path select path).ToArray());
+        //OnPropertyChanged(nameof(Headertext));
         IOC.Default.GetService<Settings>().Sources = Expanderpaths.ToList();
         string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
         File.WriteAllText(System.IO.Path.Combine(SettingsViewmodel.Default.settingspath), ab);
@@ -426,9 +430,10 @@ public partial class MainViewmodel
                 if (Directory.Exists(a) && !Expanderpaths.Contains(a))
                 {
                     Expanderpaths.Add(a);
+                    Expanderpaths.Replace((from path in Expanderpaths orderby path select path).ToArray());
                 }
             }
-            OnPropertyChanged(nameof(Headertext));
+           // OnPropertyChanged(nameof(Headertext));
             IOC.Default.GetService<Settings>().Sources.Replace(Expanderpaths);
             string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
             File.WriteAllText(System.IO.Path.Combine(SettingsViewmodel.Default.settingspath),ab);

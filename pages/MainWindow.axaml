@@ -38,7 +38,7 @@
             <Label Content="Source"></Label>
             <Grid ColumnDefinitions="*,Auto" Grid.RowDefinitions="*,Auto">
                 <TextBox IsVisible="{Binding Copyfrom}" Name="copyfrom" Text="{Binding Copyfromtext, Mode=TwoWay}"
-                         Watermark="Select folder that you want to copy">
+                         Watermark="Select folder you want to copy">
                 </TextBox>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <Button  Height="{Binding #TargetPath.Bounds.Height}"
@@ -50,7 +50,7 @@
                             Content="{materialIcons:MaterialIconExt Kind=Add}">
                     </Button>
                 </StackPanel>
-                <Expander Name="Expander" IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="0" Grid.Column="0">
+                <Expander Name="Expander" IsExpanded="{Binding Expanderexpand}" IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="0" Grid.Column="0">
                     <Expander.Header>
                         <Grid Width="{Binding  ElementName=Expander, Path=Bounds.Width}">
                             <TextBox Margin="30,5,30,5" Watermark="{Binding #copyfrom.Watermark}" Text="{Binding Copyfromtext, Mode=TwoWay}"/>

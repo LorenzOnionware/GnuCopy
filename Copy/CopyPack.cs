@@ -87,7 +87,8 @@ public class CopyPack
                         }
                         
                     }
-                    await fs.DisposeAsync();
+                    zip.Dispose();
+                    fs.Dispose();
                 }else if (IOC.Default.GetService<Settings>().Listingart == true)
                 {
                     //White
@@ -146,8 +147,8 @@ public class CopyPack
                         }
                         
                     }
-
-                    await fs.DisposeAsync();
+                    zip.Dispose();
+                    fs.Dispose();
                 }
                 else
                 {
@@ -220,6 +221,8 @@ public class CopyPack
                             }
                         }
                     }
+                    zip.Dispose();
+                    fs.Dispose();
                 }
             }
             else
