@@ -19,7 +19,7 @@ public class Settings
 
     public bool MultipleSources { get; set; } = true;
     public List<string> Sources { get; set; } = new();
-    public bool? CreateOwnFolder { get; set; } = false;
+    public bool CreateOwnFolder { get; set; } = false;
     public string? OwnFolderName { get; set; }
     public bool OwnFolderDate { get; set; } = false;
     

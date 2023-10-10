@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData.Binding;
@@ -27,11 +29,9 @@ namespace Project1.Viewmodels;
 [ObservableObject]
 public partial class MainViewmodel
 {
-    
-    
     public MainViewmodel(IFileDialogService FileDialogservice)
     {
-        IOC.Default.GetService<WindowClosingService>().Closed += (o, e) => cancelall();
+        IOC.Default.GetService<WindowClosingService>().Closed += (o, e) => Close();
         _fileDialogService = FileDialogservice;
 
         USBMonitor usbMonitor = new USBMonitor();
@@ -42,6 +42,13 @@ public partial class MainViewmodel
         usbMonitor.StartMonitoring();
     }
 
+    public async void Close()
+    {
+        Cancel = true;
+        Thread.Sleep(500);
+        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+        File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath),ab);
+    }
     private IFileDialogService _fileDialogService;
     
     private static void UsbInsertedHandler(object sender, USBEventArgs e)
@@ -49,11 +56,16 @@ public partial class MainViewmodel
         
     }
 
-    private void UsbRemovedHandler(object sender, USBEventArgs e)
+    private async void UsbRemovedHandler(object sender, USBEventArgs e)
     {
         if (!Path.Exists(copytotext) || !Path.Exists(copyfromtext))
         {
-            cancel.Dispose();
+            ContentDialog dialog = new ContentDialog();
+            dialog.Title = "Error";
+            dialog.Content = "USB removed during the copying process. The process has been canceled.";
+            dialog.PrimaryButtonText = "Ok";
+            await dialog.ShowAsync();
+            Cancel = true;
             Optaci = 0;
             OnPropertyChanged(nameof(Optaci));
             OnPropertyChanged(nameof(Isenable2));
@@ -237,12 +249,6 @@ public partial class MainViewmodel
     CancellationTokenSource cancel = new CancellationTokenSource();
     public bool Cancel = false;
     public bool Pause=false;
-    public void cancelall()
-    {
-       OnPropertyChanged(nameof(progresstext));
-       Cancel = true;
-       Pause = false;
-    }
 
     [ICommand]
     private async Task Cancell()
@@ -253,16 +259,68 @@ public partial class MainViewmodel
         dlg.Content = "If process is cancelled, some of the data copied already may be corrupt!";
         dlg.SecondaryButtonText = "Proceed cancellation";
         dlg.PrimaryButtonText = "Take me back";
-        if (await dlg.ShowAsync() == ContentDialogResult.Secondary)
+        var result2 = await dlg.ShowAsync();
+        if (result2 == ContentDialogResult.Secondary)
         {
-            cancelall();
-            Optaci = 0;
-            OnPropertyChanged(nameof(Optaci));
+            Pause = false;
+            Cancel = true;
+        }
+
+        if (result2 == ContentDialogResult.Primary)
+        {
             Cancel = false;
-            isenable = true;
-            OnPropertyChanged(nameof(Isenable2));
+            Pause = false;
+        }
+
+        if (result2 == ContentDialogResult.Secondary)
+        {
+            if (IOC.Default.GetService<Settings>().Packageformat != 0)
+            {
+                ContentDialog dlg1 = new ContentDialog();
+                dlg1.Title = "Cancelled";
+                dlg1.Content = "Some of the data copied already may be corrupt!";
+                dlg1.PrimaryButtonText = "Delete copied data";
+                dlg1.SecondaryButtonText = "Keep copied data ";
+                var result = await dlg1.ShowAsync();
+                if (result == ContentDialogResult.Primary && IOC.Default.GetService<Settings>().Packageformat != 0)
+                {
+                    Thread.Sleep(2000);
+                    File.Delete(target1);
+                } 
+            }
+            if (IOC.Default.GetService<Settings>().CreateOwnFolder == true && IOC.Default.GetService<Settings>().Packageformat == 0)
+            {
+                ContentDialog dlg1 = new ContentDialog();
+                dlg1.Title = "Cancelled";
+                dlg1.Content = "Some of the data copied already may be corrupt!";
+                dlg1.PrimaryButtonText = "Delete copied data";
+                dlg1.SecondaryButtonText = "Keep copied data ";
+                var result = await dlg1.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    Thread.Sleep(2000);
+                    Directory.Delete(deletat,true);
+                }
+            }
+            else if(IOC.Default.GetService<Settings>().Packageformat == 0)
+            {
+                Cancel = true;
+                ContentDialog dlg2 = new ContentDialog();
+                dlg2.Title = "Cancelled";
+                dlg2.Content = "Some of the data copied already may be corrupt!";
+                dlg2.PrimaryButtonText = "OK";
+                Pause = false;
+                await dlg2.ShowAsync();
+            }
+            
+            OnPropertyChanged(nameof(progresstext));
+            Pause = false;
             Isenable3 = false;
             OnPropertyChanged(nameof(Isenable3));
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            isenable = true;
+            OnPropertyChanged(nameof(Isenable2));
             var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
             taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
             if (IOC.Default.GetService<Settings>().MultipleSources)
@@ -271,18 +329,37 @@ public partial class MainViewmodel
                 OnPropertyChanged(nameof(Copyfromtext));
             }
         }
-        else
+        if(result2 == ContentDialogResult.Primary)
         {
             Pause = false;
         }
     }
 
+    public string copyto;
     public string target1;
+    public string deletat;
     [ICommand]
     private async Task Copybutton()
     {
+        Cancel = false;
         isenable = false;
         Isenable3 = true;
+        
+        foreach (var Folder in Expanderpaths)
+        {
+            if (!Path.Exists(Folder))
+            {
+                ContentDialog dlg = new ContentDialog();
+                dlg.Title = "Could not find certain paths.";
+                dlg.Content = "Pls check your source paths UwU.";
+                dlg.Foreground = Brushes.DeepPink;
+                dlg.PrimaryButtonText = "ok";
+                if (await dlg.ShowAsync() == ContentDialogResult.Primary)
+                {
+                    return;
+                }
+            }
+        }
         if (IOC.Default.GetService<Settings>().Listingart != false && string.IsNullOrEmpty(Selectedlistitem))
         {
             ContentDialog dlg1 = new ContentDialog();
@@ -296,6 +373,16 @@ public partial class MainViewmodel
             OnPropertyChanged(nameof(Isenable2));
             Isenable3 = false;
             OnPropertyChanged(nameof(Isenable3));
+            return;
+        }
+
+        if (Copyfromtext == copytotext)
+        {
+            ContentDialog dlg1 = new ContentDialog();
+            dlg1.Title = "Error";
+            dlg1.Content = "Source and target are equals.";
+            dlg1.PrimaryButtonText = "Ok";
+            await dlg1.ShowAsync();
             return;
         }
         if (!System.IO.Path.Exists(copyfromtext) && !IOC.Default.GetService<Settings>().MultipleSources)
@@ -343,15 +430,17 @@ public partial class MainViewmodel
         var Pathh = copytotext;
         Optaci = 10;
         OnPropertyChanged(nameof(Optaci));
+        copyto = copytotext;
         if (String.IsNullOrEmpty(copyfromtext) && IOC.Default.GetService<Settings>().MultipleSources)
         {
             copyfromtext = Expanderpaths[0];
         }
-        if (IOC.Default.GetService<Settings>().Packageformat == 0 && IOC.Default.GetService<Settings>().CreateOwnFolder == true)
+        if (IOC.Default.GetService<Settings>().Packageformat == 0 && IOC.Default.GetService<Settings>().CreateOwnFolder)
         {
-            var name = IOC.Default.GetService<Settings>().OwnFolderDate ? DateTime.Now.ToString("g").Replace(':','-') : IOC.Default.GetService<Settings>().OwnFolderName;
+            var name = IOC.Default.GetService<Settings>().OwnFolderDate ? DateTime.Now.ToString("G").Replace(':','-') : !String.IsNullOrEmpty(IOC.Default.GetService<Settings>().OwnFolderName)?IOC.Default.GetService<Settings>().OwnFolderName : "GnuCopyFolder";
             Directory.CreateDirectory(System.IO.Path.Combine(Pathh, name));
             copytotext = System.IO.Path.Combine(Pathh, name);
+            deletat = System.IO.Path.Combine(Pathh, name);
         }
 
         if (copyfromtext.EndsWith("\\"))
@@ -364,15 +453,14 @@ public partial class MainViewmodel
         {
             copyfromtext += "\\";
         }
-
-
+        
         if (!Copytotext.EndsWith("\\"))
         {
             copytotext += "\\";
         }
+        
         OnPropertyChanged(nameof(Copyfromtext));
         IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
-        IOC.Default.GetService<Settings>().Pathto =  IOC.Default.GetService<Settings>().CreateOwnFolder==true ? Pathh : copytotext;
         bool iscancel = false;
         if (IOC.Default.GetService<Settings>().Clearaftercopy)
         {
@@ -431,8 +519,12 @@ public partial class MainViewmodel
             }
         }
         
-        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(cancel));
-
+        await Task.Run( ()=> IOC.Default.GetService<StartCopyService>().Start(cancel));
+        
+        if (Cancel)
+        {
+            goto A;
+        }
         if (iscancel)
         {
             await Task.Run(() =>
@@ -454,45 +546,12 @@ public partial class MainViewmodel
                         File.Delete(file);
                     }
                 }
-            });   
+            });
         }
 
-        ContentDialog dlg = new ContentDialog();
-        if (Cancel)
+        if (!Cancel)
         {
-            if (IOC.Default.GetService<Settings>().Packageformat != 0 || IOC.Default.GetService<Settings>().CreateOwnFolder == true)
-            {
-                dlg.Title = "Cancelled";
-                dlg.Content = "Some of the data copied already may be corrupt!";
-                dlg.PrimaryButtonText = "Delete copied data";
-                dlg.SecondaryButtonText = "Keep copied data ";
-                Cancel = false;
-                
-                if (await dlg.ShowAsync() == ContentDialogResult.Primary&&IOC.Default.GetService<Settings>().Packageformat != 0)
-                {
-                   File.Delete(target1);
-                }
-                else
-                {
-                    var a = copytotext.TrimEnd('\\');
-                    Directory.Delete(a,true);
-                }
-            }
-            else
-            {
-                dlg.Title = "Cancelled";
-                dlg.Content = "Some of the data copied already may be corrupt!";
-                dlg.PrimaryButtonText = "OK";
-                Cancel = false;
-                if (await dlg.ShowAsync() == ContentDialogResult.Primary)
-                {
-                    goto A;
-                }
-                
-            }
-        }
-        else
-        {
+            ContentDialog dlg = new ContentDialog();
             dlg.Title = "Done";
             dlg.Content = "GnuCopy finished operation.";
             dlg.PrimaryButtonText = "Close";
@@ -515,7 +574,7 @@ public partial class MainViewmodel
         OnPropertyChanged(nameof(Isenable2));
         Isenable3 = false;
         OnPropertyChanged(nameof(Isenable3));
-        copytotext = Pathh;
+        copytotext = copyto;
         iscancel = false;
         var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
         taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
@@ -547,7 +606,8 @@ public partial class MainViewmodel
         }
         else
         {
-            Copyfromtext = await _fileDialogService.PickFolder();
+            var a = await _fileDialogService.PickFolder();
+            Copyfromtext = String.IsNullOrEmpty(a)?IOC.Default.GetService<Settings>().Pathfrom:a;
             IOC.Default.GetService<Settings>().Pathfrom = copyfromtext;
         }
 
@@ -556,8 +616,13 @@ public partial class MainViewmodel
     [ICommand]
     private async Task CopyTargetDialog()
     {
-        Copytotext = await _fileDialogService.PickFolder();
-        IOC.Default.GetService<Settings>().Pathto = copytotext;
+        var a = await _fileDialogService.PickFolder();
+        Copytotext = String.IsNullOrEmpty(a)?IOC.Default.GetService<Settings>().Pathto:a;
+        if (!String.IsNullOrEmpty(a))
+        { 
+            IOC.Default.GetService<Settings>().Pathto = copytotext;
+        }
+   
     }
   
     public void selectionchaged()

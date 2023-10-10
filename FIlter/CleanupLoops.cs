@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Project1.Viewmodels;
 
 namespace Project1;
 
 public class CleanupLoops
 {
-    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationToken token)
+    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationTokenSource token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -19,6 +20,10 @@ public class CleanupLoops
             {
                 foreach (var element in chunk)
                 {
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
                     bool allow = false;
                     if (folder)
                     {
@@ -47,12 +52,12 @@ public class CleanupLoops
                     }
                 }
             });
-        },token);
+        });
 
         return output.ToArray();
     }
 
-    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationToken token)
+    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationTokenSource token)
     {
         int chunksize = 3;
         List<string> output = new List<string>();
@@ -64,6 +69,10 @@ public class CleanupLoops
             {
                 foreach (var element in chunk)
                 {
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
                     bool allow = false;
                     allow = false;
                     foreach (var value in cleanfromat)
@@ -91,7 +100,7 @@ public class CleanupLoops
                 }
 
             });
-        },token);
+        });
         return output.ToArray();
     }
 

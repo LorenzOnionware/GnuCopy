@@ -1,3 +1,8 @@
+using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Security.Principal;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -20,7 +25,16 @@ namespace Project1
                 desktop.MainWindow = new MainWindow();
                 MainWindow = desktop.MainWindow;
             }
+
             base.OnFrameworkInitializationCompleted();
+
+        }
+
+        public bool Admin()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }

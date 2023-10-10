@@ -37,7 +37,7 @@
                 <Expander.Content>
                     <StackPanel>
                         <Label Content="Overrite existing files"></Label>
-                        <ToggleSwitch IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
+                        <ToggleSwitch IsEnabled="{Binding Overwriteenable}" IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
                         <Label Content="Clear target directory for copy"></Label>
                         <ToggleSwitch IsChecked="{Binding Clearforchecked,Mode=TwoWay}" Name="Clearforcopy"></ToggleSwitch>
                         <Label Content="Clear source directory after copy"></Label>
@@ -61,7 +61,7 @@
                         <ToggleSwitch IsChecked="{Binding Savepaths,Mode=TwoWay}"></ToggleSwitch>
                         <Label Content="Create folder"></Label>
                         <ToggleSwitch IsChecked="{Binding Createfolder}"></ToggleSwitch>
-                        <TextBox IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
+                        <TextBox Text="{Binding Createfoldername}" IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
                         <CheckBox IsVisible="{Binding ownfolderviseble }" Content="Set date as name" IsChecked="{Binding Ownfolderdate}"></CheckBox>
                         <Label Content="Multiple source path"></Label>
                         <ToggleSwitch IsChecked="{Binding Multiplesources}"></ToggleSwitch>
@@ -132,7 +132,7 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: TEST "></TextBlock>
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 23.10.1 "></TextBlock>
                         <TextBlock Margin="5" Text="Copyright © Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>
@@ -150,8 +150,11 @@
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">Special Thanks</TextBlock>
                         </Label>
                         <Label Cursor="Hand" Tapped="Thanks_OnTapped2">
-                            <TextBlock Foreground="{DynamicResource SystemAccentColor}">❤️Donate❤️</TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="{DynamicResource SystemAccentColor}">❤️Donate❤️</TextBlock>
+                            </StackPanel>
                         </Label>
+                        <TextBlock Tapped="InputElement_OnTapped22" Margin="5,5" Foreground="rgba(247, 77, 148, 0.10)" Text="UwU" FontWeight="Bold" Opacity="0,1"></TextBlock> 
                     </StackPanel>
                 </Expander.Content>
             </Expander>

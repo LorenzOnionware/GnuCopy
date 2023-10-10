@@ -116,4 +116,18 @@ public partial class SettingsControl : ContentDialog, IStyleable
             UseShellExecute = true
         }));
     }
+
+    private async void InputElement_OnTapped22(object? sender, TappedEventArgs e)
+    {
+        await Task.Run(() => Process.Start(new ProcessStartInfo
+        {
+            FileName = "https://discord.gg/tgNcZS9yUm",
+            UseShellExecute = true
+        }));
+        string filePath = System.IO.Path.Combine(AppContext.BaseDirectory, @"Assets\loadcircle.gif");
+
+        ProcessStartInfo psi = new ProcessStartInfo(filePath);
+        psi.UseShellExecute = true;
+        Process.Start(psi);
+    }
 }

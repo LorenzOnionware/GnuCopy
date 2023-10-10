@@ -26,17 +26,17 @@
             <Label Content="Not Allowed Character" Foreground="Firebrick" IsVisible="{Binding Labelenable}"></Label>
             <TextBox Name="FileName" Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
             <Label Content="Files:"></Label>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Name="StackPanel" Orientation="Horizontal">
                 <TextBox Watermark="File extension" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
                 <Button Command="{Binding FileAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">
-                <ListBox SelectedItem="{Binding Selectedfile}" Items="{Binding Files}">
+                <ListBox SelectedItem="{Binding Selectedfile}" Width="{Binding #StackPanel.Bounds.Width}" Items="{Binding Files}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Margin="0,5" Grid.Column="0" Text="{Binding}"></TextBlock>
-                                <Button Command="{Binding #fickdich.Command}" Grid.Column="1"
+                                <Button Margin="200,0,-10,0" Command="{Binding #fickdich.Command}" Grid.Column="1"
                                         Content="{avalonia:MaterialIconExt Kind=Delete}">
                                 </Button>
                             </Grid>
@@ -55,7 +55,7 @@
                         <DataTemplate>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Margin="0,5" Grid.Column="0" Text="{Binding}"></TextBlock>
-                                <Button Command="{Binding #fickdich2.Command}" Grid.Column="1"
+                                <Button Margin="200,0,-10,0" Command="{Binding #fickdich2.Command}" Grid.Column="1"
                                         Content="{avalonia:MaterialIconExt Kind=Delete}">
                                 </Button>
                             </Grid>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,12 +12,20 @@ namespace Project1;
 
 public class CopyMultiple
 {
-    public static async Task MAll(bool zip,CancellationToken token)
+    public static async Task MAll(bool zip,CancellationTokenSource token)
     {
         HashSet<string> Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths.ToHashSet();
         foreach (var Folder in Source)
         {
-            var path = ( Path.Combine(MainViewmodel.Default.Copytotext, GetLastPartFromPath(Folder)));
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");       
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
+            var path = (Path.Combine(MainViewmodel.Default.Copytotext, GetLastPartFromPath(Folder)));
             Directory.CreateDirectory(path);
 
             var First = Task.Run(() =>
@@ -24,19 +33,43 @@ public class CopyMultiple
                 var files = Directory.EnumerateFiles(Folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System});
                 foreach (var file in files)
                 {
-                    File.Copy(file, Path.Combine(path,Path.GetFileName(file)));
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
+                    File.Copy(file, Path.Combine(path,Path.GetFileName(file)),overwrite:IOC.Default.GetService<Settings>().Overrite);
                     IOC.Default.GetService<IProgressBarService>().Progress();
                 }
-            },token);
+            });
             List<string> folders = new List<string>();
             folders.Replace(Directory.EnumerateDirectories(Folder,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToList());
 
             foreach (var folder in folders)
             {
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 Directory.CreateDirectory(Path.Combine(Path.Combine(FolderPath(Folder,folder,path))));
                 List<string> files = Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToList();
                 foreach (var file in files)
                 {
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
                     try
                     {
                         File.Copy(file, Path.Combine(FolderPath(Folder,folder,path), GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
@@ -52,12 +85,20 @@ public class CopyMultiple
         }
     }
 
-    public static async Task MBlack(bool zip, CancellationToken token)
+    public static async Task MBlack(bool zip, CancellationTokenSource token)
     {
         string[] Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths.ToArray();
 
         foreach (var Folder in Source)
         {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");  
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
             var path = (Path.Combine(MainViewmodel.Default.Copytotext, GetLastPartFromPath(Folder)));
 
             var First = Task.Run(async () =>
@@ -66,10 +107,18 @@ public class CopyMultiple
                     IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(), false, token);
                 foreach (var file in files)
                 {
-                    File.Copy(file, Path.Combine(path, Path.GetFileName(file)));
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");   
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
+                    File.Copy(file, Path.Combine(path, Path.GetFileName(file)),overwrite:IOC.Default.GetService<Settings>().Overrite);
                     IOC.Default.GetService<IProgressBarService>().Progress();
                 }
-            }, token);
+            });
             List<string> folders = new();
             folders.Replace(await CleanupLoops.CLean(
                 Directory.EnumerateDirectories(Folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),
@@ -77,6 +126,14 @@ public class CopyMultiple
 
             foreach (var folder in folders)
             {
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 Directory.CreateDirectory(Path.Combine(Path.Combine(FolderPath(Folder, folder, path))));
                 List<string> files = new();
                 files.Replace(await CleanupLoops.CLean(
@@ -84,6 +141,14 @@ public class CopyMultiple
                     IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),  false, token));;
                 foreach (var file in files)
                 {
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
                     try
                     {
                         File.Copy(file, Path.Combine(FolderPath(Folder, folder, path), GetName(file)),
@@ -101,11 +166,19 @@ public class CopyMultiple
         }
     }
 
-    public static async Task MWhite(bool zip, CancellationToken token)
+    public static async Task MWhite(bool zip, CancellationTokenSource token)
     {
         string[] Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths.ToArray();
         foreach (var Folder in Source)
         {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
             var path = (Path.Combine(MainViewmodel.Default.Copytotext, GetLastPartFromPath(Folder)));
                 
             Directory.CreateDirectory(path);
@@ -116,15 +189,31 @@ public class CopyMultiple
                     IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(), false, token);
                 foreach (var file in files)
                 {
-                    File.Copy(file, Path.Combine(path, Path.GetFileName(file)));
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
+                    File.Copy(file, Path.Combine(path, Path.GetFileName(file)),overwrite:IOC.Default.GetService<Settings>().Overrite);
                     IOC.Default.GetService<IProgressBarService>().Progress();
                 }
-            }, token);
+            });
             List<string> folders = new();
             folders.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(Folder, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(), true, token));
 
             foreach (var folder in folders)
             {
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 Directory.CreateDirectory(Path.Combine(Path.Combine(FolderPath(Folder, folder, path))));
                 List<string> files = new();
                 files.Replace(await CleanupLoops.CLeanWhite(
@@ -132,6 +221,14 @@ public class CopyMultiple
                     IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false, token));;
                 foreach (var file in files)
                 {
+                    while (MainViewmodel.Default.Pause)
+                    {
+                        Debug.WriteLine("Stopp");
+                    }
+                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                    {
+                        break;
+                    }
                     try
                     {
                         File.Copy(file, Path.Combine(FolderPath(Folder, folder, path), GetName(file)),

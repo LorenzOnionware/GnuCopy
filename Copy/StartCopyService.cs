@@ -11,7 +11,7 @@ namespace Project1;
 
 public class StartCopyService
 {
-    public async Task Start(CancellationToken token)
+    public async Task Start(CancellationTokenSource token)
     {
         if (!Path.Exists(IOC.Default.GetService<MainViewmodel>().Copyfromtext) && !Path.Exists(IOC.Default.GetService<MainViewmodel>().Copytotext))
             return;

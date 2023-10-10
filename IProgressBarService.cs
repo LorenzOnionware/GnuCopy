@@ -25,7 +25,7 @@ public class IProgressBarService
         }
     }
     
-    public async Task Progressmax(CancellationToken token, bool Zip)
+    public async Task Progressmax(CancellationTokenSource token, bool Zip)
     {
         if (IOC.Default.GetService<Settings>().MultipleSources)
         {

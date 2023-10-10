@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace Project1;
 
 public class Copy
 {
-    public static async Task Settings(bool zip, CancellationToken token)
+    public static async Task Settings(bool zip, CancellationTokenSource token)
     {
         if (IOC.Default.GetService<Settings>().MultipleSources)
         {
@@ -62,7 +63,7 @@ public class Copy
         
     }
 
-    private static async Task Without(bool zip,CancellationToken token)
+    private static async Task Without(bool zip,CancellationTokenSource token)
     { 
         var copytask = Task.Run(async () =>
         {
@@ -71,10 +72,17 @@ public class Copy
             foreach (var file in firstfiles)
             {
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
-                    
                 }
                 catch (IOException e)
                 {
@@ -89,13 +97,13 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
+                            
                         }
                     }
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        },token);
+        });
         
         
         List<string> folders = Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToList();
@@ -103,11 +111,27 @@ public class Copy
         int exc = 1;
         foreach (var folder in folders)
         {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");  
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
             Directory.CreateDirectory(Path.Combine(FolderPath(folder, zip)));
             List<string> files = Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToList();
             foreach (var file in files)
             {
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file, Path.Combine(FolderPath(folder, zip), GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
@@ -125,19 +149,16 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
                         }
                     }
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-
-           
         }
         await copytask;
     }
 
-    private static async Task Black(bool zip,CancellationToken token)
+    private static async Task Black(bool zip,CancellationTokenSource token)
     { 
         string[] firstfiles = await CleanupLoops.CLean(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
 
@@ -147,6 +168,14 @@ public class Copy
             foreach (var file in firstfiles)
             {
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
@@ -164,18 +193,27 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
+                           
                         }
                     }
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        },token);
+        });
 
         string[] folderss = await CleanupLoops.CLean(Directory.GetDirectories(MainViewmodel.Default.Copyfromtext, "*", new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}), IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),true,token);
         List<string> folders = folderss.ToList();
         foreach (var folder in folders)
         {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");
+                                
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
             int exc = 0;
             var a = FolderPath(folder, zip);
             Directory.CreateDirectory(a);
@@ -183,6 +221,14 @@ public class Copy
             foreach (var file in files)
             {
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file, Path.Combine(a, GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
@@ -200,7 +246,7 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
+                            
                         }
                     }
                 }
@@ -213,7 +259,7 @@ public class Copy
       //  MainViewmodel.Default.progress += aa;
     }
 
-    private static async Task White(bool zip,CancellationToken token)
+    private static async Task White(bool zip,CancellationTokenSource token)
     { 
         string[] firstfiles = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(MainViewmodel.Default.Copyfromtext, "*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(), IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
         var copytask = Task.Run(async () =>
@@ -221,7 +267,16 @@ public class Copy
             int exc = 0;
             foreach (var file in firstfiles)
             {
+                
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file, Path.Combine(MainViewmodel.Default.Copytotext, GetName(file)));
@@ -240,23 +295,39 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
+                            
                         }
                     }
                 }
                 IOC.Default.GetService<IProgressBarService>().Progress();
             }
-        },token);
+        });
         string[] folderss = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(MainViewmodel.Default.Copyfromtext,"*",new EnumerationOptions(){RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefolder.ToArray(),true,token);
         List<string> folders = folderss.ToList();
         foreach (var folder in folders)
         {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Stopp");
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+            {
+                break;
+            }
             int exc = 0;
             Directory.CreateDirectory(Path.Combine(FolderPath(folder,zip)));
             string[] files = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folder,"*",new EnumerationOptions(){RecurseSubdirectories = false, AttributesToSkip = FileAttributes.Hidden|FileAttributes.System}).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token);
             foreach (var file in files)
             {
                 A:
+                while (MainViewmodel.Default.Pause)
+                {
+                    Debug.WriteLine("Stopp");
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                {
+                    break;
+                }
                 try
                 {
                     File.Copy(file,Path.Combine(FolderPath(folder,zip),GetName(file)), overwrite: IOC.Default.GetService<Settings>().Overrite);
@@ -274,7 +345,7 @@ public class Copy
                         dlg.PrimaryButtonText = "Ok";
                         if (await dlg.ShowAsync() is ContentDialogResult.Primary)
                         {
-                            MainViewmodel.Default.cancelall();
+                            
                         }
                     }
                 }

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Shapes;
 using DynamicData;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Project1.Viewmodels;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -19,8 +18,16 @@ namespace Project1;
 
 public class CopyPack
 {
-    public static async Task Start(CancellationToken token)
+    public static async Task Start(CancellationTokenSource token)
     {
+        string target = Path.Combine(MainViewmodel.Default.Copytotext,
+            IOC.Default.GetService<Settings>().DateAsName
+                ? DateTime.Now.ToString("G").Replace(':', '-')
+                : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
+                    ? "CompressedDirection"
+                    : IOC.Default.GetService<Settings>().ZipName));
+        string target1 = target + (IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
+        MainViewmodel.Default.target1 = target1;
         bool multiple = IOC.Default.GetService<Settings>().MultipleSources;
         await Task.Run(async () =>
         {
@@ -31,18 +38,21 @@ public class CopyPack
                 if (IOC.Default.GetService<Settings>().Listingart == false)
                 {
                      //ALL
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
-                    var target1 =target+(IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
-                    FileStream fs = new FileStream(target1, FileMode.Create);
+                     FileStream fs = new FileStream(target1, FileMode.Create);
                     var zip = new ZipWriter(fs, new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate));
                    
                     foreach (var Source in folder) 
                     {
+                        while (MainViewmodel.Default.Pause)
+                        {
+                                
+                        }
+                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                        {
+                            zip.Dispose();
+                            fs.Dispose();
+                            break;
+                        }
                         if (!Directory.EnumerateFiles(Source).Any())
                         {
                             IOC.Default.GetService<MainViewmodel>().progressmax++;
@@ -54,7 +64,16 @@ public class CopyPack
                         var ffiles= Directory.EnumerateFiles(Source, "*", new EnumerationOptions() { AttributesToSkip = FileAttributes.System | FileAttributes.Hidden });
                         foreach (var file in ffiles)
                         {
-                            
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             zip.Write(a+"/"+Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
@@ -65,6 +84,16 @@ public class CopyPack
                         });
                         foreach (var foldeer in folders)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             List<string> empty= new();
                             empty.Replace(Directory.EnumerateFiles(foldeer).ToArray());
                             if (!empty.Any())
@@ -79,6 +108,16 @@ public class CopyPack
                             string path = foldeer.Replace(Source, String.Empty);
                             foreach (var file in empty)
                             {
+                                while (MainViewmodel.Default.Pause)
+                                {
+                                
+                                }
+                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                                {
+                                    zip.Dispose();
+                                    fs.Dispose();
+                                    break;
+                                }
                                 var sssa = $"{a}{path}/{Path.GetFileName(file)}";
                                 var asss = sssa.Replace("\\", "/");
                                 zip.Write(asss, file);
@@ -92,18 +131,21 @@ public class CopyPack
                 }else if (IOC.Default.GetService<Settings>().Listingart == true)
                 {
                     //White
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
-                    var target1 =target+(IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
                     FileStream fs = new FileStream(target1, FileMode.Create);
                     var zip = new ZipWriter(fs, new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate));
                    
                     foreach (var Source in folder)
-                    {  
+                    {                         
+                        while (MainViewmodel.Default.Pause)
+                        {
+                                
+                        }
+                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                        {
+                            zip.Dispose();
+                            fs.Dispose();
+                            break;
+                        }
                         var ignorfiles =IOC.Default.GetService<MainViewmodel>().ignorefiles;
                         ignorfiles.Add(".ow");
                         var aaa = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source).ToArray(),
@@ -116,6 +158,16 @@ public class CopyPack
                         var ffiles= await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source, "*", new EnumerationOptions() { AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(), ignorfiles.ToArray(), false, token);
                         foreach (var file in ffiles)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             zip.Write(a+"/"+Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
@@ -125,6 +177,16 @@ public class CopyPack
                         
                         foreach (var foldeer in folders)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             List<string> empty= new();
                             empty.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(foldeer).ToArray(),ignorfiles.ToArray(),false,token));
                             if (!empty.Any())
@@ -139,6 +201,12 @@ public class CopyPack
                             string path = foldeer.Replace(Source, String.Empty);
                             foreach (var file in empty)
                             {
+                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                                {
+                                    zip.Dispose();
+                                    fs.Dispose();
+                                    break;
+                                }
                                 var sssa = $"{a}{path}/{Path.GetFileName(file)}";
                                 var asss = sssa.Replace("\\", "/");
                                 zip.Write(asss, file);
@@ -153,13 +221,6 @@ public class CopyPack
                 else
                 {
                     //BLACK
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
-                    var target1 = target + (IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
                     FileStream fs = new FileStream(target1, FileMode.Create);
                     var zip = new ZipWriter(fs,
                         new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1
@@ -168,6 +229,16 @@ public class CopyPack
 
                     foreach (var Source in folder)
                     {
+                        while (MainViewmodel.Default.Pause)
+                        {
+                                
+                        }
+                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                        {
+                            zip.Dispose();
+                            fs.Dispose();
+                            break;
+                        }
                         IOC.Default.GetService<MainViewmodel>().ignorefiles.Add(".ow");
                         var aaa = await CleanupLoops.CLean(Directory.EnumerateFiles(Source).ToArray(),
                             IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(), false, token);
@@ -186,7 +257,16 @@ public class CopyPack
                             MainViewmodel.Default.ignorefiles.ToArray(), false, token);
                         foreach (var file in ffiles)
                         {
-
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             zip.Write(a + "/" + Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
@@ -200,6 +280,16 @@ public class CopyPack
 
                         foreach (var foldeer in folders)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                fs.Dispose();
+                                break;
+                            }
                             List<string> empty = new();
                             empty.Replace(await CleanupLoops.CLean(Directory.EnumerateFiles(foldeer).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token));
                             if (!empty.Any())
@@ -236,38 +326,43 @@ public class CopyPack
                 if (IOC.Default.GetService<Settings>().Listingart == false)
                 {
                     //all
-                    #region vorbereitung
-
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
-                    byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-                    var target1 =target+(format == 1 ? ".tar" : ".zip");
-
-                    #endregion
                     #region enumerationen/Clean
 
                     folder.Replace(Directory.EnumerateDirectories(Source, "*", new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray());
-                    
-
                     #endregion
                     #region pack
 
                     using (var fileStream = new FileStream(target1, FileMode.Create))
                     {
+                        byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
                         var zip = new ZipWriter(fileStream, new ZipWriterOptions(format == 1 ? CompressionType.None : CompressionType.Deflate));
                         var a = Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray();
                         foreach (var file in a)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                             zip.Write(Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
 
                         foreach (var folders in folder)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                             List<string> empty = new();
                             empty.Replace(Directory.EnumerateFiles(folders).ToArray());
                             if (!empty.Any())
@@ -282,6 +377,15 @@ public class CopyPack
                             string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
                             foreach (var file in empty)
                             {
+                                while (MainViewmodel.Default.Pause)
+                                {
+                                
+                                }
+                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                                {
+                                    zip.Dispose();
+                                    break;
+                                }
                                 var sssa = $"{path}/{Path.GetFileName(file)}";
                                 var asss = sssa.Replace("\\", "/");
                                 zip.Write(asss, file);
@@ -298,15 +402,8 @@ public class CopyPack
                     //white
 
                     #region vorbereitung
-
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
+                    
                     byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-                    var target1 =target+(format == 1 ? ".tar" : ".zip");
 
                     #endregion
                     #region enumerationen/Clean
@@ -323,12 +420,30 @@ public class CopyPack
                         var a = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray(), IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token);
                         foreach (var file in a)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                             zip.Write(Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
 
                         foreach (var folders in folder)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                            List<string> empty= new(); 
                            empty.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folders).ToArray(),
                                 IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token));
@@ -344,6 +459,15 @@ public class CopyPack
                             string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
                             foreach (var file in empty)
                             {
+                                while (MainViewmodel.Default.Pause)
+                                {
+                                
+                                }
+                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                                {
+                                    zip.Dispose();
+                                    break;
+                                }
                                 var sssa = $"{path}/{Path.GetFileName(file)}";
                                 var asss = sssa.Replace("\\", "/");
                                 zip.Write(asss, file);
@@ -360,15 +484,8 @@ public class CopyPack
                     //black
 
                     #region vorbereitung
-
-                    string target = Path.Combine(MainViewmodel.Default.Copytotext,
-                        IOC.Default.GetService<Settings>().DateAsName
-                            ? DateTime.Now.ToString("g").Replace(':', '-')
-                            : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                                ? "CompressedDirection"
-                                : IOC.Default.GetService<Settings>().ZipName));
+                    
                     byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-                    var target1 =target+(format == 1 ? ".tar" : ".zip");
 
                     #endregion
                     #region enumerationen/Clean
@@ -382,12 +499,30 @@ public class CopyPack
                         var a = await CleanupLoops.CLean(Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray(), IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token);
                         foreach (var file in a)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                             zip.Write(Path.GetFileName(file), new FileInfo(file));
                             IOC.Default.GetService<IProgressBarService>().Progress();
                         }
 
                         foreach (var folders in folder)
                         {
+                            while (MainViewmodel.Default.Pause)
+                            {
+                                
+                            }
+                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                            {
+                                zip.Dispose();
+                                break;
+                            }
                            List<string> empty= new(); 
                            empty.Replace(await CleanupLoops.CLean(Directory.EnumerateFiles(folders).ToArray(),
                                 IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token));
@@ -403,6 +538,15 @@ public class CopyPack
                             string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
                             foreach (var file in empty)
                             {
+                                while (MainViewmodel.Default.Pause)
+                                {
+                                
+                                }
+                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
+                                {
+                                    zip.Dispose();
+                                    break;
+                                }
                                 var sssa = $"{path}/{Path.GetFileName(file)}";
                                 var asss = sssa.Replace("\\", "/");
                                 zip.Write(asss, file);
@@ -417,7 +561,7 @@ public class CopyPack
                 #endregion
                 
             }
-        }, token);
+        });
     }
     static string GetLastPartFromPath(string path)
     {
@@ -434,4 +578,5 @@ public class CopyPack
             IOC.Default.GetService<MainViewmodel>().progressmax2++;
         }
     }
+    
 }

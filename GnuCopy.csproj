@@ -34,16 +34,16 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview5" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="AvaloniaGenerics" Version="11.0.0-preview5" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
     <PackageReference Include="Jab" Version="0.8.6" />
     <PackageReference Include="Material.Icons.Avalonia" Version="2.0.0-preview2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="ReactiveUI" Version="18.4.1" />
+    <PackageReference Include="ReactiveUI" Version="19.4.1" />
     <PackageReference Include="SharpCompress" Version="0.33.0" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="System.Management" Version="6.0.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
    </ItemGroup>
   <ItemGroup>
@@ -89,6 +89,10 @@
     <Content Remove="pages\SettingWindow.axaml" />
     <None Remove="pages\Third-Party.txt" />
     <Content Include="pages\Third-Party.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="Assets\loadcircle.gif" />
+    <Content Include="Assets\loadcircle.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

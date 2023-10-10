@@ -2,7 +2,10 @@
 using Avalonia.Controls;
   using System.IO;
 using System.Collections.Generic;
+  using System.Diagnostics;
   using System.Linq;
+  using System.Reflection;
+  using System.Security.Principal;
   using System.Threading.Tasks;
   using Avalonia.Media;
   using Avalonia.Platform;
@@ -24,11 +27,35 @@ using Newtonsoft.Json;
         
 
         public MainWindow()
-        {
+        { 
+          /*  WindowsIdentity identity = WindowsIdentity.GetCurrent(); 
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            bool Admin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+            
+           
+            if (!Admin)
+            {
+                ProcessStartInfo proc = new ProcessStartInfo();
+                proc.UseShellExecute = true;
+                proc.WorkingDirectory = Environment.CurrentDirectory;
+                proc.FileName = "GnuCopy.exe";
+
+                proc.Verb = "runas";
+
+                try
+                {
+                    Process.Start(proc);
+                    Environment.Exit(0);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("This program must be run as an administrator! \n\n" + ex.ToString());
+                }
+            }*/
+            
             DataContext = MainViewmodel.Default;
             InitializeComponent();
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
-            
             
             ThemeChanged(null,null);
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
