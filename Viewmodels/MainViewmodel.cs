@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -75,11 +76,15 @@ public partial class MainViewmodel
                IOC.Default.GetService<Settings>().Listingart == true;
     }
 
-    private bool isenable =true;
+    private bool isenable = true;
     public  bool Isenable2
     {
         get => isenable ? IOC.Default.GetService<Settings>().MultipleSources ? Expanderpaths.Any()?true:false : String.IsNullOrEmpty(copyfromtext)?false:true: false;
     }
+
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(isenable4))]private bool isenable3 = false;
+    
+    public bool isenable4 => !isenable3;
 
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copytotext;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copyfromtext;
@@ -92,6 +97,7 @@ public partial class MainViewmodel
     public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources; 
     public bool Copyfrom => !Ismultiplevisable;
     public ObservableCollection<string> Expanderpaths { get; set; } = new();
+    
 
     public bool Isnotempty => Folderitems.Count != 0;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
@@ -101,7 +107,7 @@ public partial class MainViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public bool evaluating;
     public bool Expanderexpand => Expanderpaths.Any();
     
-    public string progresstext => !evaluating ? "Evaluating" : progress>=progressmax?"Done":progress.ToString() + " of " + progressmax2.ToString();
+    public string progresstext => !Cancel?!evaluating ? "Evaluating" : progress>=progressmax?"Done":progress.ToString() + " of " + progressmax2.ToString():"Cancelling";
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
     
     [ICommand]
@@ -228,23 +234,68 @@ public partial class MainViewmodel
         OnPropertyChanged(nameof(Isnotempty));
         
     } 
-    CancellationTokenSource cancel = new CancellationTokenSource(); 
-    CancellationToken token = default;
-
+    CancellationTokenSource cancel = new CancellationTokenSource();
+    public bool Cancel = false;
+    public bool Pause=false;
     public void cancelall()
     {
-        cancel.Dispose();
+       OnPropertyChanged(nameof(progresstext));
+       Cancel = true;
+       Pause = false;
     }
+
+    [ICommand]
+    private async Task Cancell()
+    {
+        Pause = true;
+        ContentDialog dlg = new ContentDialog();
+        dlg.Title = "Warning!";
+        dlg.Content = "If process is cancelled, some of the data copied already may be corrupt!";
+        dlg.SecondaryButtonText = "Proceed cancellation";
+        dlg.PrimaryButtonText = "Take me back";
+        if (await dlg.ShowAsync() == ContentDialogResult.Secondary)
+        {
+            cancelall();
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            Cancel = false;
+            isenable = true;
+            OnPropertyChanged(nameof(Isenable2));
+            Isenable3 = false;
+            OnPropertyChanged(nameof(Isenable3));
+            var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
+            taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+            if (IOC.Default.GetService<Settings>().MultipleSources)
+            {
+                copyfromtext = "";
+                OnPropertyChanged(nameof(Copyfromtext));
+            }
+        }
+        else
+        {
+            Pause = false;
+        }
+    }
+
+    public string target1;
     [ICommand]
     private async Task Copybutton()
     {
         isenable = false;
+        Isenable3 = true;
         if (IOC.Default.GetService<Settings>().Listingart != false && string.IsNullOrEmpty(Selectedlistitem))
         {
             ContentDialog dlg1 = new ContentDialog();
             dlg1.Title = "Please select a preset.";
             dlg1.PrimaryButtonText = "Ok";
             await dlg1.ShowAsync();
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            Cancel = false;
+            isenable = true;
+            OnPropertyChanged(nameof(Isenable2));
+            Isenable3 = false;
+            OnPropertyChanged(nameof(Isenable3));
             return;
         }
         if (!System.IO.Path.Exists(copyfromtext) && !IOC.Default.GetService<Settings>().MultipleSources)
@@ -254,6 +305,13 @@ public partial class MainViewmodel
             dlg1.Content = "Source path doesnt exist";
             dlg1.PrimaryButtonText = "Ok";
             await dlg1.ShowAsync();
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            Cancel = false;
+            isenable = true;
+            OnPropertyChanged(nameof(Isenable2));
+            Isenable3 = false;
+            OnPropertyChanged(nameof(Isenable3));
             return;
         }
 
@@ -270,6 +328,13 @@ public partial class MainViewmodel
                 dlg1.Content = "Couldnt find or create path";
                 dlg1.PrimaryButtonText = "Ok";
                 await dlg1.ShowAsync();
+                Optaci = 0;
+                OnPropertyChanged(nameof(Optaci));
+                Cancel = false;
+                isenable = true;
+                OnPropertyChanged(nameof(Isenable2));
+                Isenable3 = false;
+                OnPropertyChanged(nameof(Isenable3));
                 return;
             }
             
@@ -362,11 +427,11 @@ public partial class MainViewmodel
                             File.Delete(file);
                         }
                     }
-                },token);
+                });
             }
         }
         
-        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(token),token);
+        await Task.Run( async ()=> await IOC.Default.GetService<StartCopyService>().Start(cancel));
 
         if (iscancel)
         {
@@ -389,26 +454,67 @@ public partial class MainViewmodel
                         File.Delete(file);
                     }
                 }
-            },token);   
+            });   
         }
 
         ContentDialog dlg = new ContentDialog();
-        dlg.Title = "Done";
-        dlg.Content = "GnuCopy finished operation.";
-        dlg.PrimaryButtonText = "Close";
-        dlg.SecondaryButtonText = "Go to target";
-        if (await dlg.ShowAsync() is ContentDialogResult.Secondary)
+        if (Cancel)
         {
-            ProcessStartInfo psi = new ProcessStartInfo(copytotext);
-            psi.UseShellExecute = true;
-
-            Process.Start(psi);
+            if (IOC.Default.GetService<Settings>().Packageformat != 0 || IOC.Default.GetService<Settings>().CreateOwnFolder == true)
+            {
+                dlg.Title = "Cancelled";
+                dlg.Content = "Some of the data copied already may be corrupt!";
+                dlg.PrimaryButtonText = "Delete copied data";
+                dlg.SecondaryButtonText = "Keep copied data ";
+                Cancel = false;
+                
+                if (await dlg.ShowAsync() == ContentDialogResult.Primary&&IOC.Default.GetService<Settings>().Packageformat != 0)
+                {
+                   File.Delete(target1);
+                }
+                else
+                {
+                    var a = copytotext.TrimEnd('\\');
+                    Directory.Delete(a,true);
+                }
+            }
+            else
+            {
+                dlg.Title = "Cancelled";
+                dlg.Content = "Some of the data copied already may be corrupt!";
+                dlg.PrimaryButtonText = "OK";
+                Cancel = false;
+                if (await dlg.ShowAsync() == ContentDialogResult.Primary)
+                {
+                    goto A;
+                }
+                
+            }
         }
+        else
+        {
+            dlg.Title = "Done";
+            dlg.Content = "GnuCopy finished operation.";
+            dlg.PrimaryButtonText = "Close";
+            dlg.SecondaryButtonText = "Go to target";
+            if (await dlg.ShowAsync() is ContentDialogResult.Secondary)
+            {
+                ProcessStartInfo psi = new ProcessStartInfo(copytotext);
+                psi.UseShellExecute = true;
+
+                Process.Start(psi);
+            }
+        }
+
+
         A:
         Optaci = 0;
         OnPropertyChanged(nameof(Optaci));
+        Cancel = false;
         isenable = true;
         OnPropertyChanged(nameof(Isenable2));
+        Isenable3 = false;
+        OnPropertyChanged(nameof(Isenable3));
         copytotext = Pathh;
         iscancel = false;
         var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;

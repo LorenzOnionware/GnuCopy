@@ -42,18 +42,26 @@
                 </TextBox>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <Button  Height="{Binding #TargetPath.Bounds.Height}"
-                             Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="5,0" FontSize="18"
-                             Command="{Binding CopySourceDialogCommand}">
+                             Content="{materialIcons:MaterialIconExt Kind=FolderLocation}" Margin="10,0,2,0" FontSize="18"
+                             Command="{Binding CopySourceDialogCommand}"
+                             IsVisible="{Binding Copyfrom}">
                     </Button>
-                    <Button VerticalAlignment="Top" IsVisible="{Binding Ismultiplevisable}"
-                            Command="{Binding AddPathCommand}" Margin="5,7"
+                    <Button  VerticalAlignment="Top" IsVisible="{Binding Ismultiplevisable}"
+                            Command="{Binding AddPathCommand}" Margin="2,13,3,7"
                             Content="{materialIcons:MaterialIconExt Kind=Add}">
                     </Button>
                 </StackPanel>
-                <Expander Name="Expander" IsExpanded="{Binding Expanderexpand}" IsVisible="{Binding Ismultiplevisable}" Margin="0,5" Grid.Row="0" Grid.Column="0">
+                <Expander Name="Expander" IsExpanded="{Binding Expanderexpand}" IsVisible="{Binding Ismultiplevisable}"
+                          Margin="0,5,3,5" Grid.Row="0" Grid.Column="0">
                     <Expander.Header>
-                        <Grid Width="{Binding  ElementName=Expander, Path=Bounds.Width}">
-                            <TextBox Margin="30,5,30,5" Watermark="{Binding #copyfrom.Watermark}" Text="{Binding Copyfromtext, Mode=TwoWay}"/>
+                        <Grid RowDefinitions="*,Auto" Width="{Binding  ElementName=Expander, Path=Bounds.Width}">
+                            <TextBox Margin="30,5,70,5" Watermark="{Binding #copyfrom.Watermark}"
+                                     Text="{Binding Copyfromtext, Mode=TwoWay}" />
+                            <Button Grid.Row="0" Grid.Column="1" Margin="10,5,25,5" HorizontalAlignment="Right" VerticalAlignment="Top" Height="{Binding #TargetPath.Bounds.Height}"
+                                    Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
+                                    FontSize="18"
+                                    Command="{Binding CopySourceDialogCommand}">
+                            </Button>
                         </Grid>
                     </Expander.Header>
                     <Expander.Content>
@@ -76,7 +84,7 @@
             <Grid ColumnDefinitions="*,Auto">
                 <TextBox Text="{Binding Copytotext, Mode=TwoWay}" Name="TargetPath" Watermark="Copy to"></TextBox>
                 <Button Grid.Column="1" Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
-                        Height="{Binding #TargetPath.Bounds.Height}" Margin="5,0" FontSize="18"
+                        Height="{Binding #TargetPath.Bounds.Height}" Margin="10,0,2,0" FontSize="18"
                         Command="{Binding CopyTargetDialogCommand}">
                 </Button>
             </Grid>
@@ -189,9 +197,10 @@
                               Margin="5,5">
                 </ProgressBar>
             </StackPanel>
-            <Button Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable2}" Content="Copy"
+            <Button IsVisible="{Binding isenable4}" Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable2}" Content="Copy"
                     Command="{Binding CopybuttonCommand}">
             </Button>
+            <Button IsVisible="{Binding Isenable3}" Grid.Column="2" Content="cancel" Command="{Binding CancellCommand}"></Button>
         </Grid>
     </Grid>
 </Window>
