@@ -351,8 +351,7 @@ public partial class MainViewmodel
             {
                 ContentDialog dlg = new ContentDialog();
                 dlg.Title = "Could not find certain paths.";
-                dlg.Content = "Pls check your source paths UwU.";
-                dlg.Foreground = Brushes.DeepPink;
+                dlg.Content = "Please check your source paths.";
                 dlg.PrimaryButtonText = "ok";
                 if (await dlg.ShowAsync() == ContentDialogResult.Primary)
                 {

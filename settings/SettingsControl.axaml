@@ -154,7 +154,6 @@
                                 <TextBlock Foreground="{DynamicResource SystemAccentColor}">❤️Donate❤️</TextBlock>
                             </StackPanel>
                         </Label>
-                        <TextBlock Tapped="InputElement_OnTapped22" Margin="5,5" Foreground="rgba(247, 77, 148, 0.10)" Text="UwU" FontWeight="Bold" Opacity="0,1"></TextBlock> 
                     </StackPanel>
                 </Expander.Content>
             </Expander>

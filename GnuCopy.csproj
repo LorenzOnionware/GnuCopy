@@ -92,9 +92,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Remove="Assets\loadcircle.gif" />
-    <Content Include="Assets\loadcircle.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Update="av_libglesv2.dll">
