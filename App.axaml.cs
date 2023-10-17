@@ -29,12 +29,5 @@ namespace Project1
             base.OnFrameworkInitializationCompleted();
 
         }
-
-        public bool Admin()
-        {
-            WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(identity);
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
     }
 }
