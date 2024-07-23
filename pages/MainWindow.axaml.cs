@@ -13,6 +13,7 @@ using System.Collections.Generic;
   using Microsoft.Win32;
 using Newtonsoft.Json;
   using Project1.Viewmodels;
+using Avalonia.Markup.Xaml;
 
 
   namespace Project1
@@ -55,6 +56,7 @@ using Newtonsoft.Json;
             
             DataContext = MainViewmodel.Default;
             InitializeComponent();
+            
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
             
             ThemeChanged(null,null);
@@ -79,6 +81,7 @@ using Newtonsoft.Json;
             SystemEvents.UserPreferenceChanged += ThemeChanged;
 
         }
+
 
         public void Addsources()
         {

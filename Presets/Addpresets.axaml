@@ -10,7 +10,7 @@
     xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
     x:DataType="viewmodels:AddpresetsViewmodel"
     x:CompileBindings="True"
-    PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" IsPrimaryButtonEnabled="{Binding primary}" PrimaryButtonText="Save"
+    PrimaryButtonCommand="{Binding PrimaryButtonClickCommand}" IsPrimaryButtonEnabled="{Binding Cansave}" PrimaryButtonText="Save"
     SecondaryButtonText="Cancel" Title="Add Preset"  Closing="ContentDialog_OnClosing" SecondaryButtonCommand="{Binding SecondaryButtonClickCommand}">
 
     <Control.Styles>
@@ -23,8 +23,8 @@
         
         <StackPanel>
             <Button IsVisible="False" Command="{Binding CallAllCommand}" HotKey="Enter"></Button>
-            <Label Content="Not Allowed Character" Foreground="Firebrick" IsVisible="{Binding Labelenable}"></Label>
-            <TextBox Name="FileName" Watermark="Preset name" TextChanged="TextBox_OnTextChanged" Text="{Binding Presetname}"></TextBox>
+            <TextBox Name="FileName" Watermark="Preset name" Text="{Binding Presetname}"></TextBox>
+            <Label IsVisible="{Binding Cantsave}" Foreground="Red" Content="Not valid char"></Label>
             <Label Content="Files:"></Label>
             <StackPanel Name="StackPanel" Orientation="Horizontal">
                 <TextBox Watermark="File extension" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>

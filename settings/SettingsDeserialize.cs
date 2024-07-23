@@ -17,7 +17,7 @@ public class Settings
 
     public string? TempfolderPath { get; set; }
 
-    public bool MultipleSources { get; set; } = true;
+    public bool MultipleSources { get; } = true;
     public List<string> Sources { get; set; } = new();
     public bool CreateOwnFolder { get; set; } = false;
     public string? OwnFolderName { get; set; }

@@ -63,8 +63,6 @@
                         <ToggleSwitch IsChecked="{Binding Createfolder}"></ToggleSwitch>
                         <TextBox Text="{Binding Createfoldername}" IsVisible="{Binding ownfolderviseble }" IsEnabled="{Binding owndateenabled}" Watermark="Folder name"></TextBox>
                         <CheckBox IsVisible="{Binding ownfolderviseble }" Content="Set date as name" IsChecked="{Binding Ownfolderdate}"></CheckBox>
-                        <Label Content="Multiple source path"></Label>
-                        <ToggleSwitch IsChecked="{Binding Multiplesources}"></ToggleSwitch>
                     </StackPanel>
                 </Expander.Content>
             </Expander>

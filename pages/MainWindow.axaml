@@ -191,7 +191,7 @@
             <StackPanel Orientation="Vertical" Grid.Column="1">
                 <StackPanel Opacity="{Binding Optaci}" Orientation="Horizontal">
                     <Label>Progress:  </Label>
-                    <Label Content="{Binding progresstext}"></Label>
+                    <Label Content="{Binding Currentfile}"></Label>
                 </StackPanel>
                 <ProgressBar Maximum="{Binding Progressmax}" Value="{Binding Progress}" Opacity="{Binding Optaci}"
                               Margin="5,5">

@@ -19,7 +19,7 @@ namespace Project1;
 [Singleton<GetSetPresetIndex>]
 [Singleton<ExportViewmodel>]
 [Singleton<MainWindow>]
-[Singleton<IProgressBarService>]
+[Singleton<ProgressBarService>]
 [Singleton<WindowClosingService>]
 [Singleton<EditPresetsWindow>]
 sealed partial class ServiceProvider

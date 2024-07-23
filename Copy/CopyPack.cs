@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Shapes;
 using DynamicData;
+using GnuCopy.Interfaces;
 using Project1.Viewmodels;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -18,6 +23,10 @@ namespace Project1;
 
 public class CopyPack
 {
+    public static List<string> Igfolder = IOC.Default.GetService<MainViewmodel>().ignorefolder;
+    public static List<string> Igfiles = IOC.Default.GetService<MainViewmodel>().ignorefiles;
+    public static ObservableCollection<string> Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths;
+
     public static async Task Start(CancellationTokenSource token)
     {
         string target = Path.Combine(MainViewmodel.Default.Copytotext,
@@ -26,557 +35,210 @@ public class CopyPack
                 : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
                     ? "CompressedDirection"
                     : IOC.Default.GetService<Settings>().ZipName));
-        string target1 = target + (IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
+        string target2 = target + (IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
+        string target1 = Regex.Replace(target2, " ", "-");
         MainViewmodel.Default.target1 = target1;
-        bool multiple = IOC.Default.GetService<Settings>().MultipleSources;
-        await Task.Run(async () =>
+        switch (IOC.Default.GetService<Settings>().Listingart)
         {
-            if (multiple)
-            {
-                IOC.Default.GetService<IProgressBarService>().Progressmax(token,true);
-                HashSet<string> folder = IOC.Default.GetService<MainViewmodel>().Expanderpaths.ToHashSet();
-                if (IOC.Default.GetService<Settings>().Listingart == false)
-                {
-                     //ALL
-                     FileStream fs = new FileStream(target1, FileMode.Create);
-                    var zip = new ZipWriter(fs, new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate));
-                   
-                    foreach (var Source in folder) 
-                    {
-                        while (MainViewmodel.Default.Pause)
-                        {
-                                
-                        }
-                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                        {
-                            zip.Dispose();
-                            fs.Dispose();
-                            break;
-                        }
-                        if (!Directory.EnumerateFiles(Source).Any())
-                        {
-                            IOC.Default.GetService<MainViewmodel>().progressmax++;
-                            IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                            var fss = new FileStream(Path.Combine(Source, @"onionfile.ow"), FileMode.Create);
-                            fss.Dispose();
-                        }
-                        var a = GetLastPartFromPath(Source);
-                        var ffiles= Directory.EnumerateFiles(Source, "*", new EnumerationOptions() { AttributesToSkip = FileAttributes.System | FileAttributes.Hidden });
-                        foreach (var file in ffiles)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            zip.Write(a+"/"+Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        var folders = Directory.EnumerateDirectories(Source, "*", new EnumerationOptions()
-                        {
-                            RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden 
-                        });
-                        foreach (var foldeer in folders)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            List<string> empty= new();
-                            empty.Replace(Directory.EnumerateFiles(foldeer).ToArray());
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fss = new FileStream(Path.Combine(foldeer, @"onionfile.ow"), FileMode.Create);
-                                fss.Dispose();
-                                empty.Add((Path.Combine(foldeer, @"onionfile.ow")));
-                            }
-
-                            string path = foldeer.Replace(Source, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                while (MainViewmodel.Default.Pause)
-                                {
-                                
-                                }
-                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                                {
-                                    zip.Dispose();
-                                    fs.Dispose();
-                                    break;
-                                }
-                                var sssa = $"{a}{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                        
-                    }
-                    zip.Dispose();
-                    fs.Dispose();
-                }else if (IOC.Default.GetService<Settings>().Listingart == true)
-                {
-                    //White
-                    FileStream fs = new FileStream(target1, FileMode.Create);
-                    var zip = new ZipWriter(fs, new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate));
-                   
-                    foreach (var Source in folder)
-                    {                         
-                        while (MainViewmodel.Default.Pause)
-                        {
-                                
-                        }
-                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                        {
-                            zip.Dispose();
-                            fs.Dispose();
-                            break;
-                        }
-                        var ignorfiles =IOC.Default.GetService<MainViewmodel>().ignorefiles;
-                        ignorfiles.Add(".ow");
-                        var aaa = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source).ToArray(),
-                            ignorfiles.ToArray(), false, token);
-                        if (!aaa.Any())
-                        {
-                            emptyy(Source);
-                        }
-                        var a = GetLastPartFromPath(Source);
-                        var ffiles= await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source, "*", new EnumerationOptions() { AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(), ignorfiles.ToArray(), false, token);
-                        foreach (var file in ffiles)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            zip.Write(a+"/"+Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        var folders = await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(Source, "*", new EnumerationOptions()
-                        { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(), MainViewmodel.Default.ignorefolder.ToArray(), true, token);
-                        
-                        foreach (var foldeer in folders)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            List<string> empty= new();
-                            empty.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(foldeer).ToArray(),ignorfiles.ToArray(),false,token));
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fss = new FileStream(Path.Combine(foldeer, @"onionfile.ow"), FileMode.Create);
-                                fss.Dispose();
-                                empty.Add((Path.Combine(foldeer, @"onionfile.ow")));
-                            }
-
-                            string path = foldeer.Replace(Source, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                                {
-                                    zip.Dispose();
-                                    fs.Dispose();
-                                    break;
-                                }
-                                var sssa = $"{a}{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                        
-                    }
-                    zip.Dispose();
-                    fs.Dispose();
-                }
-                else
-                {
-                    //BLACK
-                    FileStream fs = new FileStream(target1, FileMode.Create);
-                    var zip = new ZipWriter(fs,
-                        new ZipWriterOptions(IOC.Default.GetService<Settings>().Packageformat == 1
-                            ? CompressionType.None
-                            : CompressionType.Deflate));
-
-                    foreach (var Source in folder)
-                    {
-                        while (MainViewmodel.Default.Pause)
-                        {
-                                
-                        }
-                        if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                        {
-                            zip.Dispose();
-                            fs.Dispose();
-                            break;
-                        }
-                        IOC.Default.GetService<MainViewmodel>().ignorefiles.Add(".ow");
-                        var aaa = await CleanupLoops.CLean(Directory.EnumerateFiles(Source).ToArray(),
-                            IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(), false, token);
-                        if (!aaa.Any())
-                        {
-                            IOC.Default.GetService<MainViewmodel>().progressmax++;
-                            IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                            var fss = new FileStream(Path.Combine(Source, @"onionfile.ow"), FileMode.Create);
-                            fss.Dispose();
-                        }
-                        var a = GetLastPartFromPath(Source);
-                        var ffiles = await CleanupLoops.CLean(
-                            Directory.EnumerateFiles(Source, "*",
-                                new EnumerationOptions()
-                                    { AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(),
-                            MainViewmodel.Default.ignorefiles.ToArray(), false, token);
-                        foreach (var file in ffiles)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            zip.Write(a + "/" + Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        var folders = await CleanupLoops.CLean(Directory.EnumerateDirectories(Source, "*",
-                            new EnumerationOptions()
-                            {
-                                RecurseSubdirectories = true,
-                                AttributesToSkip = FileAttributes.System | FileAttributes.Hidden
-                            }).ToArray(), MainViewmodel.Default.ignorefolder.ToArray(), true, token);
-
-                        foreach (var foldeer in folders)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                fs.Dispose();
-                                break;
-                            }
-                            List<string> empty = new();
-                            empty.Replace(await CleanupLoops.CLean(Directory.EnumerateFiles(foldeer).ToArray(),IOC.Default.GetService<MainViewmodel>().ignorefiles.ToArray(),false,token));
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fss = new FileStream(Path.Combine(foldeer, @"onionfile.ow"), FileMode.Create);
-                                fss.Dispose();
-                                empty.Add((Path.Combine(foldeer, @"onionfile.ow")));
-                            }
-
-                            string path = foldeer.Replace(Source, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                var sssa = $"{a}{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                    }
-                    zip.Dispose();
-                    fs.Dispose();
-                }
-            }
-            else
-            {
-                IOC.Default.GetService<IProgressBarService>().Progressmax(token,true);
-                string Source = MainViewmodel.Default.Copyfromtext;
-                HashSet<string> folder = new HashSet<string>();
-
-                #region Listing
-
-                if (IOC.Default.GetService<Settings>().Listingart == false)
-                {
-                    //all
-                    #region enumerationen/Clean
-
-                    folder.Replace(Directory.EnumerateDirectories(Source, "*", new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray());
-                    #endregion
-                    #region pack
-
-                    using (var fileStream = new FileStream(target1, FileMode.Create))
-                    {
-                        byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-                        var zip = new ZipWriter(fileStream, new ZipWriterOptions(format == 1 ? CompressionType.None : CompressionType.Deflate));
-                        var a = Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray();
-                        foreach (var file in a)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                            zip.Write(Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        foreach (var folders in folder)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                            List<string> empty = new();
-                            empty.Replace(Directory.EnumerateFiles(folders).ToArray());
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fs = new FileStream(Path.Combine(folders, @"onionfile.ow"), FileMode.Create);
-                                fs.Dispose();
-                                empty.Add((Path.Combine(folders, @"onionfile.ow")));
-                            }
-
-                            string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                while (MainViewmodel.Default.Pause)
-                                {
-                                
-                                }
-                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                                {
-                                    zip.Dispose();
-                                    break;
-                                }
-                                var sssa = $"{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                        zip.Dispose();
-                    }
-
-                    #endregion
-                }
-                else if (IOC.Default.GetService<Settings>().Listingart == true)
-                {
-                    //white
-
-                    #region vorbereitung
-                    
-                    byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-
-                    #endregion
-                    #region enumerationen/Clean
-
-                    folder.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateDirectories(Source, "*", new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(), MainViewmodel.Default.ignorefolder.ToArray(), true, token));
-                    
-
-                    #endregion
-                    #region pack
-
-                    using (var fileStream = new FileStream(target1, FileMode.Create))
-                    {
-                        var zip = new ZipWriter(fileStream, new ZipWriterOptions(format == 1 ? CompressionType.None : CompressionType.Deflate));
-                        var a = await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray(), IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token);
-                        foreach (var file in a)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                            zip.Write(Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        foreach (var folders in folder)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                           List<string> empty= new(); 
-                           empty.Replace(await CleanupLoops.CLeanWhite(Directory.EnumerateFiles(folders).ToArray(),
-                                IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token));
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fs = new FileStream(Path.Combine(folders, @"onionfile.ow"), FileMode.Create);
-                                fs.Dispose();
-                                empty.Add((Path.Combine(folders, @"onionfile.ow")));
-                            }
-
-                            string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                while (MainViewmodel.Default.Pause)
-                                {
-                                
-                                }
-                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                                {
-                                    zip.Dispose();
-                                    break;
-                                }
-                                var sssa = $"{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                        zip.Dispose();
-                    }
-
-                    #endregion
-                }
-                else
-                {
-                    //black
-
-                    #region vorbereitung
-                    
-                    byte format = (byte)IOC.Default.GetService<Settings>().Packageformat;
-
-                    #endregion
-                    #region enumerationen/Clean
-                    folder.Replace(await CleanupLoops.CLean(Directory.EnumerateDirectories(Source, "*", new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.System | FileAttributes.Hidden }).ToArray(), MainViewmodel.Default.ignorefolder.ToArray(), true, token));
-                    #endregion
-                    #region pack
-
-                    using (var fileStream = new FileStream(target1, FileMode.Create))
-                    {
-                        var zip = new ZipWriter(fileStream, new ZipWriterOptions(format == 1 ? CompressionType.None : CompressionType.Deflate));
-                        var a = await CleanupLoops.CLean(Directory.EnumerateFiles(Source, "*",new EnumerationOptions() { RecurseSubdirectories = false }).ToArray(), IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token);
-                        foreach (var file in a)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                            zip.Write(Path.GetFileName(file), new FileInfo(file));
-                            IOC.Default.GetService<IProgressBarService>().Progress();
-                        }
-
-                        foreach (var folders in folder)
-                        {
-                            while (MainViewmodel.Default.Pause)
-                            {
-                                
-                            }
-                            if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                            {
-                                zip.Dispose();
-                                break;
-                            }
-                           List<string> empty= new(); 
-                           empty.Replace(await CleanupLoops.CLean(Directory.EnumerateFiles(folders).ToArray(),
-                                IOC.Default.GetService<MainViewmodel>().Ignorefiles.ToArray(), false, token));
-                            if (!empty.Any())
-                            {
-                                IOC.Default.GetService<MainViewmodel>().progressmax++;
-                                IOC.Default.GetService<MainViewmodel>().progressmax2++;
-                                var fs = new FileStream(Path.Combine(folders, @"onionfile.ow"), FileMode.Create);
-                                fs.Dispose();
-                                empty.Add((Path.Combine(folders, @"onionfile.ow")));
-                            }
-
-                            string path = folders.Replace(IOC.Default.GetService<MainViewmodel>().Copyfromtext, String.Empty);
-                            foreach (var file in empty)
-                            {
-                                while (MainViewmodel.Default.Pause)
-                                {
-                                
-                                }
-                                if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                                {
-                                    zip.Dispose();
-                                    break;
-                                }
-                                var sssa = $"{path}/{Path.GetFileName(file)}";
-                                var asss = sssa.Replace("\\", "/");
-                                zip.Write(asss, file);
-                                IOC.Default.GetService<IProgressBarService>().Progress();
-                            }
-                        }
-                        zip.Dispose();
-                    }
-
-                    #endregion
-                }
-                #endregion
-                
-            }
-        });
-    }
-    static string GetLastPartFromPath(string path)
-    {
-        string[] parts = path.Split('\\');
-        string lastPart = parts[parts.Length - 1];
-        return lastPart;
-    }
-
-    private static void emptyy(string Source)
-    {
-        using (var fss = new FileStream(Path.Combine(Source, @"onionfile.ow"), FileMode.Create))
-        {
-            IOC.Default.GetService<MainViewmodel>().progressmax++;
-            IOC.Default.GetService<MainViewmodel>().progressmax2++;
+            case true:
+                White(Regex.Replace(target1, "/", "-"));
+                return;
+            case false:
+                All(Regex.Replace(target1, "/", "-"));
+                return;
+            default:
+                Black(Regex.Replace(target1, "/", "-"));
+                return;
         }
     }
-    
+
+    private static void Black(string target)
+    {
+        Stream stream = File.OpenWrite(target); 
+        var writer = WriterFactory.Open(stream,(IOC.Default.GetService<Settings>().Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip), IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
+        foreach (var Folder in Source)
+        {
+            var subs = Directory.EnumerateDirectories(Folder, "*",
+                new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden });
+            if (subs.Any())
+            {
+                PrepEmptyDirs(subs.ToList(), false);
+            }
+            if (!Directory.GetFiles(Folder).Any())
+            {
+                File.Create(Path.Combine(Folder,"onionfile.ow"));
+            }
+            writer.WriteAll(Folder, "*", fileSearchFuncBlack, SearchOption.AllDirectories);
+        }
+        writer.Dispose();
+        stream.Dispose();
+    }
+
+    private static void White(string target)
+    {
+        Stream stream = File.OpenWrite(target); 
+        var writer = WriterFactory.Open(stream,(IOC.Default.GetService<Settings>().Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip), IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
+        foreach (var Folder in Source)
+        {
+            var splitts = Folder.Split(Path.DirectorySeparatorChar);
+            foreach (var a in splitts)
+            {
+                Igfolder.Add(a);
+            }
+            Igfiles.Add(".ow");
+            List<string> prep = new();
+            var d = Directory.EnumerateDirectories(Folder, "*", SearchOption.AllDirectories);
+            if (d.Any())
+            {
+                foreach (var dir in d)
+                {
+                    if (!Filter.FilterTask(Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).ToList(), true).Any())
+                    {
+                        prep.Add(dir);
+                    }
+                }
+            }
+            if (prep.Any())
+            {
+                PrepEmptyDirs(prep, true);
+            }
+            writer.WriteAll(Folder, "*", fileSearchFuncWhite, SearchOption.AllDirectories);
+            foreach (var a in splitts)
+            {
+                Igfolder.Remove(a);
+            }
+        }
+        writer.Dispose();
+        stream.Dispose();
+    }
+
+    private static void All(string target)
+    { 
+        Stream stream = File.OpenWrite(target); 
+        var writer = WriterFactory.Open(stream,(IOC.Default.GetService<Settings>().Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip), IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
+        foreach (var Folder in Source)
+        {
+            var subs = Directory.EnumerateDirectories(Folder, "*",
+                new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden });
+            if (subs.Any())
+            {
+                PrepEmptyDirs(subs.ToList(), false);
+            }
+
+            if (!Directory.GetFiles(Folder).Any())
+            {
+                File.Create(Path.Combine(Folder,"onionfile.ow"));
+            }
+            
+            writer.WriteAll(Folder, "*", AllFunc,SearchOption.AllDirectories);
+        }
+        writer.Dispose();
+        stream.Dispose();
+    }
+
+    private static void PrepEmptyDirs(List<string> source, bool w)
+    {
+        foreach (var folder in source)
+        {
+            if (w)
+            {
+                File.Create(Path.Combine(folder, "onionfile.ow"));
+                IOC.Default.GetService<MainViewmodel>().Progressmax++;
+                return;
+            }
+
+            var files = Directory.GetFiles(folder);
+            if (!files.Any())
+            {
+                File.Create(Path.Combine(folder, "onionfile.ow"));
+                IOC.Default.GetService<MainViewmodel>().Progressmax++;
+            }
+
+        }
+    }
+
+    private static Func<string, bool> fileSearchFuncBlack = filepath =>
+    {
+        if (MainViewmodel.Default.Pause)
+        {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Pause");
+            }
+        }
+
+        if (MainViewmodel.Default.Cancel)
+        {
+            return false;
+        }
+
+        bool output = !Igfiles.Contains(Path.GetExtension(filepath));
+        string[] parts = filepath.Split(Path.DirectorySeparatorChar);
+        foreach (var part in parts)
+        {
+            if (Igfolder.Contains(part))
+            {
+                return false;
+            }
+        }
+
+        if (output)
+        {
+            IOC.Default.GetService<MainViewmodel>().currentfile = filepath;
+            IOC.Default.GetService<MainViewmodel>().Actualise();
+        }
+
+        return output;
+    };
+
+    private static Func<string, bool> fileSearchFuncWhite = filepath =>
+    {
+        if (MainViewmodel.Default.Pause)
+        {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Pause");
+            }
+        }
+        if (MainViewmodel.Default.Cancel)
+        {
+            return false;
+        }
+        
+        bool output = Igfiles.Contains(Path.GetExtension(filepath));
+        var splitts = filepath.Split(Path.DirectorySeparatorChar).ToList(); 
+        splitts.Remove(Path.GetFileName(filepath));
+        foreach (var part in splitts)
+        {
+            if (!Igfolder.Contains(part))
+            {
+                output = false;
+            }   
+        }
+        if (output)
+        {
+            IOC.Default.GetService<MainViewmodel>().currentfile = filepath;
+            IOC.Default.GetService<MainViewmodel>().Actualise();
+        }
+        return output;
+    };
+
+    private static Func<string, bool> AllFunc =CallerFilePathAttribute=>
+    {
+        if (MainViewmodel.Default.Pause)
+        {
+            while (MainViewmodel.Default.Pause)
+            {
+                Debug.WriteLine("Pause");
+            }
+        }
+        if (MainViewmodel.Default.Cancel)
+        {
+            return false;
+        }
+        
+        IOC.Default.GetService<MainViewmodel>().currentfile = CallerFilePathAttribute;
+        IOC.Default.GetService<MainViewmodel>().Actualise();
+        return true;
+    };
 }

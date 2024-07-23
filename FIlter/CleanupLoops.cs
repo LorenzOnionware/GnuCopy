@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,113 +7,72 @@ using Project1.Viewmodels;
 
 namespace Project1;
 
-public class CleanupLoops
+public class Filter
 {
-    public static async Task<string[]> CLean(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationTokenSource token)
+    public static List<string>FilterTask(List<string> Input, bool Format)
     {
-        int chunksize = 3;
-        List<string> output = new List<string>();
-
-        var chunks = arraytoclean.Chunk(chunksize).ToList();
-        await Task.Run(() =>
+        // Format = true; means that files get filtert
+        bool? listing = IOC.Default.GetService<Settings>().Listingart;
+        switch(listing)
         {
-            Parallel.ForEach(chunks, chunk =>
-            {
-                foreach (var element in chunk)
-                {
-                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                    {
-                        break;
-                    }
-                    bool allow = false;
-                    if (folder)
-                    {
-                        foreach (var value in cleanfromat)
-                        {
-                            if (GetName(element) == value)
-                            {
-                                allow = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var value in cleanfromat)
-                        {
-                            if (element.Contains(value))
-                            {
-                                allow = true;
-                            }
-                        }
-                    }
-
-                    if (!allow)
-                    {
-                        output.Add(element);
-                    }
-                }
-            });
-        });
-
-        return output.ToArray();
-    }
-
-    public static async Task<string[]> CLeanWhite(string[] arraytoclean, string[] cleanfromat,bool folder,CancellationTokenSource token)
-    {
-        int chunksize = 3;
-        List<string> output = new List<string>();
-
-        var chunks = arraytoclean.Chunk(chunksize).ToList();
-        await Task.Run(() =>
-        {
-            Parallel.ForEach(chunks, chunk =>
-            {
-                foreach (var element in chunk)
-                {
-                    if (IOC.Default.GetService<MainViewmodel>().Cancel)
-                    {
-                        break;
-                    }
-                    bool allow = false;
-                    allow = false;
-                    foreach (var value in cleanfromat)
-                    {
-                        if (folder)
-                        {
-                            if (GetName(element) == value)
-                            {
-                                allow = true;
-                            }
-                        }
-                        else
-                        {
-                            if (element.Contains(value))
-                            {
-                                allow = true;
-                            }
-                        }
-                    }
-
-                    if (allow)
-                    {
-                        output.Add(element);
-                    }
-                }
-
-            });
-        });
-        return output.ToArray();
-    }
-
-    private static string GetName(string element)
-    {
-        string output = string.Empty;
-        int lastIndex = element.LastIndexOf("\\");
-        if (lastIndex >= 0 && lastIndex < element.Length - 1)
-        {
-            output = element.Substring(lastIndex + 1);
+            case true:
+                return White(Input, Format);
+            case false:
+                return Input; 
+            default:
+                return Black(Input, Format);
         }
-
-        return output;
+    }  
+    private static List<string> Black(List<string> Input, bool Format)
+    {
+        var ignore = Format ? IOC.Default.GetService<MainViewmodel>().Ignorefiles : IOC.Default.GetService<MainViewmodel>().Ignorefolder;
+        List<string> Output = new();
+        if(Format == true)
+        {
+            foreach(var file in Input)
+            {
+                if(!ignore.Contains(Path.GetExtension(file)))
+                {
+                    Output.Add(file);
+                }
+            }
+        }
+        else
+        {
+            foreach(var folder in Input)
+            {
+                if(!ignore.Contains(Path.GetFileName(Path.GetFileName(folder))))
+                {
+                    Output.Add(folder);
+                }
+            }
+        }
+        return Output;
+    }
+    private static List<string> White(List<string> Input, bool Format)
+    {
+        var ignore = Format ? IOC.Default.GetService<MainViewmodel>().Ignorefiles : IOC.Default.GetService<MainViewmodel>().Ignorefolder;
+        List<string> Output = new();
+        if(Format == true)
+        {
+            foreach(var file in Input)
+            {
+                if(ignore.Contains(Path.GetExtension(file)))
+                {
+                    Output.Add(file);
+                }
+            }
+        }
+        else
+        {
+            foreach(var folder in Input)
+            {
+                if(ignore.Contains(Path.GetFileName(Path.GetFileName(folder))))
+                {
+                    Output.Add(folder);
+                }
+            }
+        }
+        return Output;
     }
 }

@@ -9,14 +9,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using System.Windows.Input;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
+using GnuCopy.Interfaces;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Newtonsoft.Json;
 using Project1.Presets;
+using ReactiveUI;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
@@ -112,15 +115,17 @@ public partial class MainViewmodel
     
 
     public bool Isnotempty => Folderitems.Count != 0;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progress2;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public int progressmax2;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(progresstext))] public bool evaluating;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Progressmax))][AlsoNotifyChangeFor(nameof(Progress))] public string currentfile = "";
+    [ObservableProperty]public int progress;
+    [ObservableProperty]public int progressmax;
     public bool Expanderexpand => Expanderpaths.Any();
-    
-    public string progresstext => !Cancel?!evaluating ? "Evaluating" : progress>=progressmax?"Done":progress.ToString() + " of " + progressmax2.ToString():"Cancelling";
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
+
+    public void Actualise()
+    {
+        Progress++;
+        OnPropertyChanged(nameof(Currentfile));
+    }
     
     [ICommand]
     public void AddPath()
@@ -272,48 +277,18 @@ public partial class MainViewmodel
             Pause = false;
         }
 
-        if (result2 == ContentDialogResult.Secondary)
+
+        if (Cancel)
         {
-            if (IOC.Default.GetService<Settings>().Packageformat != 0)
-            {
-                ContentDialog dlg1 = new ContentDialog();
-                dlg1.Title = "Cancelled";
-                dlg1.Content = "Some of the data copied already may be corrupt!";
-                dlg1.PrimaryButtonText = "Delete copied data";
-                dlg1.SecondaryButtonText = "Keep copied data ";
-                var result = await dlg1.ShowAsync();
-                if (result == ContentDialogResult.Primary && IOC.Default.GetService<Settings>().Packageformat != 0)
-                {
-                    Thread.Sleep(2000);
-                    File.Delete(target1);
-                } 
-            }
-            if (IOC.Default.GetService<Settings>().CreateOwnFolder == true && IOC.Default.GetService<Settings>().Packageformat == 0)
-            {
-                ContentDialog dlg1 = new ContentDialog();
-                dlg1.Title = "Cancelled";
-                dlg1.Content = "Some of the data copied already may be corrupt!";
-                dlg1.PrimaryButtonText = "Delete copied data";
-                dlg1.SecondaryButtonText = "Keep copied data ";
-                var result = await dlg1.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    Thread.Sleep(2000);
-                    Directory.Delete(deletat,true);
-                }
-            }
-            else if(IOC.Default.GetService<Settings>().Packageformat == 0)
-            {
-                Cancel = true;
-                ContentDialog dlg2 = new ContentDialog();
-                dlg2.Title = "Cancelled";
-                dlg2.Content = "Some of the data copied already may be corrupt!";
-                dlg2.PrimaryButtonText = "OK";
-                Pause = false;
-                await dlg2.ShowAsync();
-            }
-            
-            OnPropertyChanged(nameof(progresstext));
+            Cancel = true;
+            ContentDialog dlg2 = new ContentDialog();
+            dlg2.Title = "Cancelled";
+            dlg2.Content = "Some of the data copied already may be corrupt!";
+            dlg2.PrimaryButtonText = "OK";
+            Pause = false;
+            await dlg2.ShowAsync();
+
+
             Pause = false;
             Isenable3 = false;
             OnPropertyChanged(nameof(Isenable3));
@@ -328,10 +303,11 @@ public partial class MainViewmodel
                 copyfromtext = "";
                 OnPropertyChanged(nameof(Copyfromtext));
             }
-        }
-        if(result2 == ContentDialogResult.Primary)
-        {
-            Pause = false;
+
+            if (result2 == ContentDialogResult.Primary)
+            {
+                Pause = false;
+            }
         }
     }
 
@@ -382,22 +358,6 @@ public partial class MainViewmodel
             dlg1.Content = "Source and target are equals.";
             dlg1.PrimaryButtonText = "Ok";
             await dlg1.ShowAsync();
-            return;
-        }
-        if (!System.IO.Path.Exists(copyfromtext) && !IOC.Default.GetService<Settings>().MultipleSources)
-        {
-            ContentDialog dlg1 = new ContentDialog();
-            dlg1.Title = "Error";
-            dlg1.Content = "Source path doesnt exist";
-            dlg1.PrimaryButtonText = "Ok";
-            await dlg1.ShowAsync();
-            Optaci = 0;
-            OnPropertyChanged(nameof(Optaci));
-            Cancel = false;
-            isenable = true;
-            OnPropertyChanged(nameof(Isenable2));
-            Isenable3 = false;
-            OnPropertyChanged(nameof(Isenable3));
             return;
         }
 
@@ -517,11 +477,14 @@ public partial class MainViewmodel
                 });
             }
         }
-        
-        await Task.Run( ()=> IOC.Default.GetService<StartCopyService>().Start(cancel));
+
+        ProgressBarService Pc = new ProgressBarService();
+        Pc.MaxProgress();
+        OnPropertyChanged(nameof(Currentfile));
+        await Task.Run( ()=> IOC.Default.GetService<StartCopyService>().Start(cancel,Expanderpaths));
         
         if (Cancel)
-        {
+        { 
             goto A;
         }
         if (iscancel)
@@ -550,6 +513,8 @@ public partial class MainViewmodel
 
         if (!Cancel)
         {
+            progress = progressmax;
+            OnPropertyChanged(nameof(Progress));
             ContentDialog dlg = new ContentDialog();
             dlg.Title = "Done";
             dlg.Content = "GnuCopy finished operation.";
@@ -582,6 +547,9 @@ public partial class MainViewmodel
             copyfromtext = "";
             OnPropertyChanged(nameof(Copyfromtext));
         }
+
+        progress = 0;
+        OnPropertyChanged(nameof(Progress));
     }
 
     [ICommand]

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,13 +20,44 @@ public partial class AddpresetsViewmodel
 
     [ObservableProperty] private string filetext;
     [ObservableProperty] private string foldertext;
-    public bool primary => !Labelenable;
 
     [ObservableProperty] private string selectedfolder;
     [ObservableProperty] private string selectedfile;
+    private string presetname ="";
 
-    [ObservableProperty] private string presetname;
+    public string Presetname
+    {
+        get=>presetname;
+        set
+        {
+            presetname = value;
+            var a = System.IO.Path.GetInvalidFileNameChars();
+            foreach (var c in a)
+            {
+                if (value.Contains(c))
+                {
+                   Cantsave = true;
+                   OnPropertyChanged(nameof(Cansave));
+                   OnPropertyChanged(nameof(Cantsave));
+                   return;
+                }
+                else
+                {
+                    Cantsave = false;
+                    OnPropertyChanged(nameof(Cansave));
+                    OnPropertyChanged(nameof(Cantsave));
+                }
+            }
+        }
+    }
 
+    private bool cansave => String.IsNullOrEmpty(Presetname)||Cantsave?false:true;
+    [ObservableProperty] private bool cantsave=false;
+
+    public bool Cansave
+    {
+        get => cansave;
+    }
     [ICommand]
     private void FileAdd()
     {
@@ -87,28 +119,18 @@ public partial class AddpresetsViewmodel
     [ICommand]
     public void PrimaryButtonClick()
     {
-        if (!b)
+        PresetIndex preset = new PresetIndex
         {
-            if (String.IsNullOrEmpty(AddpresetsViewmodel.Default.presetname))
-                AddpresetsViewmodel.Default.presetname = "Please write presetname";
-            else
-            {
-                PresetIndex preset = new PresetIndex
-                {
-                    Folder = AddpresetsViewmodel.Default.Folder.ToList(),
-                    Files = AddpresetsViewmodel.Default.Files.ToList()
-                };
-                var index = JsonConvert.SerializeObject(preset);
-                File.WriteAllText(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy",
-                        AddpresetsViewmodel.Default.presetname + ".json"), index);
-            }
-
-            Folder.Clear();
-            Files.Clear();
-            Presetname = String.Empty;
-        }
-
+            Folder = AddpresetsViewmodel.Default.Folder.ToList(),
+            Files = AddpresetsViewmodel.Default.Files.ToList()
+        };
+        var index = JsonConvert.SerializeObject(preset);
+        File.WriteAllText(
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy",
+                AddpresetsViewmodel.Default.presetname + ".json"), index);
+        Folder.Clear();
+        Files.Clear();
+        Presetname = String.Empty;
     }
 
     //Cancel
@@ -119,9 +141,5 @@ public partial class AddpresetsViewmodel
         Files.Clear();
         Presetname = String.Empty;
     }
-
-
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(primary))]private bool labelenable = false;
-    public bool b = false;
     
 }

@@ -61,6 +61,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Remove="Readsettings.cs" />
+    <Compile Update="ProgressBarService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Interfaces\IProgressBarService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Avalonia.Controls">

@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Generics.Dialogs;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -44,7 +45,6 @@ public partial class SettingsControl : ContentDialog, IStyleable
         settings.DateAsName = SettingsViewmodel.Default.Dateasname;
         settings.ZipName = SettingsViewmodel.Default.Zipname;
         settings.TempfolderPath = SettingsViewmodel.Default.Costumepath;
-        settings.MultipleSources = SettingsViewmodel.Default.Multiplesources;
         settings.CreateOwnFolder = SettingsViewmodel.Default.Createfolder;
         settings.OwnFolderName = SettingsViewmodel.Default.Createfoldername;
         settings.OwnFolderDate = SettingsViewmodel.Default.Ownfolderdate;
@@ -119,5 +119,4 @@ public partial class SettingsControl : ContentDialog, IStyleable
             UseShellExecute = true
         }));
     }
-
 }
