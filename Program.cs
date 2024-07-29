@@ -1,5 +1,8 @@
 ﻿using Avalonia;
 using System;
+using System.IO;
+using Newtonsoft.Json;
+using Project1.Viewmodels;
 
 namespace Project1
 {
@@ -14,6 +17,10 @@ namespace Project1
          IOC.Default.InitializeServices(new ServiceProvider());
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
+            
+            string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+            IOC.Default.GetService<Settings>().Packageformat = 0;
+            File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.

@@ -21,6 +21,7 @@ public class CopyMultiple
     public static bool? listing = IOC.Default.GetService<Settings>().Listingart;
     private static string dest2 = "";
     private static FileAttributes Skip = FileAttributes.Hidden | FileAttributes.System;
+    private static bool Overwrite = IOC.Default.GetService<Settings>().Overrite;
     public static async Task Start(ObservableCollection<string> Paths)
     {
         foreach (var foler in IOC.Default.GetService<MainViewmodel>().Expanderpaths)
@@ -68,7 +69,19 @@ public class CopyMultiple
             Debug.WriteLine("FF"+Path.Combine(dest,Path.GetFileName(file)));
             IOC.Default.GetService<MainViewmodel>().currentfile = file;
             IOC.Default.GetService<MainViewmodel>().Actualise();
-            File.Copy(file,Path.Combine(dest,Path.GetFileName(file)),overwrite:true);
+            try
+            {
+                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite);
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+            {
+                IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                IOC.Default.GetService<MainViewmodel>().Checking();
+            }
         }
 
         foreach (var sub in subdirs)
@@ -107,7 +120,19 @@ public class CopyMultiple
                 Debug.WriteLine(Path.Combine(de,Path.GetFileName(file)));
                 IOC.Default.GetService<MainViewmodel>().currentfile = file;
                 IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file,Path.Combine(de,Path.GetFileName(file)));
+                try
+                {
+                    File.Copy(file,Path.Combine(de,Path.GetFileName(file)), Overwrite);
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
     }
@@ -143,7 +168,19 @@ public class CopyMultiple
                 }
                 IOC.Default.GetService<MainViewmodel>().currentfile = file;
                 IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: true);
+                try
+                {
+                   File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite);
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
 
@@ -185,7 +222,20 @@ public class CopyMultiple
                     {
                         IOC.Default.GetService<MainViewmodel>().currentfile = file;
                         IOC.Default.GetService<MainViewmodel>().Actualise();
-                        File.Copy(file, Path.Combine(de, Path.GetFileName(file)));
+                        try
+                        {
+                           File.Copy(file, Path.Combine(de, Path.GetFileName(file)),Overwrite);
+                        }
+                        catch(Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                        }
+                       
+                        if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                        {
+                            IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                            IOC.Default.GetService<MainViewmodel>().Checking();
+                        }
                     }
                 }
             }
@@ -225,7 +275,20 @@ public class CopyMultiple
                 }
                 IOC.Default.GetService<MainViewmodel>().currentfile = file;
                 IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: true);
+                try
+                {
+                       File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite);
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+             
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
 
@@ -268,7 +331,19 @@ public class CopyMultiple
                     {
                         IOC.Default.GetService<MainViewmodel>().currentfile = file;
                         IOC.Default.GetService<MainViewmodel>().Actualise();
-                        File.Copy(file, Path.Combine(de, Path.GetFileName(file)));
+                        try
+                        {
+                            File.Copy(file, Path.Combine(de, Path.GetFileName(file)), Overwrite);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                        }
+                        if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                        {
+                            IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                            IOC.Default.GetService<MainViewmodel>().Checking();
+                        }
                     }
                 }
             }

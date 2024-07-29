@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Jab;
 using Newtonsoft.Json;
 using Project1.Presets;
+using Project1.Services;
 using Project1.Viewmodels;
 
 namespace Project1;
@@ -12,14 +13,14 @@ namespace Project1;
 [Singleton<MainViewmodel>]
 [Singleton<SettingsViewmodel>]
 [Singleton<IFileDialogService,Avaloniafiledialogservice>]
-[Singleton<StartCopyService>]
+[Transient<StartCopyService>]
 [Singleton<AktualiselSettingsInUI>]
 [Singleton<Settings>(Instance = nameof(JsonAppSettings))]
-[Singleton<PresetIndex>]
-[Singleton<GetSetPresetIndex>]
-[Singleton<ExportViewmodel>]
-[Singleton<MainWindow>]
-[Singleton<ProgressBarService>]
+[Transient<PresetIndex>]
+[Transient<GetSetPresetIndex>]
+[Transient<ExportViewmodel>]
+[Transient<MainWindow>]
+[Transient<ProgressBarService>]
 [Singleton<WindowClosingService>]
 [Singleton<EditPresetsWindow>]
 sealed partial class ServiceProvider

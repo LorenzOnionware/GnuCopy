@@ -35,8 +35,8 @@
     <PackageReference Include="Avalonia" Version="11.0.0-preview5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview5" />
     <PackageReference Include="AvaloniaGenerics" Version="11.0.0-preview5" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview5" />
     <PackageReference Include="Jab" Version="0.8.6" />
     <PackageReference Include="Material.Icons.Avalonia" Version="2.0.0-preview2" />
@@ -61,9 +61,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Remove="Readsettings.cs" />
-    <Compile Update="ProgressBarService.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
     <Compile Update="Interfaces\IProgressBarService.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

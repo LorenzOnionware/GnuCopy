@@ -53,9 +53,8 @@ using Avalonia.Markup.Xaml;
                     Console.WriteLine("This program must be run as an administrator! \n\n" + ex.ToString());
                 }
             }*/
-            
-            DataContext = MainViewmodel.Default;
             InitializeComponent();
+            DataContext = MainViewmodel.Default;
             
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
             
@@ -163,6 +162,12 @@ using Avalonia.Markup.Xaml;
         }
 
         #endregion
-        
+
+        private void TargetPath_OnTextChanged(object? sender, TextChangedEventArgs e)
+        {
+            string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+            IOC.Default.GetService<Settings>().Pathto = IOC.Default.GetService<MainViewmodel>().Copytotext;
+            File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
+        }
     }
 }
