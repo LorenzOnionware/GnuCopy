@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
              x:Class
              ="Project1.SettingsControl" xmlns:viewmodels="using:Project1.Viewmodels"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -37,7 +37,7 @@
                 <Expander.Content>
                     <StackPanel>
                         <Label Content="Overrite existing files"></Label>
-                        <ToggleSwitch IsEnabled="{Binding Overwriteenable}" IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
+                        <ToggleSwitch IsChecked="{Binding Overritechecked,Mode=TwoWay}" Name="Overritefiles"></ToggleSwitch>
                         <Label Content="Clear target directory for copy"></Label>
                         <ToggleSwitch IsChecked="{Binding Clearforchecked,Mode=TwoWay}" Name="Clearforcopy"></ToggleSwitch>
                         <Label Content="Clear source directory after copy"></Label>
@@ -67,7 +67,7 @@
                 </Expander.Content>
             </Expander>
         </Border>
-        <Border Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+        <Border IsVisible="False" Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
             <Expander>
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
@@ -130,7 +130,7 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
-                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 23.10.1 "></TextBlock>
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 24.0.0 "></TextBlock>
                         <TextBlock Margin="5" Text="Copyright © Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>

@@ -17,12 +17,15 @@ public class StartCopyService
         if (!Path.Exists(IOC.Default.GetService<MainViewmodel>().Copyfromtext) && !Path.Exists(IOC.Default.GetService<MainViewmodel>().Copytotext))
             return;
         if (IOC.Default.GetService<Settings>().Packageformat != 0)
-        { 
-            await CopyPack.Start(token);
+        {
+
+           await IOC.Default.GetService<CopyPack>().Start();
+           
         }
         else
         {
-            await CopyMultiple.Start(paths);
+           await IOC.Default.GetService<CopyMultiple>().Start();
+            
         }
         MainViewmodel.Default.selectionchaged();
         return;

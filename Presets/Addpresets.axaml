@@ -27,7 +27,7 @@
             <Label IsVisible="{Binding Cantsave}" Foreground="Red" Content="Not valid char"></Label>
             <Label Content="Files:"></Label>
             <StackPanel Name="StackPanel" Orientation="Horizontal">
-                <TextBox Watermark="File extension" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
+                <TextBox Watermark="File extension, No Double extensions" Width="250" Text="{Binding Filetext,Mode=TwoWay}"></TextBox>
                 <Button Command="{Binding FileAddCommand}" Margin="5,0" Content="{avalonia:MaterialIconExt Kind=Add}"></Button>
             </StackPanel>
             <ScrollViewer Height="200">

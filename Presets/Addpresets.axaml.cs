@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
@@ -29,4 +30,5 @@ public partial class Addpresets : ContentDialog, IStyleable
         _Blocker = true;
         AddpresetsViewmodel.Default = new AddpresetsViewmodel();
     }
+    
 }

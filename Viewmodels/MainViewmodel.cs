@@ -19,6 +19,7 @@ using GnuCopy.Interfaces;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using Newtonsoft.Json;
 using Project1.Presets;
+using Project1.Services;
 using ReactiveUI;
 using SharpCompress.Archives;
 using SharpCompress.Common;
@@ -36,10 +37,8 @@ public partial class MainViewmodel
     {
         IOC.Default.GetService<WindowClosingService>().Closed += (o, e) => Close();
         _fileDialogService = FileDialogservice;
-
+        
         USBMonitor usbMonitor = new USBMonitor();
-
-        usbMonitor.USBInserted += UsbInsertedHandler;
         usbMonitor.USBRemoved += UsbRemovedHandler;
 
         usbMonitor.StartMonitoring();
@@ -54,11 +53,6 @@ public partial class MainViewmodel
     }
     private IFileDialogService _fileDialogService;
     
-    private static void UsbInsertedHandler(object sender, USBEventArgs e)
-    {
-        
-    }
-
     private async void UsbRemovedHandler(object sender, USBEventArgs e)
     {
         if (!Path.Exists(copytotext) || !Path.Exists(copyfromtext))
@@ -94,14 +88,14 @@ public partial class MainViewmodel
     private bool isenable = true;
     public  bool Isenable2
     {
-        get => isenable ? IOC.Default.GetService<Settings>().MultipleSources ? Expanderpaths.Any()?true:false : String.IsNullOrEmpty(copyfromtext)?false:true: false;
+        get => !String.IsNullOrEmpty(Copytotext)&& Expanderpaths.Any();
     }
 
     [ObservableProperty][AlsoNotifyChangeFor(nameof(isenable4))]private bool isenable3 = false;
     
     public bool isenable4 => !isenable3;
 
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copytotext;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))]private string copytotext;
     [ObservableProperty][AlsoNotifyChangeFor(nameof(Isenable2))] private string copyfromtext;
     [ObservableProperty] private bool isvisable;   
     [ObservableProperty][AlsoNotifyChangeFor(nameof(canedit))] private int selectedpreset;
@@ -112,18 +106,23 @@ public partial class MainViewmodel
     public bool Ismultiplevisable => IOC.Default.GetService<Settings>().MultipleSources; 
     public bool Copyfrom => !Ismultiplevisable;
     public ObservableCollection<string> Expanderpaths { get; set; } = new();
-    
+
+    public void Checking()
+    {
+        OnPropertyChanged(nameof(Currentfile));
+    }
 
     public bool Isnotempty => Folderitems.Count != 0;
-    [ObservableProperty][AlsoNotifyChangeFor(nameof(Progressmax))][AlsoNotifyChangeFor(nameof(Progress))] public string currentfile = "";
-    [ObservableProperty]public int progress;
-    [ObservableProperty]public int progressmax;
-    public bool Expanderexpand => Expanderpaths.Any();
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(Progressmax))][AlsoNotifyChangeFor(nameof(Progress))][AlsoNotifyChangeFor(nameof(fileof))] public string currentfile = "";
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(fileof))] public double progress = 0.0;
+    [ObservableProperty][AlsoNotifyChangeFor(nameof(fileof))] public double progressmax = 0.0;
+    public string fileof => (progress +" of " + Progressmax);
+    
+
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     public void Actualise()
     {
-        Progress++;
         OnPropertyChanged(nameof(Currentfile));
     }
     
@@ -133,7 +132,6 @@ public partial class MainViewmodel
         if (!Expanderpaths.Contains(Copyfromtext) && Directory.Exists(Copyfromtext))
         {
               Expanderpaths.Add(Copyfromtext);
-              OnPropertyChanged(nameof(Expanderexpand));
               Expanderpaths.Replace((from path in Expanderpaths orderby path select path).ToArray());
         }
 
@@ -141,7 +139,7 @@ public partial class MainViewmodel
         {
             copyfromtext = "";
         }
-        
+        OnPropertyChanged(nameof(Isenable2));
         OnPropertyChanged(nameof(Copyfromtext));
     }
 
@@ -276,51 +274,39 @@ public partial class MainViewmodel
             Cancel = false;
             Pause = false;
         }
-
-
-        if (Cancel)
-        {
-            Cancel = true;
-            ContentDialog dlg2 = new ContentDialog();
-            dlg2.Title = "Cancelled";
-            dlg2.Content = "Some of the data copied already may be corrupt!";
-            dlg2.PrimaryButtonText = "OK";
-            Pause = false;
-            await dlg2.ShowAsync();
-
-
-            Pause = false;
-            Isenable3 = false;
-            OnPropertyChanged(nameof(Isenable3));
-            Optaci = 0;
-            OnPropertyChanged(nameof(Optaci));
-            isenable = true;
-            OnPropertyChanged(nameof(Isenable2));
-            var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
-            taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
-            if (IOC.Default.GetService<Settings>().MultipleSources)
-            {
-                copyfromtext = "";
-                OnPropertyChanged(nameof(Copyfromtext));
-            }
-
-            if (result2 == ContentDialogResult.Primary)
-            {
-                Pause = false;
-            }
-        }
     }
 
     public string copyto;
     public string target1;
     public string deletat;
+    
+
     [ICommand]
     private async Task Copybutton()
     {
+        if (!Expanderpaths.Any())
+        {
+            ContentDialog dlg = new ContentDialog();
+            dlg.Title = "Warning!";
+            dlg.Content = "No sources";
+            dlg.SecondaryButtonText = "Ok";
+            var result2 = await dlg.ShowAsync();
+            return;
+        }
+
+        if (String.IsNullOrEmpty(copytotext))
+        {
+            ContentDialog dlg = new ContentDialog();
+            dlg.Title = "Warning!";
+            dlg.Content = "No Target";
+            dlg.SecondaryButtonText = "Ok";
+            var result2 = await dlg.ShowAsync();
+            return;
+        }
+
         Cancel = false;
         isenable = false;
         Isenable3 = true;
-        
         foreach (var Folder in Expanderpaths)
         {
             if (!Path.Exists(Folder))
@@ -511,6 +497,8 @@ public partial class MainViewmodel
             });
         }
 
+
+        A:
         if (!Cancel)
         {
             progress = progressmax;
@@ -528,12 +516,36 @@ public partial class MainViewmodel
                 Process.Start(psi);
             }
         }
+        else
+        {
+            Cancel = true;
+            ContentDialog dlg2 = new ContentDialog();
+            dlg2.Title = "Cancelled";
+            dlg2.Content = "Some of the data copied already may be corrupt!";
+            dlg2.PrimaryButtonText = "OK";
+            Pause = false;
+            await dlg2.ShowAsync();
+            
+            Pause = false;
+            Isenable3 = false;
+            OnPropertyChanged(nameof(Isenable3));
+            Optaci = 0;
+            OnPropertyChanged(nameof(Optaci));
+            isenable = true;
+            OnPropertyChanged(nameof(Isenable2));
+            if (IOC.Default.GetService<Settings>().MultipleSources)
+            {
+                copyfromtext = "";
+                OnPropertyChanged(nameof(Copyfromtext));
+            }
+        }
 
-
-        A:
         Optaci = 0;
+        Progress = 0;
+        Progressmax = 0;
         OnPropertyChanged(nameof(Optaci));
         Cancel = false;
+        Currentfile = "";
         isenable = true;
         OnPropertyChanged(nameof(Isenable2));
         Isenable3 = false;

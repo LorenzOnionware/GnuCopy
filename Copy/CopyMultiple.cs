@@ -12,20 +12,21 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using DynamicData;
 using GnuCopy.Interfaces;
 using Microsoft.WindowsAPICodePack.Shell;
+using Project1.Services;
 using Project1.Viewmodels;
 
 namespace Project1;
 
 public class CopyMultiple
 {
-    public static bool? listing = IOC.Default.GetService<Settings>().Listingart;
     private static string dest2 = "";
     private static FileAttributes Skip = FileAttributes.Hidden | FileAttributes.System;
-    public static async Task Start(ObservableCollection<string> Paths)
+    private bool Overwrite = IOC.Default.GetService<Settings>().Overrite;
+    public async Task Start()
     {
         foreach (var foler in IOC.Default.GetService<MainViewmodel>().Expanderpaths)
         {
-            switch (listing)
+            switch (IOC.Default.GetService<MainViewmodel>().Listing)
             {
                 case false:
                     CopyDirectory(foler, IOC.Default.GetService<MainViewmodel>().Copytotext);
@@ -40,7 +41,7 @@ public class CopyMultiple
         }
     }
    
-    private static async Task CopyDirectory(string sourcePath,string destPath)
+    private async Task CopyDirectory(string sourcePath,string destPath)
     {
         Debug.WriteLine(sourcePath);
         var subdirs = Directory.EnumerateDirectories(sourcePath, "*",
@@ -66,9 +67,22 @@ public class CopyMultiple
                 return;
             }
             Debug.WriteLine("FF"+Path.Combine(dest,Path.GetFileName(file)));
-            IOC.Default.GetService<MainViewmodel>().currentfile = file;
-            IOC.Default.GetService<MainViewmodel>().Actualise();
-            File.Copy(file,Path.Combine(dest,Path.GetFileName(file)),overwrite:true);
+          
+            try
+            {
+                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite); 
+                IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                IOC.Default.GetService<ProgressBarService>().AddProgress();
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+            if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+            {
+                IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                IOC.Default.GetService<MainViewmodel>().Checking();
+            }
         }
 
         foreach (var sub in subdirs)
@@ -105,13 +119,26 @@ public class CopyMultiple
                     return;
                 }
                 Debug.WriteLine(Path.Combine(de,Path.GetFileName(file)));
-                IOC.Default.GetService<MainViewmodel>().currentfile = file;
-                IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file,Path.Combine(de,Path.GetFileName(file)));
+           
+                try
+                {
+                    File.Copy(file,Path.Combine(de,Path.GetFileName(file)), Overwrite);  
+                    IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                    IOC.Default.GetService<ProgressBarService>().AddProgress();
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
     }
-    private static void CopyWhite(string sourcePath, string destPath)
+    private void CopyWhite(string sourcePath, string destPath)
     {
         var splitts0 = sourcePath.Split(Path.DirectorySeparatorChar);
         foreach (var a in splitts0)
@@ -127,7 +154,8 @@ public class CopyMultiple
         foreach (var file in FFiles)
         {
             Debug.WriteLine("FF" + Path.Combine(dest, Path.GetFileName(file)));
-            if (IOC.Default.GetService<MainViewmodel>().ignorefiles.Contains(Path.GetExtension(file)))
+            var fileExtension = Path.GetExtension(file); // Erhalte die Dateierweiterung
+            if (IOC.Default.GetService<MainViewmodel>().ignorefiles.Any(f => f.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
             {
                 if (MainViewmodel.Default.Pause)
                 {
@@ -141,9 +169,22 @@ public class CopyMultiple
                 {
                     return;
                 }
-                IOC.Default.GetService<MainViewmodel>().currentfile = file;
-                IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: true);
+              
+                try
+                {
+                   File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite);
+                   IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                   IOC.Default.GetService<ProgressBarService>().AddProgress(); 
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
 
@@ -181,11 +222,26 @@ public class CopyMultiple
                         return;
                     }
                     Debug.WriteLine(Path.Combine(de, Path.GetFileName(file)));
-                    if (IOC.Default.GetService<MainViewmodel>().ignorefiles.Contains(Path.GetExtension(file)))
+                    var fileExtension = Path.GetExtension(file);
+                    if (IOC.Default.GetService<MainViewmodel>().ignorefiles.Any(f => f.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
                     {
-                        IOC.Default.GetService<MainViewmodel>().currentfile = file;
-                        IOC.Default.GetService<MainViewmodel>().Actualise();
-                        File.Copy(file, Path.Combine(de, Path.GetFileName(file)));
+                       
+                        try
+                        {
+                           File.Copy(file, Path.Combine(de, Path.GetFileName(file)),Overwrite); 
+                           IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                           IOC.Default.GetService<ProgressBarService>().AddProgress();
+                        }
+                        catch(Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                        }
+                       
+                        if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                        {
+                            IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                            IOC.Default.GetService<MainViewmodel>().Checking();
+                        }
                     }
                 }
             }
@@ -195,7 +251,7 @@ public class CopyMultiple
             IOC.Default.GetService<MainViewmodel>().ignorefolder.Remove(a);
         }
     }
-    private static void CopyBlack(string sourcePath, string destPath)
+    private void CopyBlack(string sourcePath, string destPath)
     {
         Debug.WriteLine(sourcePath);
         var subdirs = Directory.EnumerateDirectories(sourcePath, "*",
@@ -209,7 +265,8 @@ public class CopyMultiple
         foreach (var file in FFiles)
         {
             Debug.WriteLine("FF" + Path.Combine(dest, Path.GetFileName(file)));
-            if (!IOC.Default.GetService<MainViewmodel>().ignorefiles.Contains(Path.GetExtension(file)))
+            var fileExtension = Path.GetExtension(file);
+            if (!IOC.Default.GetService<MainViewmodel>().ignorefiles.Any(f => f.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
             {
                 if (MainViewmodel.Default.Pause)
                 {
@@ -223,9 +280,23 @@ public class CopyMultiple
                 {
                     return;
                 }
-                IOC.Default.GetService<MainViewmodel>().currentfile = file;
-                IOC.Default.GetService<MainViewmodel>().Actualise();
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: true);
+               
+                try
+                {
+                       File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), overwrite: Overwrite);
+                       IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                       IOC.Default.GetService<ProgressBarService>().AddProgress();
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+             
+                if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                {
+                    IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                    IOC.Default.GetService<MainViewmodel>().Checking();
+                }
             }
         }
 
@@ -264,11 +335,25 @@ public class CopyMultiple
                     }
 
                     Debug.WriteLine(Path.Combine(de, Path.GetFileName(file)));
-                    if (!IOC.Default.GetService<MainViewmodel>().ignorefiles.Contains(Path.GetExtension(file)))
+                    var fileExtension = Path.GetExtension(file);
+                    if (!IOC.Default.GetService<MainViewmodel>().ignorefiles.Any(f => f.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
                     {
-                        IOC.Default.GetService<MainViewmodel>().currentfile = file;
-                        IOC.Default.GetService<MainViewmodel>().Actualise();
-                        File.Copy(file, Path.Combine(de, Path.GetFileName(file)));
+                       
+                        try
+                        {
+                            File.Copy(file, Path.Combine(de, Path.GetFileName(file)), Overwrite);
+                            IOC.Default.GetService<MainViewmodel>().currentfile = file;
+                            IOC.Default.GetService<ProgressBarService>().AddProgress();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex);
+                        }
+                        if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
+                        {
+                            IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
+                            IOC.Default.GetService<MainViewmodel>().Checking();
+                        }
                     }
                 }
             }
