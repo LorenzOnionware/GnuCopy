@@ -53,7 +53,7 @@ public partial class AddpresetsViewmodel
 
     private bool cansave => String.IsNullOrEmpty(Presetname)||Cantsave?false:true;
     [ObservableProperty] private bool cantsave=false;
-
+    
     public bool Cansave
     {
         get => cansave;

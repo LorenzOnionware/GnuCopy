@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -88,7 +89,7 @@ public partial class MainViewmodel
     private bool isenable = true;
     public  bool Isenable2
     {
-        get => isenable ? IOC.Default.GetService<Settings>().MultipleSources ? Expanderpaths.Any()?true:false : String.IsNullOrEmpty(copyfromtext)?false:true: false;
+        get => !String.IsNullOrEmpty(Copytotext)&& Expanderpaths.Any();
     }
 
     [ObservableProperty][AlsoNotifyChangeFor(nameof(isenable4))]private bool isenable3 = false;
@@ -118,12 +119,11 @@ public partial class MainViewmodel
     [ObservableProperty][AlsoNotifyChangeFor(nameof(fileof))] public double progressmax = 0.0;
     public string fileof => (progress +" of " + Progressmax);
     
-    public bool Expanderexpand => Expanderpaths.Any();
+
     private PresetIndex? presetindex => IOC.Default.GetService<GetSetPresetIndex>().getpresetindex();
 
     public void Actualise()
     {
-        Progress++;
         OnPropertyChanged(nameof(Currentfile));
     }
     
@@ -133,7 +133,6 @@ public partial class MainViewmodel
         if (!Expanderpaths.Contains(Copyfromtext) && Directory.Exists(Copyfromtext))
         {
               Expanderpaths.Add(Copyfromtext);
-              OnPropertyChanged(nameof(Expanderexpand));
               Expanderpaths.Replace((from path in Expanderpaths orderby path select path).ToArray());
         }
 
@@ -141,7 +140,7 @@ public partial class MainViewmodel
         {
             copyfromtext = "";
         }
-        
+        OnPropertyChanged(nameof(Isenable2));
         OnPropertyChanged(nameof(Copyfromtext));
     }
 
@@ -281,11 +280,37 @@ public partial class MainViewmodel
     public string copyto;
     public string target1;
     public string deletat;
-    
+    [ObservableProperty]private bool copyactive=true;
 
     [ICommand]
     private async Task Copybutton()
     {
+        IOC.Default.GetService<Settings>().Sources = Expanderpaths.ToList();
+        IOC.Default.GetService<Settings>().Pathto = copytotext;
+        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+        IOC.Default.GetService<Settings>().Listingart = IOC.Default.GetService<MainViewmodel>().Listing;
+        File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
+            
+        if (!Expanderpaths.Any())
+        {
+            ContentDialog dlg = new ContentDialog();
+            dlg.Title = "Warning!";
+            dlg.Content = "No sources";
+            dlg.SecondaryButtonText = "Ok";
+            var result2 = await dlg.ShowAsync();
+            return;
+        }
+
+        if (String.IsNullOrEmpty(copytotext))
+        {
+            ContentDialog dlg = new ContentDialog();
+            dlg.Title = "Warning!";
+            dlg.Content = "No Target";
+            dlg.SecondaryButtonText = "Ok";
+            var result2 = await dlg.ShowAsync();
+            return;
+        }
+
         Cancel = false;
         isenable = false;
         Isenable3 = true;
@@ -364,7 +389,7 @@ public partial class MainViewmodel
         }
         if (IOC.Default.GetService<Settings>().Packageformat == 0 && IOC.Default.GetService<Settings>().CreateOwnFolder)
         {
-            var name = IOC.Default.GetService<Settings>().OwnFolderDate ? DateTime.Now.ToString("G").Replace(':','-') : !String.IsNullOrEmpty(IOC.Default.GetService<Settings>().OwnFolderName)?IOC.Default.GetService<Settings>().OwnFolderName : "GnuCopyFolder";
+            var name = IOC.Default.GetService<Settings>().OwnFolderDate ? Regex.Replace(DateTime.Now.ToString("G").Replace(':', '-'), " ", "-").Replace("/", "-"): !String.IsNullOrEmpty(IOC.Default.GetService<Settings>().OwnFolderName)?IOC.Default.GetService<Settings>().OwnFolderName : "GnuCopyFolder";
             Directory.CreateDirectory(System.IO.Path.Combine(Pathh, name));
             copytotext = System.IO.Path.Combine(Pathh, name);
             deletat = System.IO.Path.Combine(Pathh, name);
@@ -448,9 +473,12 @@ public partial class MainViewmodel
 
         ProgressBarService Pc = new ProgressBarService();
         Pc.MaxProgress();
-        OnPropertyChanged(nameof(Currentfile));
+        OnPropertyChanged(nameof(Currentfile));    
+        copyactive = false;
+        OnPropertyChanged(nameof(Copyactive));
         await Task.Run( ()=> IOC.Default.GetService<StartCopyService>().Start(cancel,Expanderpaths));
-        
+        copyactive = true;
+        OnPropertyChanged(nameof(Copyactive));
         if (Cancel)
         { 
             goto A;
@@ -541,7 +569,8 @@ public partial class MainViewmodel
             copyfromtext = "";
             OnPropertyChanged(nameof(Copyfromtext));
         }
-
+        copyactive = true;
+        OnPropertyChanged(nameof(copyactive));
         progress = 0;
         OnPropertyChanged(nameof(Progress));
     }
