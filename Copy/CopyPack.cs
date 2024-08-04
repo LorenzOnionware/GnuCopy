@@ -28,7 +28,7 @@ public class CopyPack
     public static List<string> Igfiles = IOC.Default.GetService<MainViewmodel>().ignorefiles;
     public static ObservableCollection<string> Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths;
     public static List<string> Copied = new();
-    public static async Task Start(CancellationTokenSource token)
+    public async Task Start()
     {
         string target = Path.Combine(MainViewmodel.Default.Copytotext,
             IOC.Default.GetService<Settings>().DateAsName

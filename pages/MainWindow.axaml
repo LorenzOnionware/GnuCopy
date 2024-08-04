@@ -27,7 +27,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Margin="2,-12,130,10" BorderBrush="Transparent" Background="Transparent" Height="30" Width="30" HorizontalAlignment="Right" Command="{Binding SettingsCommand}"
-                Content="{materialIcons:MaterialIconExt Settings}">
+                Content="{materialIcons:MaterialIconExt Settings}" IsEnabled="{Binding Copyactive}">
         </Button>
         <Label Margin="25,-7,2,10" Content="GnuCopy" VerticalAlignment="Top" HorizontalAlignment="Left"></Label>
         <Image HorizontalAlignment="Left" Width="40" Height="10" Margin="2,-7,2,10" Source="../Assets/GnuCopy.png"></Image>
@@ -47,17 +47,17 @@
                              IsVisible="{Binding Copyfrom}">
                     </Button>
                     <Button  VerticalAlignment="Top" IsVisible="{Binding Ismultiplevisable}"
-                            Command="{Binding AddPathCommand}" Margin="2,13,3,7"
+                            Command="{Binding AddPathCommand}" Height="{Binding  #dialog.Bounds.Height}" Width="{Binding #dialog.Bounds.Width}" Margin="2,13,3,7"
                             Content="{materialIcons:MaterialIconExt Kind=Add}">
                     </Button>
                 </StackPanel>
-                <Expander Name="Expander" IsExpanded="{Binding Expanderexpand}" IsVisible="{Binding Ismultiplevisable}"
+                <Expander Name="Expander" IsExpanded="True" IsVisible="{Binding Ismultiplevisable}"
                           Margin="0,5,3,5" Grid.Row="0" Grid.Column="0">
                     <Expander.Header>
                         <Grid RowDefinitions="*,Auto" Width="{Binding  ElementName=Expander, Path=Bounds.Width}">
                             <TextBox Margin="30,5,70,5" Watermark="{Binding #copyfrom.Watermark}"
                                      Text="{Binding Copyfromtext, Mode=TwoWay}" />
-                            <Button Grid.Row="0" Grid.Column="1" Margin="10,5,25,5" HorizontalAlignment="Right" VerticalAlignment="Top" Height="{Binding #TargetPath.Bounds.Height}"
+                            <Button Grid.Row="0" Name="dialog" Grid.Column="1" Margin="10,5,25,5" HorizontalAlignment="Right" VerticalAlignment="Top" Height="{Binding #TargetPath.Bounds.Height}"
                                     Content="{materialIcons:MaterialIconExt Kind=FolderLocation}"
                                     FontSize="18"
                                     Command="{Binding CopySourceDialogCommand}">
@@ -147,8 +147,8 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Row="1">
-                    <CheckBox Margin="2" IsThreeState="True" HorizontalAlignment="Left" Command="{Binding ListingPropertyChangedCommand}" IsChecked="{Binding Listing}" 
-                              Content="{Binding Listing,Converter={StaticResource ListingConverter}}"></CheckBox>
+                    <CheckBox Margin="2" IsThreeState="True" IsEnabled="{Binding Copyactive}" HorizontalAlignment="Left" Command="{Binding ListingPropertyChangedCommand}" IsChecked="{Binding Listing}" 
+                              Content="{Binding Listing,Converter={StaticResource ListingConverter}}" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"></CheckBox>
                 </StackPanel>
             </Grid>
 
@@ -201,7 +201,7 @@
                               Margin="5,5">
                 </ProgressBar>
             </StackPanel>
-            <Button IsVisible="{Binding isenable4}" Grid.Column="2" Margin="3,5" IsEnabled="{Binding Isenable2}" Content="Copy"
+            <Button IsVisible="{Binding isenable4}" Grid.Column="2" Margin="3,5" Content="Copy"
                     Command="{Binding CopybuttonCommand}">
             </Button>
             <Button IsVisible="{Binding Isenable3}" Grid.Column="2" Margin="3,23,0,-23" Content="cancel" Command="{Binding CancellCommand}"></Button>

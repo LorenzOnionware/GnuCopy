@@ -10,6 +10,8 @@ using Project1.Viewmodels;
 namespace Project1;
 
 [ServiceProvider]
+[Transient<CopyPack>]
+[Transient<CopyMultiple>]
 [Singleton<MainViewmodel>]
 [Singleton<SettingsViewmodel>]
 [Singleton<IFileDialogService,Avaloniafiledialogservice>]
@@ -40,7 +42,7 @@ sealed partial class ServiceProvider
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GnuCopy", "Settings"));
             }
         });
-        
-        JsonAppSettings = File.Exists(path) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path)) ?? new() : new();
+
+        JsonAppSettings = File.Exists(path) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path)) ?? new() : new();      
     }
 }

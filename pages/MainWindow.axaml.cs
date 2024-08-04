@@ -7,6 +7,8 @@ using System.Collections.Generic;
   using System.Reflection;
   using System.Security.Principal;
   using System.Threading.Tasks;
+  using Avalonia;
+  using Avalonia.Interactivity;
   using Avalonia.Media;
   using Avalonia.Platform;
   using Avalonia.Styling;
@@ -55,6 +57,9 @@ using Avalonia.Markup.Xaml;
             }*/
             InitializeComponent();
             DataContext = MainViewmodel.Default;
+            string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+            IOC.Default.GetService<Settings>().Packageformat = 0;
+            File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
             
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
             
@@ -163,11 +168,42 @@ using Avalonia.Markup.Xaml;
 
         #endregion
 
+        private bool busy;
+
         private void TargetPath_OnTextChanged(object? sender, TextChangedEventArgs e)
         {
+            busy = true;
             string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
             IOC.Default.GetService<Settings>().Pathto = IOC.Default.GetService<MainViewmodel>().Copytotext;
             File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
+            busy = false;
+        }
+        
+
+        private void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            if (!busy)
+            {
+                busy = true;
+                string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+                IOC.Default.GetService<Settings>().Listingart = IOC.Default.GetService<MainViewmodel>().Listing;
+                File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
+                busy = false;
+            }
+            else
+            {
+                while (busy)
+                {
+                    if (!busy)
+                    {
+                        busy = true;
+                        string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
+                        IOC.Default.GetService<Settings>().Listingart = IOC.Default.GetService<MainViewmodel>().Listing;
+                        File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
+                        busy = false;
+                    }
+                }
+            }
         }
     }
 }
