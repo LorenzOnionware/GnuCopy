@@ -130,7 +130,11 @@
                 </Expander.Header>
                 <Expander.Content>
                     <StackPanel>
+<<<<<<< HEAD
                         <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 24.0.1 "></TextBlock>
+=======
+                        <TextBlock Margin="5" FontWeight="Bold" MaxHeight="350" Text="GnuCopy: 24.0.0 "></TextBlock>
+>>>>>>> 89e23699c0e4ae1a0d15987d5fed68070b7d4863
                         <TextBlock Margin="5" Text="Copyright © Lorenz Otto"></TextBlock>
                         <Label Cursor="Hand" Tapped="InputElement_OnTapped4">
                             <TextBlock Foreground="{DynamicResource SystemAccentColor}">License</TextBlock>
