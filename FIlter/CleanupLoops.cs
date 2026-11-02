@@ -1,78 +1,40 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Project1.Viewmodels;
 
 namespace Project1;
 
-public class Filter
+public static class Filter
 {
-    public static List<string>FilterTask(List<string> Input, bool Format)
+    /// <summary>
+    /// Applies the configured file or folder filter. Format is true for files and false for folders.
+    /// </summary>
+    public static List<string> FilterTask(List<string> input, bool format)
     {
-        // Format = true; means that files get filtert
-        bool? listing = IOC.Default.GetService<Settings>().Listingart;
-        switch(listing)
-        {
-            case true:
-                return White(Input, Format);
-            case false:
-                return Input; 
-            default:
-                return Black(Input, Format);
-        }
-    }  
-    private static List<string> Black(List<string> Input, bool Format)
-    {
-        var ignore = Format ? IOC.Default.GetService<MainViewmodel>().Ignorefiles : IOC.Default.GetService<MainViewmodel>().Ignorefolder;
-        List<string> Output = new();
-        if(Format == true)
-        {
-            foreach(var file in Input)
-            {
-                if(!ignore.Contains(Path.GetExtension(file)))
-                {
-                    Output.Add(file);
-                }
-            }
-        }
-        else
-        {
-            foreach(var folder in Input)
-            {
-                if(!ignore.Contains(Path.GetFileName(Path.GetFileName(folder))))
-                {
-                    Output.Add(folder);
-                }
-            }
-        }
-        return Output;
+        ArgumentNullException.ThrowIfNull(input);
+
+        var listing = IOC.Default.GetService<Settings>().Listingart;
+        if (listing is null or false)
+            return listing == false ? input : FilterItems(input, format, includeMatches: false);
+
+        return FilterItems(input, format, includeMatches: true);
     }
-    private static List<string> White(List<string> Input, bool Format)
+
+    private static List<string> FilterItems(List<string> input, bool format, bool includeMatches)
     {
-        var ignore = Format ? IOC.Default.GetService<MainViewmodel>().Ignorefiles : IOC.Default.GetService<MainViewmodel>().Ignorefolder;
-        List<string> Output = new();
-        if(Format == true)
+        var viewmodel = IOC.Default.GetService<MainViewmodel>();
+        var configuredItems = format ? viewmodel.Ignorefiles : viewmodel.Ignorefolder;
+        var filter = new HashSet<string>(configuredItems, StringComparer.OrdinalIgnoreCase);
+
+        return input.Where(path =>
         {
-            foreach(var file in Input)
-            {
-                if(ignore.Contains(Path.GetExtension(file)))
-                {
-                    Output.Add(file);
-                }
-            }
-        }
-        else
-        {
-            foreach(var folder in Input)
-            {
-                if(ignore.Contains(Path.GetFileName(Path.GetFileName(folder))))
-                {
-                    Output.Add(folder);
-                }
-            }
-        }
-        return Output;
+            var value = format
+                ? Path.GetExtension(path)
+                : Path.GetFileName(Path.TrimEndingDirectorySeparator(path));
+            var matches = filter.Contains(value);
+            return matches == includeMatches;
+        }).ToList();
     }
 }

@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Shapes;
 using DynamicData;
 using FluentAvalonia.UI.Data;
 using GnuCopy.Interfaces;
+using Project1.Services;
 using Project1.Viewmodels;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -27,156 +27,127 @@ public class CopyPack
     public static List<string> Igfolder = IOC.Default.GetService<MainViewmodel>().ignorefolder;
     public static List<string> Igfiles = IOC.Default.GetService<MainViewmodel>().ignorefiles;
     public static ObservableCollection<string> Source = IOC.Default.GetService<MainViewmodel>().Expanderpaths;
-    public static List<string> Copied = new();
-    public async Task Start()
+    public static HashSet<string> Copied = new(StringComparer.OrdinalIgnoreCase);
+    public Task Start()
     {
-        string target = Path.Combine(MainViewmodel.Default.Copytotext,
-            IOC.Default.GetService<Settings>().DateAsName
-                ? Regex.Replace(DateTime.Now.ToString("G").Replace(':', '-'), " ", "-")
-                : (string.IsNullOrEmpty(IOC.Default.GetService<Settings>().ZipName)
-                    ? "CompressedDirection"
-                    : IOC.Default.GetService<Settings>().ZipName));
-        string target2 = target + (IOC.Default.GetService<Settings>().Packageformat == 1 ? ".tar" : ".zip");
-        MainViewmodel.Default.target1 = target2;
+        Copied.Clear();
+        var settings = IOC.Default.GetService<Settings>();
+        var name = settings.DateAsName
+            ? DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", System.Globalization.CultureInfo.InvariantCulture)
+            : (string.IsNullOrWhiteSpace(settings.ZipName) ? "CompressedDirection" : settings.ZipName);
+        name = SanitizeFileName(name);
+        Directory.CreateDirectory(MainViewmodel.Default.Copytotext);
+        string target = Path.Combine(MainViewmodel.Default.Copytotext, name) + (settings.Packageformat == 1 ? ".tar" : ".zip");
+        MainViewmodel.Default.target1 = target;
         switch (IOC.Default.GetService<Settings>().Listingart)
         {
             case true:
-                White(Regex.Replace(target2, "/", "-"));
-                return;
+                White(target);
+                break;
             case false:
-                All(Regex.Replace(target2, "/", "-"));
-                return;
+                All(target);
+                break;
             default:
-                Black(Regex.Replace(target2, "/", "-"));
-                return;
+                Black(target);
+                break;
         }
+        return Task.CompletedTask;
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        var invalidCharacters = Path.GetInvalidFileNameChars();
+        var sanitized = new StringBuilder(name.Length);
+        foreach (var character in name)
+            sanitized.Append(Array.IndexOf(invalidCharacters, character) >= 0 ? '-' : character);
+
+        var result = sanitized.ToString().Trim().TrimEnd('.');
+        return string.IsNullOrWhiteSpace(result) ? "CompressedDirection" : result;
     }
 
     private static string current="";
     private static void Black(string target)
     {
-        Stream stream = File.OpenWrite(target); 
-        var writer = WriterFactory.Open(stream,(IOC.Default.GetService<Settings>().Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip), IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
+        using Stream stream = File.Create(target);
+        using var writer = CreateWriter(stream, IOC.Default.GetService<Settings>().Packageformat);
         foreach (var Folder0 in Source)
         {
+            if (MainViewmodel.Default.Cancel) break;
             current = Folder0;
             var Folder = Path.GetDirectoryName(Folder0);
-
-            var subs = Directory.EnumerateDirectories(Folder, "*",
-                new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden });
-            if (subs.Any())
-            {
-                PrepEmptyDirs(subs.ToList(), false);
-            }
-            if (!Directory.GetFiles(Folder).Any())
-            {
-                File.Create(Path.Combine(Folder,"onionfile.ow"));
-            }
+            if (string.IsNullOrEmpty(Folder) || !Directory.Exists(Folder)) continue;
             writer.WriteAll(Folder, "*", fileSearchFuncBlack, SearchOption.AllDirectories);
         }
-        writer.Dispose();
-        stream.Dispose();
     }
 
     private static void White(string target)
     {
-        foreach (var VARIABLE in Source)
+        using Stream stream = File.Create(target);
+        using var writer = CreateWriter(stream, IOC.Default.GetService<Settings>().Packageformat);
+        var addedFolderNames = new List<string>();
+        try
         {
-            Igfolder.Add(Path.GetFileName(VARIABLE));
-        }
-        Stream stream = File.OpenWrite(target); 
-        var writer = WriterFactory.Open(stream,(IOC.Default.GetService<Settings>().Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip), IOC.Default.GetService<Settings>().Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
-        foreach (var Folder0 in Source)
-        {
-            current = Folder0;
-            var Folder = Path.GetDirectoryName(Folder0);
-            
-            var splitts = Folder.Split(Path.DirectorySeparatorChar);
-            foreach (var a in splitts)
+            foreach (var Folder0 in Source)
             {
-                Igfolder.Add(a);
-            }
-            Igfiles.Add(".ow");
-            List<string> prep = new();
-            var d = Directory.EnumerateDirectories(Folder, "*", SearchOption.AllDirectories);
-            if (d.Any())
-            {
-                foreach (var dir in d)
+                if (MainViewmodel.Default.Cancel) break;
+                current = Folder0;
+                var Folder = Path.GetDirectoryName(Folder0);
+                if (string.IsNullOrEmpty(Folder) || !Directory.Exists(Folder)) continue;
+
+                var selectedName = Path.GetFileName(Path.TrimEndingDirectorySeparator(Folder0));
+                if (!Igfolder.Contains(selectedName))
                 {
-                    if (!Filter.FilterTask(Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).ToList(), true).Any())
+                    Igfolder.Add(selectedName);
+                    addedFolderNames.Add(selectedName);
+                }
+                var splitts = Folder.Split(Path.DirectorySeparatorChar);
+                foreach (var a in splitts)
+                {
+                    if (!Igfolder.Contains(a))
                     {
-                        prep.Add(dir);
+                        Igfolder.Add(a);
+                        addedFolderNames.Add(a);
                     }
                 }
-            }
-            if (prep.Any())
-            {
-                PrepEmptyDirs(prep, true);
-            }
-            writer.WriteAll(Folder, "*", fileSearchFuncWhite, SearchOption.AllDirectories);
-            foreach (var a in splitts)
-            {
-                Igfolder.Remove(a);
+                writer.WriteAll(Folder, "*", fileSearchFuncWhite, SearchOption.AllDirectories);
             }
         }
-        writer.Dispose();
-        stream.Dispose();
+        finally
+        {
+            foreach (var folderName in addedFolderNames) Igfolder.Remove(folderName);
+        }
     }
 
     private static void All(string target)
     { 
-        using (Stream stream = File.OpenWrite(target))
+        using (Stream stream = File.Create(target))
         {
             var settings = IOC.Default.GetService<Settings>();
-            var writer = WriterFactory.Open(stream,
-                settings.Packageformat == 1 ? ArchiveType.Tar : ArchiveType.Zip,
-                settings.Packageformat == 1 ? CompressionType.None : CompressionType.Deflate);
+            using var writer = CreateWriter(stream, settings.Packageformat);
 
             foreach (var Folder0 in Source)
             {
                 current = Folder0;
                 var Folder = Path.GetDirectoryName(Folder0);
-                var subs = Directory.EnumerateDirectories(Folder, "*",
-                    new EnumerationOptions() { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.Hidden });
-
-                if (subs.Any())
-                {
-                    PrepEmptyDirs(subs.ToList(), false);
-                }
-
-                if (!Directory.GetFiles(Folder).Any())
-                {
-                    File.Create(Path.Combine(Folder,"onionfile.ow")).Dispose();
-                }
+                if (string.IsNullOrEmpty(Folder) || !Directory.Exists(Folder)) continue;
             
                 writer.WriteAll(Folder, "*", AllFunc, SearchOption.AllDirectories);
             }
-
-            writer.Dispose();
         }
     }
 
-
-    private static void PrepEmptyDirs(List<string> source, bool w)
+    private static IWriter CreateWriter(Stream stream, int packageFormat)
     {
-        foreach (var folder in source)
+        if (packageFormat == 1)
         {
-            if (w)
-            {
-                File.Create(Path.Combine(folder, "onionfile.ow"));
-                IOC.Default.GetService<MainViewmodel>().Progressmax++;
-                return;
-            }
-
-            var files = Directory.GetFiles(folder);
-            if (!files.Any())
-            {
-                File.Create(Path.Combine(folder, "onionfile.ow"));
-                IOC.Default.GetService<MainViewmodel>().Progressmax++;
-            }
-
+            return WriterFactory.OpenWriter(stream, ArchiveType.Tar, new WriterOptions(CompressionType.None));
         }
+
+        // Large ZIP entries need ZIP64; without it a single file over 4 GiB cannot be written.
+        var options = new ZipWriterOptions(CompressionType.Deflate) { UseZip64 = true };
+        return WriterFactory.OpenWriter(stream, ArchiveType.Zip, options);
     }
+
 
     private static Func<string, bool> fileSearchFuncBlack = filepath =>
     {
@@ -184,19 +155,7 @@ public class CopyPack
         {
             return false;
         }
-        var splitcur = current.Split(Path.DirectorySeparatorChar).Length - 1;
-        var ab = filepath.Split(Path.DirectorySeparatorChar);
-        var ab2 = "";
-        for (int i = 0; i <= splitcur; i++)
-        {
-            ab2 += (ab[i] + (i != splitcur ? Path.DirectorySeparatorChar.ToString() : ""));
-        }
-        Debug.WriteLine("fsaasf "+current);
-        foreach (var VARIABLE in Source)
-        {
-            Debug.WriteLine(VARIABLE);
-        }
-        if (!Source.Contains(ab2))
+        if (!IsWithinCurrentSource(filepath))
         {
             return false;
         }
@@ -204,7 +163,8 @@ public class CopyPack
         {
             while (MainViewmodel.Default.Pause)
             {
-                Debug.WriteLine("Pause");
+                if (MainViewmodel.Default.Cancel) return false;
+                Thread.Sleep(100);
             }
         }
 
@@ -225,14 +185,8 @@ public class CopyPack
 
         if (output)
         {
-            IOC.Default.GetService<MainViewmodel>().currentfile = filepath;
-            IOC.Default.GetService<MainViewmodel>().Actualise();
+            IOC.Default.GetService<ProgressBarService>().ReportFile(filepath);
             Copied.Add(filepath);
-            if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
-            {
-                IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
-                IOC.Default.GetService<MainViewmodel>().Checking();
-            }
         }
 
         return output;
@@ -244,19 +198,7 @@ public class CopyPack
         {
             return false;
         }
-        var splitcur = current.Split(Path.DirectorySeparatorChar).Length - 1;
-        var ab = filepath.Split(Path.DirectorySeparatorChar);
-        var ab2 = "";
-        for (int i = 0; i <= splitcur; i++)
-        {
-            ab2 += (ab[i] + (i != splitcur ? Path.DirectorySeparatorChar.ToString() : ""));
-        }
-        Debug.WriteLine("fsaasf "+current);
-        foreach (var VARIABLE in Source)
-        {
-            Debug.WriteLine(VARIABLE);
-        }
-        if (!Source.Contains(ab2))
+        if (!IsWithinCurrentSource(filepath))
         {
             return false;
         }
@@ -264,7 +206,8 @@ public class CopyPack
         {
             while (MainViewmodel.Default.Pause)
             {
-                Debug.WriteLine("Pause");
+                if (MainViewmodel.Default.Cancel) return false;
+                Thread.Sleep(100);
             }
         }
         if (MainViewmodel.Default.Cancel)
@@ -285,13 +228,7 @@ public class CopyPack
         if (output)
         {
             Copied.Add(filepath);
-            IOC.Default.GetService<MainViewmodel>().currentfile = filepath;
-            IOC.Default.GetService<MainViewmodel>().Actualise();
-            if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
-            {
-                IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
-                IOC.Default.GetService<MainViewmodel>().Checking();
-            }
+            IOC.Default.GetService<ProgressBarService>().ReportFile(filepath);
         }
         return output;
     };
@@ -302,19 +239,7 @@ public class CopyPack
         {
             return false;
         }
-        var splitcur = current.Split(Path.DirectorySeparatorChar).Length - 1;
-        var ab = CallerFilePathAttribute.Split(Path.DirectorySeparatorChar);
-        var ab2 = "";
-        for (int i = 0; i <= splitcur; i++)
-        {
-            ab2 += (ab[i] + (i != splitcur ? Path.DirectorySeparatorChar.ToString() : ""));
-        }
-        Debug.WriteLine("fsaasf "+current);
-        foreach (var VARIABLE in Source)
-        {
-            Debug.WriteLine(VARIABLE);
-        }
-        if (!Source.Contains(ab2))
+        if (!IsWithinCurrentSource(CallerFilePathAttribute))
         {
             return false;
         }
@@ -322,21 +247,32 @@ public class CopyPack
         {
             while (MainViewmodel.Default.Pause)
             {
-                Debug.WriteLine("Pause");
+                if (MainViewmodel.Default.Cancel) return false;
+                Thread.Sleep(100);
             }
         }
         if (MainViewmodel.Default.Cancel)
         {
             return false;
         }
-        IOC.Default.GetService<MainViewmodel>().currentfile = CallerFilePathAttribute;
-        IOC.Default.GetService<MainViewmodel>().Actualise();
+        IOC.Default.GetService<ProgressBarService>().ReportFile(CallerFilePathAttribute);
         Copied.Add(CallerFilePathAttribute);
-        if (IOC.Default.GetService<MainViewmodel>().Progressmax== IOC.Default.GetService<MainViewmodel>().Progress)
-        {
-            IOC.Default.GetService<MainViewmodel>().currentfile = "Checking data";
-            IOC.Default.GetService<MainViewmodel>().Checking();
-        }
         return true;
     };
+
+    private static bool IsWithinCurrentSource(string path)
+    {
+        try
+        {
+            var root = Path.GetFullPath(current);
+            var candidate = Path.GetFullPath(path);
+            var relative = Path.GetRelativePath(root, candidate);
+            return relative == "." || (!Path.IsPathRooted(relative) && relative != ".." &&
+                                        !relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal));
+        }
+        catch (Exception ex) when (ex is IOException or ArgumentException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
 }

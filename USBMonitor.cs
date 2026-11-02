@@ -1,87 +1,120 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Management;
+using System.Runtime.Versioning;
 
 namespace Project1;
 
-public class USBMonitor
+public class USBMonitor : IDisposable
 {
- private ManagementEventWatcher watcher;
+    private readonly List<ManagementEventWatcher> _watchers = new();
 
-    public event EventHandler<USBEventArgs> USBInserted;
-    public event EventHandler<USBEventArgs> USBRemoved;
+    public event EventHandler<USBEventArgs>? USBInserted;
+    public event EventHandler<USBEventArgs>? USBRemoved;
 
     public void StartMonitoring()
     {
-        WqlEventQuery insertQuery = new WqlEventQuery("SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'");
-        WqlEventQuery removeQuery = new WqlEventQuery("SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'");
+        // System.Management/WMI is only available in Windows desktop applications.
+        if (!OperatingSystem.IsWindows())
+            return;
 
-        watcher = new ManagementEventWatcher();
-        watcher.EventArrived += USBEventArrived;
+        StopMonitoring();
+        try
+        {
+            StartWatcher(
+                "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'",
+                USBInserted);
+            StartWatcher(
+                "SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_USBHub'",
+                USBRemoved);
+        }
+        catch (Exception ex) when (ex is ManagementException or PlatformNotSupportedException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            Debug.WriteLine($"USB monitoring could not be started: {ex}");
+            StopMonitoring();
+        }
+    }
 
-        watcher.Query = insertQuery;
+    private void StartWatcher(string query, EventHandler<USBEventArgs>? handler)
+    {
+        var watcher = new ManagementEventWatcher(new WqlEventQuery(query));
+        watcher.EventArrived += (_, args) =>
+        {
+            try
+            {
+                var target = args.NewEvent["TargetInstance"] as ManagementBaseObject;
+                var deviceId = target?["DeviceID"]?.ToString();
+                if (string.IsNullOrEmpty(deviceId))
+                    return;
+
+                handler?.Invoke(this, new USBEventArgs(GetDriveLetter(deviceId)));
+            }
+            catch (Exception ex) when (ex is ManagementException or InvalidOperationException or UnauthorizedAccessException)
+            {
+                Debug.WriteLine($"USB event could not be processed: {ex}");
+            }
+        };
+
         watcher.Start();
-
-        watcher.Query = removeQuery;
-        watcher.Start();
+        _watchers.Add(watcher);
     }
 
     public void StopMonitoring()
     {
-        if (watcher != null)
+        foreach (var watcher in _watchers)
         {
-            watcher.Stop();
-            watcher.Dispose();
-        }
-    }
-
-    private void USBEventArrived(object sender, EventArrivedEventArgs e)
-    {
-        ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-        string deviceId = targetInstance["DeviceID"].ToString();
-        string driveLetter = GetDriveLetter(deviceId);
-
-        if (e.NewEvent.ClassPath.ClassName.Equals("__InstanceCreationEvent"))
-        {
-            USBInserted?.Invoke(this, new USBEventArgs(driveLetter));
-        }
-        else if (e.NewEvent.ClassPath.ClassName.Equals("__InstanceDeletionEvent"))
-        {
-            USBRemoved?.Invoke(this, new USBEventArgs(driveLetter));
-        }
-    }
-
-    private string GetDriveLetter(string deviceId)
-    {
-        string driveLetter = "";
-
-        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive WHERE InterfaceType='USB'"))
-        {
-            foreach (ManagementObject drive in searcher.Get())
+            try
             {
-                string driveId = drive.GetPropertyValue("PNPDeviceID").ToString();
-                if (driveId.Equals(deviceId))
-                {
-                    using (ManagementObject partition = new ManagementObject("ASSOCIATORS OF {Win32_DiskDrive.DeviceID='" + driveId + "'} WHERE AssocClass = Win32_DiskDriveToDiskPartition"))
-                    {
-                        using (ManagementObject logical = new ManagementObject("ASSOCIATORS OF {Win32_DiskPartition.DeviceID='" + partition["DeviceID"] + "'} WHERE AssocClass = Win32_LogicalDiskToPartition"))
-                        {
-                            driveLetter = logical["Name"].ToString();
-                        }
-                    }
-                }
+                watcher.Stop();
+            }
+            catch (ManagementException ex)
+            {
+                Debug.WriteLine($"USB watcher could not be stopped cleanly: {ex}");
+            }
+            finally
+            {
+                watcher.Dispose();
             }
         }
 
-        return driveLetter;
+        _watchers.Clear();
+    }
+
+    public void Dispose() => StopMonitoring();
+
+    [SupportedOSPlatform("windows")]
+    private static string GetDriveLetter(string deviceId)
+    {
+        using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive WHERE InterfaceType='USB'");
+        foreach (ManagementObject drive in searcher.Get())
+        {
+            using (drive)
+            {
+                var driveId = drive["PNPDeviceID"]?.ToString();
+                if (!string.Equals(driveId, deviceId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var escapedId = deviceId.Replace("\\", "\\\\").Replace("'", "\\'");
+                using var partition = new ManagementObject($"ASSOCIATORS OF {{Win32_DiskDrive.DeviceID='{escapedId}'}} WHERE AssocClass = Win32_DiskDriveToDiskPartition");
+                partition.Get();
+                var partitionId = partition["DeviceID"]?.ToString();
+                if (string.IsNullOrEmpty(partitionId))
+                    continue;
+
+                using var logical = new ManagementObject($"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{partitionId}'}} WHERE AssocClass = Win32_LogicalDiskToPartition");
+                logical.Get();
+                return logical["Name"]?.ToString() ?? string.Empty;
+            }
+        }
+
+        return string.Empty;
     }
 }
 
 public class USBEventArgs : EventArgs
 {
-    public string DriveLetter { get; private set; }
+    public string DriveLetter { get; }
 
-    public USBEventArgs(string driveLetter)
-    {
-        DriveLetter = driveLetter;
-    }
+    public USBEventArgs(string driveLetter) => DriveLetter = driveLetter;
 }

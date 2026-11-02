@@ -1,7 +1,9 @@
-﻿namespace GnuCopy.Interfaces;
+using System.Threading.Tasks;
+
+namespace GnuCopy.Interfaces;
 
 public interface IProgressBarService
-{ 
+{
     void AddProgress();
-    void MaxProgress();
+    Task MaxProgressAsync();
 }

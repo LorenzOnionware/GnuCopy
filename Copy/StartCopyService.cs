@@ -18,14 +18,11 @@ public class StartCopyService
             return;
         if (IOC.Default.GetService<Settings>().Packageformat != 0)
         {
-
            await IOC.Default.GetService<CopyPack>().Start();
-           
         }
         else
         {
            await IOC.Default.GetService<CopyMultiple>().Start();
-            
         }
         MainViewmodel.Default.selectionchaged();
         return;

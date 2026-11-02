@@ -39,20 +39,21 @@ public partial class MainViewmodel
         IOC.Default.GetService<WindowClosingService>().Closed += (o, e) => Close();
         _fileDialogService = FileDialogservice;
         
-        USBMonitor usbMonitor = new USBMonitor();
-        usbMonitor.USBRemoved += UsbRemovedHandler;
-
-        usbMonitor.StartMonitoring();
+        _usbMonitor = new USBMonitor();
+        _usbMonitor.USBRemoved += UsbRemovedHandler;
+        _usbMonitor.StartMonitoring();
     }
 
     public async void Close()
     {
+        _usbMonitor?.StopMonitoring();
         Cancel = true;
         Thread.Sleep(500);
         string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
         File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath),ab);
     }
     private IFileDialogService _fileDialogService;
+    private readonly USBMonitor _usbMonitor;
     
     private async void UsbRemovedHandler(object sender, USBEventArgs e)
     {
@@ -209,7 +210,7 @@ public partial class MainViewmodel
         var b = a[0];
         var c = Task.Run(() =>
         {
-            using (var archive = ZipArchive.Open(b))
+            using (var archive = ArchiveFactory.OpenArchive(b))
             {
                 foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                 {
@@ -472,7 +473,7 @@ public partial class MainViewmodel
         }
 
         ProgressBarService Pc = new ProgressBarService();
-        Pc.MaxProgress();
+        await Pc.MaxProgressAsync();
         OnPropertyChanged(nameof(Currentfile));    
         copyactive = false;
         OnPropertyChanged(nameof(Copyactive));

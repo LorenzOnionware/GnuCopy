@@ -57,9 +57,6 @@ using Avalonia.Markup.Xaml;
             }*/
             InitializeComponent();
             DataContext = MainViewmodel.Default;
-            string ab = JsonConvert.SerializeObject(IOC.Default.GetService<Settings>());
-            IOC.Default.GetService<Settings>().Packageformat = 0;
-            File.WriteAllText(Path.Combine(SettingsViewmodel.Default.settingspath), ab);
             
             IOC.Default.GetService<WindowClosingService>().RegisterWindow(this);
             

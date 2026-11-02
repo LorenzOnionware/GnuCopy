@@ -67,7 +67,7 @@
                 </Expander.Content>
             </Expander>
         </Border>
-        <Border IsVisible="False" Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+        <Border IsVisible="True" Grid.Row="2" Margin="5" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
             <Expander>
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">

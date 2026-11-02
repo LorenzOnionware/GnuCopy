@@ -53,7 +53,7 @@ public partial class ExportViewmodel
                 File.Copy(Path.Combine(path,filee), Path.Combine(Temp.FullName,filee));
             }
         });
-        using (var archive = ZipArchive.Create())
+        using (var archive = ZipArchive.CreateArchive())
         {
             archive.AddAllFromDirectory(Temp.FullName);
             archive.SaveTo(ZipPath, CompressionType.None);
